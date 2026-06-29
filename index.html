@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gyfut — Sistema de gestión</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1117;--surface:#161b27;--surface2:#1e2535;--surface3:#252d3d;
+  --border:#2a3347;--border2:#364158;
+  --text:#e8eaf0;--text2:#9aa3b8;--text3:#5c677d;
+  --accent:#3b82f6;--accent2:#1d4ed8;
+  --success:#22c55e;--warning:#f59e0b;--danger:#ef4444;--purple:#a855f7;
+  --radius:8px;--font:'Inter',system-ui,sans-serif
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);height:100vh;overflow:hidden}
+.app{display:flex;height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.logo{padding:20px 16px 14px;border-bottom:1px solid var(--border)}
+.logo-name{font-size:16px;font-weight:700;color:var(--text);letter-spacing:-.3px}
+.logo-sub{font-size:10px;color:var(--text3);margin-top:2px;text-transform:uppercase;letter-spacing:.08em}
+.nav-section{padding:6px 0}
+.nav-label{font-size:9px;color:var(--text3);padding:10px 14px 3px;text-transform:uppercase;letter-spacing:.1em;font-weight:600}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 14px;cursor:pointer;font-size:12px;color:var(--text2);border-left:2px solid transparent;transition:all .12s}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:rgba(59,130,246,.12);color:var(--accent);border-left-color:var(--accent);font-weight:500}
+.nav-item i{font-size:15px;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--danger);color:#fff;font-size:9px;padding:1px 6px;border-radius:10px;font-weight:700}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface);flex-shrink:0}
+.topbar-title{font-size:14px;font-weight:600;color:var(--text)}
+.topbar-right{display:flex;gap:8px;align-items:center}
+.sync-status{font-size:10px;color:var(--text3);display:flex;align-items:center;gap:4px}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--success)}
+.sync-dot.syncing{background:var(--warning);animation:pulse 1s infinite}
+.sync-dot.error{background:var(--danger)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:var(--radius);font-size:11px;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--text);font-family:var(--font);transition:all .12s}
+.btn:hover{background:var(--surface3)}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary:hover{background:var(--accent2)}
+
+.content{flex:1;overflow-y:auto;padding:20px}
+.page{display:none}.page.active{display:block}
+
+/* STATS */
+.sg{display:grid;gap:10px;margin-bottom:18px}
+.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.sc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.sl{font-size:10px;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em}
+.sv{font-size:20px;font-weight:700;color:var(--text)}
+.ss{font-size:10px;color:var(--text3);margin-top:3px}
+
+/* TABLE */
+.tw{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:18px}
+table{width:100%;border-collapse:collapse;font-size:11px}
+thead{background:var(--surface2)}
+th{padding:9px 14px;text-align:left;font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border)}
+td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surface2)}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:600}
+.bg{background:rgba(34,197,94,.15);color:#4ade80}
+.ba{background:rgba(245,158,11,.15);color:#fbbf24}
+.bb{background:rgba(59,130,246,.15);color:#60a5fa}
+.bgr{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
+.br{background:rgba(239,68,68,.15);color:#f87171}
+.bp{background:rgba(168,85,247,.15);color:#c084fc}
+
+/* ICON BTN */
+.icon-btn{background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;border-radius:5px;font-size:14px;transition:all .1s}
+.icon-btn:hover{color:var(--text);background:var(--surface3)}
+
+/* MODAL */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center}
+.mo.open{display:flex}
+.modal{background:var(--surface);border-radius:12px;border:1px solid var(--border2);padding:20px;width:500px;max-width:96vw;max-height:92vh;overflow-y:auto}
+.mt{font-size:14px;font-weight:600;color:var(--text);margin-bottom:16px}
+.fr{margin-bottom:11px}
+.fr label{display:block;font-size:10px;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+.fr input,.fr select,.fr textarea{width:100%;padding:8px 10px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-size:12px;font-family:var(--font)}
+.fr input:focus,.fr select:focus,.fr textarea:focus{outline:none;border-color:var(--accent)}
+.fr textarea{min-height:60px;resize:vertical}
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.ma{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.divider{border:none;border-top:1px solid var(--border);margin:12px 0}
+.sub-label{font-size:9px;color:var(--text3);margin:8px 0 4px;text-transform:uppercase;letter-spacing:.07em}
+
+/* KANBAN */
+.kanban{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px;align-items:flex-start}
+.kcol{flex-shrink:0;width:178px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.khdr{padding:10px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:var(--surface2)}
+.kht{font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em}
+.kcnt{font-size:10px;color:var(--text3);background:var(--surface);border-radius:10px;padding:1px 7px;border:1px solid var(--border)}
+.kcards{padding:8px;display:flex;flex-direction:column;gap:6px;min-height:60px}
+.kcard{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:10px;cursor:pointer;transition:border-color .12s}
+.kcard:hover{border-color:var(--accent)}
+.kn{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px}
+.km{font-size:10px;color:var(--text3);margin-bottom:6px}
+.ktags{display:flex;gap:3px;flex-wrap:wrap}
+.kempty{font-size:10px;color:var(--text3);text-align:center;padding:14px 8px}
+
+/* PANEL LATERAL */
+.dp{position:fixed;right:0;top:0;bottom:0;width:320px;background:var(--surface);border-left:1px solid var(--border);z-index:150;display:none;flex-direction:column}
+.dp.open{display:flex}
+.dph{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface2)}
+.dpn{font-size:14px;font-weight:600;color:var(--text)}
+.dpb{flex:1;overflow-y:auto;padding:16px}
+.dpst{font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.dpf{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:11px}
+.dpf:last-child{border-bottom:none}
+.dpfl{color:var(--text3)}.dpfv{color:var(--text);font-weight:500;text-align:right;max-width:170px}
+.seg-in{display:flex;gap:6px;padding:12px 14px;border-top:1px solid var(--border)}
+.seg-in input{flex:1;padding:7px 10px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-size:11px;font-family:var(--font)}
+.seg-item{padding:8px 0;border-bottom:1px solid var(--border);font-size:11px}
+.seg-item:last-child{border-bottom:none}
+.seg-fecha{font-size:9px;color:var(--text3);margin-bottom:2px}
+.hist-item{padding:8px 0;border-bottom:1px solid var(--border)}
+.hist-item:last-child{border-bottom:none}
+.hist-fecha{font-size:9px;color:var(--text3);margin-bottom:2px}
+.hist-svc{font-size:11px;font-weight:600;color:var(--text)}
+.hist-det{font-size:10px;color:var(--text3)}
+
+/* SEARCH */
+.sbar{display:flex;gap:8px;margin-bottom:14px}
+.sbar input,.sbar select{padding:7px 10px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--surface);color:var(--text);font-size:11px;font-family:var(--font)}
+.sbar input{flex:1}
+.sbar select:focus,.sbar input:focus{outline:none;border-color:var(--accent)}
+
+/* TWO COL */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.card-title{font-size:11px;font-weight:600;color:var(--text2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em}
+.ot-item{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:11px}
+.ot-item:last-child{border-bottom:none}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dg{background:var(--success)}.da{background:var(--warning)}.db{background:var(--accent)}.dgr{background:var(--border2)}.dr{background:var(--danger)}
+.oi{flex:1}.on{font-weight:600;color:var(--text)}.om{font-size:9px;color:var(--text3)}
+.ing{color:var(--success);font-weight:600}.eg{color:var(--danger);font-weight:600}
+.empty{text-align:center;padding:32px 16px;color:var(--text3);font-size:11px}
+.empty i{font-size:28px;display:block;margin-bottom:10px;opacity:.4}
+
+/* REC */
+.rec-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);font-size:11px}
+.rec-item:last-child{border-bottom:none}
+.rec-info{flex:1}.rec-n{font-weight:600;color:var(--text)}.rec-m{font-size:9px;color:var(--text3);margin-top:1px}
+.vh{color:var(--danger);font-weight:700;font-size:10px}
+.vp{color:var(--warning);font-weight:700;font-size:10px}
+.vok{color:var(--text3);font-size:10px}
+
+/* TAB BAR */
+.tab-bar{display:flex;gap:2px;margin-bottom:14px;background:var(--surface2);border-radius:var(--radius);padding:3px;border:1px solid var(--border)}
+.tab{flex:1;padding:6px 8px;text-align:center;font-size:10px;cursor:pointer;border-radius:6px;color:var(--text3);transition:all .12s}
+.tab.active{background:var(--surface);color:var(--text);font-weight:600;border:1px solid var(--border2)}
+
+/* LOADING */
+.loading{text-align:center;padding:40px;color:var(--text3);font-size:12px}
+.loading i{font-size:24px;display:block;margin-bottom:10px;animation:spin 1s linear infinite;opacity:.5}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+/* CHECKBOX GROUP */
+.chk-group{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+.chk-label{display:flex;align-items:center;gap:5px;font-size:11px;cursor:pointer;color:var(--text2)}
+.chk-label input[type=checkbox]{accent-color:var(--accent)}
+
+/* SELECT FULL */
+select.full{width:100%;padding:7px 10px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-size:12px;font-family:var(--font)}
+select.full:focus{outline:none;border-color:var(--accent)}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="logo">
+    <div class="logo-name">Gyfut</div>
+    <div class="logo-sub">Sistema de gestión</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">General</div>
+    <div class="nav-item active" onclick="navTo('dashboard',this)"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
+    <div class="nav-item" onclick="navTo('recordatorios',this)"><i class="ti ti-bell"></i> Recordatorios <span class="nav-badge" id="badge-rec" style="display:none">0</span></div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">CRM — Autos</div>
+    <div class="nav-item" onclick="navTo('leads-autos',this)"><i class="ti ti-filter"></i> Pipeline ventas</div>
+    <div class="nav-item" onclick="navTo('contactos-autos',this)"><i class="ti ti-users"></i> Contactos</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">CRM — Taller</div>
+    <div class="nav-item" onclick="navTo('leads-taller',this)"><i class="ti ti-filter"></i> Pipeline servicios</div>
+    <div class="nav-item" onclick="navTo('clientes-taller',this)"><i class="ti ti-user-check"></i> Clientes</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Vehículos</div>
+    <div class="nav-item" onclick="navTo('inventario',this)"><i class="ti ti-car"></i> Inventario</div>
+    <div class="nav-item" onclick="navTo('ventas',this)"><i class="ti ti-transfer"></i> Ventas</div>
+    <div class="nav-item" onclick="navTo('caja-vehiculos',this)"><i class="ti ti-cash"></i> Caja vehículos</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Taller</div>
+    <div class="nav-item" onclick="navTo('ordenes',this)"><i class="ti ti-tool"></i> Órdenes de trabajo</div>
+    <div class="nav-item" onclick="navTo('caja-taller',this)"><i class="ti ti-cash"></i> Caja taller</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Admin</div>
+    <div class="nav-item" onclick="navTo('costos-fijos',this)"><i class="ti ti-file-invoice"></i> Costos fijos</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">Dashboard</div>
+    <div class="topbar-right">
+      <div class="sync-status"><div class="sync-dot" id="sync-dot"></div><span id="sync-txt">Conectado</span></div>
+      <div id="topbar-actions"></div>
+    </div>
+  </div>
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="sg g4">
+        <div class="sc"><div class="sl">Leads autos</div><div class="sv" id="s-la">—</div><div class="ss">en pipeline</div></div>
+        <div class="sc"><div class="sl">Leads taller</div><div class="sv" id="s-lt">—</div><div class="ss">en pipeline</div></div>
+        <div class="sc"><div class="sl">Clientes taller</div><div class="sv" id="s-clt">—</div></div>
+        <div class="sc"><div class="sl">Resultado neto</div><div class="sv" id="s-neto">—</div></div>
+      </div>
+      <div class="sg g3" style="margin-bottom:18px">
+        <div class="sc"><div class="sl">Caja taller</div><div class="sv ing" id="s-ct">—</div></div>
+        <div class="sc"><div class="sl">Caja vehículos</div><div class="sv ing" id="s-cv">—</div></div>
+        <div class="sc"><div class="sl">Costos fijos/mes</div><div class="sv eg" id="s-cf">—</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card"><div class="card-title">⚡ Recordatorios esta semana</div><div id="dash-rec"><div class="loading"><i class="ti ti-loader-2"></i>Cargando...</div></div></div>
+        <div class="card"><div class="card-title">🔥 Leads calientes</div><div id="dash-leads"><div class="loading"><i class="ti ti-loader-2"></i>Cargando...</div></div></div>
+      </div>
+    </div>
+
+    <!-- RECORDATORIOS -->
+    <div class="page" id="page-recordatorios">
+      <div class="tab-bar">
+        <div class="tab active" onclick="recTab('todos',this)">Todos</div>
+        <div class="tab" onclick="recTab('hoy',this)">Hoy</div>
+        <div class="tab" onclick="recTab('semana',this)">Esta semana</div>
+        <div class="tab" onclick="recTab('auto',this)">Automáticos</div>
+        <div class="tab" onclick="recTab('manual',this)">Manuales</div>
+      </div>
+      <div class="tw" id="rec-list"><div class="loading"><i class="ti ti-loader-2"></i>Cargando...</div></div>
+    </div>
+
+    <!-- PIPELINE AUTOS -->
+    <div class="page" id="page-leads-autos">
+      <div class="sbar">
+        <input id="la-q" placeholder="Buscar lead..." oninput="renderKanban('autos')">
+        <select id="la-origen" onchange="renderKanban('autos')">
+          <option value="">Todos los orígenes</option>
+          <option>Instagram</option><option>WhatsApp</option><option>Referido</option><option>Visita directa</option><option>Otro</option>
+        </select>
+      </div>
+      <div class="kanban" id="kanban-autos"><div class="loading"><i class="ti ti-loader-2"></i>Cargando...</div></div>
+    </div>
+
+    <!-- CONTACTOS AUTOS -->
+    <div class="page" id="page-contactos-autos">
+      <div class="sbar"><input id="ca-q" placeholder="Buscar..." oninput="renderContactosAutos()"></div>
+      <div class="tw"><table><thead><tr><th>Nombre</th><th>Teléfono</th><th>Origen</th><th>Busca</th><th>Estado</th><th>Creado</th><th></th></tr></thead><tbody id="tb-ca"><tr><td colspan="7"><div class="loading"><i class="ti ti-loader-2"></i>Cargando...</div></td></tr></tbody></table></div>
+    </div>
+
+    <!-- PIPELINE TALLER -->
+    <div class="page" id="page-leads-taller">
+      <div class="sbar">
+        <input id="lt-q" placeholder="Buscar lead..." oninput="renderKanban('taller')">
+        <select id="lt-svc" onchange="renderKanban('taller')">
+          <option value="">Todos los servicios</option>
+          <option>PPF</option><option>Detailing</option><option>Mecánica</option><option>Lavado</option><option>Otro</option>
+        </select>
+      </div>
+      <div class="kanban" id="kanban-taller"><div class="loading"><i class="ti ti-loader-2"></i>Cargando...</div></div>
+    </div>
+
+    <!-- CLIENTES TALLER -->
+    <div class="page" id="page-clientes-taller">
+      <div class="sbar"><input id="ct-q" placeholder="Buscar cliente..." oninput="renderClientesTaller()"></div>
+      <div class="tw"><table><thead><tr><th>Cliente</th><th>Teléfono</th><th>Vehículo</th><th>Último servicio</th><th>Servicios</th><th>Próx. recordatorio</th><th></th></tr></thead><tbody id="tb-ct"><tr><td colspan="7"><div class="loading"><i class="ti ti-loader-2"></i>Cargando...</div></td></tr></tbody></table></div>
+    </div>
+
+    <!-- INVENTARIO -->
+    <div class="page" id="page-inventario">
+      <div class="tw"><table><thead><tr><th>Vehículo</th><th>Año</th><th>Km</th><th>Costo total</th><th>Precio venta</th><th>Margen</th><th>Fuente</th><th>Estado</th><th></th></tr></thead><tbody id="tb-inv"><tr><td colspan="9"><div class="loading"><i class="ti ti-loader-2"></i>Cargando...</div></td></tr></tbody></table></div>
+    </div>
+
+    <!-- VENTAS -->
+    <div class="page" id="page-ventas">
+      <div class="tw"><table><thead><tr><th>Vehículo</th><th>Comprador</th><th>Precio</th><th>Costo</th><th>Ganancia</th><th>Fecha</th><th>Estado</th></tr></thead><tbody id="tb-ventas"><tr><td colspan="7"><div class="loading"><i class="ti ti-loader-2"></i>Cargando...</div></td></tr></tbody></table></div>
+    </div>
+
+    <!-- CAJA VEHÍCULOS -->
+    <div class="page" id="page-caja-vehiculos">
+      <div class="sg g3" style="margin-bottom:18px">
+        <div class="sc"><div class="sl">Ingresos</div><div class="sv ing" id="cv-ing">—</div></div>
+        <div class="sc"><div class="sl">Egresos</div><div class="sv eg" id="cv-eg">—</div></div>
+        <div class="sc"><div class="sl">Saldo</div><div class="sv" id="cv-saldo">—</div></div>
+      </div>
+      <div class="tw"><table><thead><tr><th>Fecha</th><th>Descripción</th><th>Vehículo</th><th>Categoría</th><th>Tipo</th><th>Monto</th></tr></thead><tbody id="tb-cajav"><tr><td colspan="6"><div class="loading"><i class="ti ti-loader-2"></i>Cargando...</div></td></tr></tbody></table></div>
+    </div>
+
+    <!-- ÓRDENES -->
+    <div class="page" id="page-ordenes">
+      <div class="tw"><table><thead><tr><th>N°</th><th>Cliente</th><th>Servicios</th><th>Asignado</th><th>Costo</th><th>Cobrado</th><th>Margen</th><th>Estado</th><th></th></tr></thead><tbody id="tb-ot"><tr><td colspan="9"><div class="loading"><i class="ti ti-loader-2"></i>Cargando...</div></td></tr></tbody></table></div>
+    </div>
+
+    <!-- CAJA TALLER -->
+    <div class="page" id="page-caja-taller">
+      <div class="sg g3" style="margin-bottom:18px">
+        <div class="sc"><div class="sl">Ingresos</div><div class="sv ing" id="ctt-ing">—</div></div>
+        <div class="sc"><div class="sl">Egresos</div><div class="sv eg" id="ctt-eg">—</div></div>
+        <div class="sc"><div class="sl">Saldo</div><div class="sv" id="ctt-saldo">—</div></div>
+      </div>
+      <div class="tw"><table><thead><tr><th>Fecha</th><th>Descripción</th><th>Categoría</th><th>Tipo</th><th>Monto</th></tr></thead><tbody id="tb-cajat"><tr><td colspan="5"><div class="loading"><i class="ti ti-loader-2"></i>Cargando...</div></td></tr></tbody></table></div>
+    </div>
+
+    <!-- COSTOS FIJOS -->
+    <div class="page" id="page-costos-fijos">
+      <div class="sg g3" style="margin-bottom:18px">
+        <div class="sc"><div class="sl">Total/mes</div><div class="sv eg" id="cf-total">—</div></div>
+        <div class="sc"><div class="sl">Activos</div><div class="sv" id="cf-activos">—</div></div>
+        <div class="sc"><div class="sl">Próx. vencimiento</div><div class="sv" id="cf-prox" style="font-size:12px">—</div></div>
+      </div>
+      <div class="tw"><table><thead><tr><th>Nombre</th><th>Categoría</th><th>Monto/mes</th><th>Día</th><th>Estado</th><th></th></tr></thead><tbody id="tb-cf"><tr><td colspan="6"><div class="loading"><i class="ti ti-loader-2"></i>Cargando...</div></td></tr></tbody></table></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- PANEL LATERAL -->
+<div class="dp" id="detail-panel">
+  <div class="dph">
+    <span class="dpn" id="dp-nombre"></span>
+    <button class="icon-btn" onclick="closeDetail()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="dpb">
+    <div id="dp-main"></div>
+    <div id="dp-extra"></div>
+    <div style="margin-top:14px">
+      <div class="dpst">Notas de seguimiento</div>
+      <div id="dp-seg"></div>
+    </div>
+  </div>
+  <div class="seg-in">
+    <input id="seg-input" placeholder="Agregar nota..." onkeydown="if(event.key==='Enter')agregarNota()">
+    <button class="btn btn-primary" onclick="agregarNota()"><i class="ti ti-send"></i></button>
+  </div>
+</div>
+
+</div>
+
+<!-- MODALES -->
+<!-- LEAD AUTOS -->
+<div class="mo" id="m-la"><div class="modal">
+  <div class="mt">Nuevo lead — venta de auto</div>
+  <div class="fg2"><div class="fr"><label>Nombre</label><input id="la-n" placeholder="Juan Pérez"></div><div class="fr"><label>Teléfono</label><input id="la-t" placeholder="341..."></div></div>
+  <div class="fg2">
+    <div class="fr"><label>Origen</label><select id="la-o"><option>Instagram</option><option>WhatsApp</option><option>Referido</option><option>Visita directa</option><option>Otro</option></select></div>
+    <div class="fr"><label>Estado</label><select id="la-e"><option>Nuevo contacto</option><option>Conversando</option><option>Visita agendada</option></select></div>
+  </div>
+  <div class="fr"><label>¿Qué busca?</label><input id="la-i" placeholder="Hilux 4x4 / Ranger doble cabina..."></div>
+  <div class="fr"><label>Vehículo del inventario</label><select id="la-v" class="full"><option value="">— ninguno —</option></select></div>
+  <div class="fr"><label>Nota inicial</label><textarea id="la-nota" placeholder="Contexto del contacto..."></textarea></div>
+  <div class="ma"><button class="btn" onclick="closeM('m-la')">Cancelar</button><button class="btn btn-primary" onclick="guardarLA()">Guardar</button></div>
+</div></div>
+
+<!-- LEAD TALLER -->
+<div class="mo" id="m-lt"><div class="modal">
+  <div class="mt">Nuevo lead — servicio de taller</div>
+  <div class="fg2"><div class="fr"><label>Nombre</label><input id="lt-n" placeholder="Juan Pérez"></div><div class="fr"><label>Teléfono</label><input id="lt-t" placeholder="341..."></div></div>
+  <div class="fg2">
+    <div class="fr"><label>Origen</label><select id="lt-o"><option>Instagram</option><option>WhatsApp</option><option>Referido</option><option>Visita directa</option><option>Otro</option></select></div>
+    <div class="fr"><label>Estado</label><select id="lt-e"><option>Consulta recibida</option><option>Presupuesto enviado</option><option>Turno agendado</option></select></div>
+  </div>
+  <div class="fr"><label>Servicio que busca</label><select id="lt-svc-tipo"><option>PPF</option><option>Detailing</option><option>Mecánica</option><option>Lavado</option><option>Otro</option></select></div>
+  <div class="fr"><label>Vehículo del cliente</label><input id="lt-v" placeholder="VW Vento 2019..."></div>
+  <div class="fr"><label>Nota inicial</label><textarea id="lt-nota" placeholder="Detalle de lo que necesita..."></textarea></div>
+  <div class="ma"><button class="btn" onclick="closeM('m-lt')">Cancelar</button><button class="btn btn-primary" onclick="guardarLT()">Guardar</button></div>
+</div></div>
+
+<!-- CLIENTE TALLER -->
+<div class="mo" id="m-clt"><div class="modal">
+  <div class="mt">Nuevo cliente de taller</div>
+  <div class="fg2"><div class="fr"><label>Nombre</label><input id="clt-n" placeholder="Juan Pérez"></div><div class="fr"><label>Teléfono</label><input id="clt-t" placeholder="341..."></div></div>
+  <div class="fg2"><div class="fr"><label>Vehículo</label><input id="clt-v" placeholder="VW Vento 2019"></div><div class="fr"><label>Patente</label><input id="clt-pat" placeholder="AB123CD"></div></div>
+  <hr class="divider">
+  <div class="sub-label">Primer servicio</div>
+  <div class="chk-group">
+    <label class="chk-label"><input type="checkbox" id="cs-mec"> Mecánica</label>
+    <label class="chk-label"><input type="checkbox" id="cs-det"> Detailing</label>
+    <label class="chk-label"><input type="checkbox" id="cs-ppf"> PPF</label>
+    <label class="chk-label"><input type="checkbox" id="cs-lav"> Lavado</label>
+    <label class="chk-label"><input type="checkbox" id="cs-otro"> Otro</label>
+  </div>
+  <div class="fr"><label>Descripción</label><textarea id="clt-desc" placeholder="Detalle del trabajo..."></textarea></div>
+  <hr class="divider">
+  <div class="sub-label">Recordatorio automático</div>
+  <div class="fg2">
+    <div class="fr"><label>Cada cuántos meses</label><select id="clt-rec"><option value="">Sin recordatorio</option><option value="1">1 mes</option><option value="2">2 meses</option><option value="3">3 meses</option><option value="6">6 meses</option><option value="12">12 meses</option></select></div>
+    <div class="fr"><label>Motivo</label><input id="clt-rec-mot" placeholder="Lavado / PPF renovación..."></div>
+  </div>
+  <div class="ma"><button class="btn" onclick="closeM('m-clt')">Cancelar</button><button class="btn btn-primary" onclick="guardarCLT()">Guardar</button></div>
+</div></div>
+
+<!-- RECORDATORIO MANUAL -->
+<div class="mo" id="m-rec"><div class="modal">
+  <div class="mt">Recordatorio manual</div>
+  <div class="fr"><label>Cliente / lead</label><select id="rec-cl" class="full"></select></div>
+  <div class="fr"><label>Motivo</label><input id="rec-mot" placeholder="Llamar / Ofrecer PPF..."></div>
+  <div class="fr"><label>Fecha</label><input id="rec-fecha" type="date"></div>
+  <div class="ma"><button class="btn" onclick="closeM('m-rec')">Cancelar</button><button class="btn btn-primary" onclick="guardarRec()">Guardar</button></div>
+</div></div>
+
+<!-- VEHÍCULO -->
+<div class="mo" id="m-veh"><div class="modal">
+  <div class="mt">Agregar vehículo</div>
+  <div class="fg2"><div class="fr"><label>Marca</label><input id="v-marca" placeholder="Toyota"></div><div class="fr"><label>Modelo</label><input id="v-modelo" placeholder="Hilux"></div></div>
+  <div class="fg3"><div class="fr"><label>Año</label><input id="v-anio" type="number"></div><div class="fr"><label>Km</label><input id="v-km" type="number"></div><div class="fr"><label>Color</label><input id="v-color" placeholder="Blanco"></div></div>
+  <hr class="divider">
+  <div class="sub-label">Costos de adquisición</div>
+  <div class="fg2"><div class="fr"><label>Precio compra ($)</label><input id="v-costo" type="number" placeholder="0"></div><div class="fr"><label>Fuente de fondos</label><select id="v-fuente"><option>Caja propia</option><option>Financiamiento</option><option>Consignación</option><option>Socio / inversor</option><option>Otro</option></select></div></div>
+  <div class="fg3"><div class="fr"><label>Preparación ($)</label><input id="v-prep" type="number" placeholder="0"></div><div class="fr"><label>Gestoría ($)</label><input id="v-gest" type="number" placeholder="0"></div><div class="fr"><label>Otros ($)</label><input id="v-otros" type="number" placeholder="0"></div></div>
+  <div class="fg2"><div class="fr"><label>Precio venta ($)</label><input id="v-precio" type="number" placeholder="0"></div><div class="fr"><label>Estado</label><select id="v-estado"><option value="disponible">Disponible</option><option value="preparacion">En preparación</option><option value="reservado">Reservado</option></select></div></div>
+  <div class="fr"><label>Notas</label><textarea id="v-notas"></textarea></div>
+  <div class="ma"><button class="btn" onclick="closeM('m-veh')">Cancelar</button><button class="btn btn-primary" onclick="guardarVeh()">Guardar</button></div>
+</div></div>
+
+<!-- OT -->
+<div class="mo" id="m-ot"><div class="modal">
+  <div class="mt">Nueva orden de trabajo</div>
+  <div class="fr"><label>Cliente / vehículo</label><input id="ot-cl" placeholder="Juan Pérez — VW Vento 2019"></div>
+  <div class="fg2"><div class="fr"><label>Asignado a</label><select id="ot-resp"><option>Martín (mecánica)</option><option>Theo (detailing/PPF)</option><option>Ambos</option></select></div><div class="fr"><label>Estado</label><select id="ot-est"><option>Ingresado</option><option>En proceso</option><option>Listo</option><option>Entregado</option></select></div></div>
+  <div class="sub-label">Servicios</div>
+  <div class="chk-group">
+    <label class="chk-label"><input type="checkbox" id="os-mec"> Mecánica</label>
+    <label class="chk-label"><input type="checkbox" id="os-det"> Detailing</label>
+    <label class="chk-label"><input type="checkbox" id="os-ppf"> PPF</label>
+    <label class="chk-label"><input type="checkbox" id="os-lav"> Lavado</label>
+    <label class="chk-label"><input type="checkbox" id="os-otro"> Otro</label>
+  </div>
+  <hr class="divider">
+  <div class="fg3"><div class="fr"><label>Insumos ($)</label><input id="ot-ins" type="number" placeholder="0"></div><div class="fr"><label>Mano de obra ($)</label><input id="ot-mo" type="number" placeholder="0"></div><div class="fr"><label>Precio cobrado ($)</label><input id="ot-pr" type="number" placeholder="0"></div></div>
+  <div class="fr"><label>Descripción</label><textarea id="ot-desc"></textarea></div>
+  <div class="ma"><button class="btn" onclick="closeM('m-ot')">Cancelar</button><button class="btn btn-primary" onclick="guardarOT()">Guardar</button></div>
+</div></div>
+
+<!-- CAJA V -->
+<div class="mo" id="m-cajav"><div class="modal">
+  <div class="mt">Movimiento — caja vehículos</div>
+  <div class="fr"><label>Descripción</label><input id="cv-desc"></div>
+  <div class="fg2"><div class="fr"><label>Tipo</label><select id="cv-tipo"><option value="ingreso">Ingreso</option><option value="egreso">Egreso</option></select></div><div class="fr"><label>Categoría</label><select id="cv-cat"><option>Venta vehículo</option><option>Compra vehículo</option><option>Preparación</option><option>Gestoría</option><option>Comisión</option><option>Otro</option></select></div></div>
+  <div class="fg2"><div class="fr"><label>Vehículo</label><input id="cv-veh"></div><div class="fr"><label>Monto ($)</label><input id="cv-monto" type="number" placeholder="0"></div></div>
+  <div class="ma"><button class="btn" onclick="closeM('m-cajav')">Cancelar</button><button class="btn btn-primary" onclick="guardarCajaV()">Guardar</button></div>
+</div></div>
+
+<!-- CAJA T -->
+<div class="mo" id="m-cajat"><div class="modal">
+  <div class="mt">Movimiento — caja taller</div>
+  <div class="fr"><label>Descripción</label><input id="ct-desc"></div>
+  <div class="fg2"><div class="fr"><label>Tipo</label><select id="ct-tipo"><option value="ingreso">Ingreso</option><option value="egreso">Egreso</option></select></div><div class="fr"><label>Categoría</label><select id="ct-cat"><option>Cobro trabajo</option><option>Insumos</option><option>Herramientas</option><option>Lavado</option><option>Otro</option></select></div></div>
+  <div class="fr"><label>Monto ($)</label><input id="ct-monto" type="number" placeholder="0"></div>
+  <div class="ma"><button class="btn" onclick="closeM('m-cajat')">Cancelar</button><button class="btn btn-primary" onclick="guardarCajaT()">Guardar</button></div>
+</div></div>
+
+<!-- CF -->
+<div class="mo" id="m-cf"><div class="modal">
+  <div class="mt">Agregar costo fijo</div>
+  <div class="fr"><label>Nombre</label><input id="cf-n" placeholder="Alquiler / Proveedor..."></div>
+  <div class="fg2"><div class="fr"><label>Categoría</label><select id="cf-cat"><option value="alquiler">Alquiler</option><option value="proveedor">Proveedor</option><option value="servicio">Servicio</option><option value="otro">Otro</option></select></div><div class="fr"><label>Monto/mes ($)</label><input id="cf-m" type="number" placeholder="0"></div></div>
+  <div class="fg2"><div class="fr"><label>Día vencimiento</label><input id="cf-dia" type="number" placeholder="5"></div><div class="fr"><label>Estado</label><select id="cf-est"><option value="activo">Activo</option><option value="pausado">Pausado</option></select></div></div>
+  <div class="fr"><label>Notas</label><input id="cf-notas"></div>
+  <div class="ma"><button class="btn" onclick="closeM('m-cf')">Cancelar</button><button class="btn btn-primary" onclick="guardarCF()">Guardar</button></div>
+</div></div>
+
+<!-- VENTA -->
+<div class="mo" id="m-venta"><div class="modal">
+  <div class="mt">Registrar venta</div>
+  <div class="fr"><label>Vehículo</label><select id="vt-v" class="full"></select></div>
+  <div class="fr"><label>Comprador</label><input id="vt-c"></div>
+  <div class="fg2"><div class="fr"><label>Precio ($)</label><input id="vt-p" type="number" placeholder="0"></div><div class="fr"><label>Estado</label><select id="vt-e"><option>Seña</option><option>Cerrado</option><option>Entregado</option></select></div></div>
+  <div class="ma"><button class="btn" onclick="closeM('m-venta')">Cancelar</button><button class="btn btn-primary" onclick="guardarVenta()">Guardar</button></div>
+</div></div>
+
+<!-- NUEVO SVC -->
+<div class="mo" id="m-nsvc"><div class="modal">
+  <div class="mt">Agregar servicio a cliente</div>
+  <div class="chk-group">
+    <label class="chk-label"><input type="checkbox" id="ns-mec"> Mecánica</label>
+    <label class="chk-label"><input type="checkbox" id="ns-det"> Detailing</label>
+    <label class="chk-label"><input type="checkbox" id="ns-ppf"> PPF</label>
+    <label class="chk-label"><input type="checkbox" id="ns-lav"> Lavado</label>
+    <label class="chk-label"><input type="checkbox" id="ns-otro"> Otro</label>
+  </div>
+  <div class="fr"><label>Descripción</label><textarea id="ns-desc"></textarea></div>
+  <div class="ma"><button class="btn" onclick="closeM('m-nsvc')">Cancelar</button><button class="btn btn-primary" onclick="guardarNSvc()">Guardar</button></div>
+</div></div>
+
+<script>
+// =============================================
+// SUPABASE INIT
+// =============================================
+const SURL = 'https://qmhijhbyludxsdieaeyg.supabase.co';
+const SKEY = 'sb_publishable_cGmh1uuQrwnL1wpRR6QaOw_QZB78aFy';
+const { createClient } = supabase;
+const db = createClient(SURL, SKEY);
+
+// =============================================
+// ESTADO LOCAL (cache)
+// =============================================
+let C = {
+  leadsA:[], leadsT:[], clt:[], veh:[], ots:[],
+  cajav:[], cajat:[], cf:[], ventas:[], recs:[],
+  activePage:'dashboard', activeId:null, activeType:null, recFiltro:'todos'
+};
+
+// =============================================
+// UTILS
+// =============================================
+const fmt = n => '$' + Number(n||0).toLocaleString('es-AR');
+const hoy = () => new Date().toLocaleDateString('es-AR');
+const hoyD = () => new Date().toISOString().split('T')[0];
+const openM = id => document.getElementById(id).classList.add('open');
+const closeM = id => document.getElementById(id).classList.remove('open');
+const b = (cls,txt) => `<span class="badge ${cls}">${txt}</span>`;
+const svcsGet = prefijo => {
+  const m = {mec:'Mecánica',det:'Detailing',ppf:'PPF',lav:'Lavado',otro:'Otro'};
+  return Object.keys(m).filter(k => document.getElementById(prefijo+k)?.checked).map(k=>m[k]);
+};
+const svcsReset = prefijo => ['mec','det','ppf','ppf','lav','otro'].forEach(k => { const el=document.getElementById(prefijo+k); if(el) el.checked=false; });
+
+const EA = ['Nuevo contacto','Conversando','Visita agendada','Oferta enviada','Cerrado','Perdido'];
+const ET = ['Consulta recibida','Presupuesto enviado','Turno agendado','Trabajo en proceso','Entregado','Perdido'];
+const BA = {'Nuevo contacto':'bgr','Conversando':'bb','Visita agendada':'ba','Oferta enviada':'bp','Cerrado':'bg','Perdido':'br'};
+const BT = {'Consulta recibida':'bgr','Presupuesto enviado':'bb','Turno agendado':'ba','Trabajo en proceso':'bp','Entregado':'bg','Perdido':'br'};
+
+function setSyncStatus(state) {
+  const dot = document.getElementById('sync-dot');
+  const txt = document.getElementById('sync-txt');
+  if(state==='ok'){dot.className='sync-dot';txt.textContent='Conectado';}
+  else if(state==='syncing'){dot.className='sync-dot syncing';txt.textContent='Guardando...';}
+  else{dot.className='sync-dot error';txt.textContent='Error de conexión';}
+}
+
+// =============================================
+// NAVEGACIÓN
+// =============================================
+const titles = {dashboard:'Dashboard',recordatorios:'Recordatorios','leads-autos':'Pipeline — ventas de autos','contactos-autos':'Contactos — leads autos','leads-taller':'Pipeline — servicios de taller','clientes-taller':'Clientes de taller',inventario:'Inventario',ventas:'Ventas','caja-vehiculos':'Caja — vehículos',ordenes:'Órdenes de trabajo','caja-taller':'Caja — taller','costos-fijos':'Costos fijos'};
+const actions = {'leads-autos':'<button class="btn btn-primary" onclick="abrirLA()"><i class="ti ti-plus"></i> Nuevo lead</button>','contactos-autos':'<button class="btn btn-primary" onclick="abrirLA()"><i class="ti ti-plus"></i> Nuevo lead</button>','leads-taller':'<button class="btn btn-primary" onclick="openM(\'m-lt\')"><i class="ti ti-plus"></i> Nuevo lead</button>','clientes-taller':'<button class="btn btn-primary" onclick="openM(\'m-clt\')"><i class="ti ti-plus"></i> Nuevo cliente</button>',recordatorios:'<button class="btn btn-primary" onclick="abrirRecM()"><i class="ti ti-plus"></i> Recordatorio manual</button>',inventario:'<button class="btn btn-primary" onclick="openM(\'m-veh\')"><i class="ti ti-plus"></i> Agregar vehículo</button>',ventas:'<button class="btn btn-primary" onclick="abrirVenta()"><i class="ti ti-plus"></i> Registrar venta</button>','caja-vehiculos':'<button class="btn btn-primary" onclick="openM(\'m-cajav\')"><i class="ti ti-plus"></i> Movimiento</button>',ordenes:'<button class="btn btn-primary" onclick="openM(\'m-ot\')"><i class="ti ti-plus"></i> Nueva orden</button>','caja-taller':'<button class="btn btn-primary" onclick="openM(\'m-cajat\')"><i class="ti ti-plus"></i> Movimiento</button>','costos-fijos':'<button class="btn btn-primary" onclick="openM(\'m-cf\')"><i class="ti ti-plus"></i> Agregar costo</button>'};
+
+async function navTo(pg, el) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+pg).classList.add('active');
+  el.classList.add('active');
+  document.getElementById('topbar-title').textContent = titles[pg]||pg;
+  document.getElementById('topbar-actions').innerHTML = actions[pg]||'';
+  C.activePage = pg;
+  closeDetail();
+  const loaders = {
+    dashboard: loadDash,
+    recordatorios: () => { loadRecs().then(renderRecs); },
+    'leads-autos': () => { loadLeadsA().then(()=>renderKanban('autos')); },
+    'contactos-autos': () => { loadLeadsA().then(renderContactosAutos); },
+    'leads-taller': () => { loadLeadsT().then(()=>renderKanban('taller')); },
+    'clientes-taller': () => { loadCLT().then(renderClientesTaller); },
+    inventario: () => { loadVeh().then(renderInv); },
+    ventas: () => { loadVentas().then(renderVentas); },
+    'caja-vehiculos': () => { loadCajaV().then(renderCajaV); },
+    ordenes: () => { loadOT().then(renderOT); },
+    'caja-taller': () => { loadCajaT().then(renderCajaT); },
+    'costos-fijos': () => { loadCF().then(renderCF); },
+  };
+  if(loaders[pg]) await loaders[pg]();
+}
+
+// =============================================
+// LOADERS (desde Supabase)
+// =============================================
+async function loadLeadsA() {
+  const {data} = await db.from('leads_autos').select('*').order('created_at',{ascending:false});
+  C.leadsA = data||[];
+}
+async function loadLeadsT() {
+  const {data} = await db.from('leads_taller').select('*').order('created_at',{ascending:false});
+  C.leadsT = data||[];
+}
+async function loadCLT() {
+  const {data} = await db.from('clientes_taller').select('*').order('created_at',{ascending:false});
+  C.clt = data||[];
+}
+async function loadVeh() {
+  const {data} = await db.from('vehiculos').select('*').order('created_at',{ascending:false});
+  C.veh = data||[];
+}
+async function loadOT() {
+  const {data} = await db.from('ordenes_trabajo').select('*').order('created_at',{ascending:false});
+  C.ots = data||[];
+}
+async function loadCajaV() {
+  const {data} = await db.from('caja_vehiculos').select('*').order('created_at',{ascending:false});
+  C.cajav = data||[];
+}
+async function loadCajaT() {
+  const {data} = await db.from('caja_taller').select('*').order('created_at',{ascending:false});
+  C.cajat = data||[];
+}
+async function loadCF() {
+  const {data} = await db.from('costos_fijos').select('*').order('created_at',{ascending:false});
+  C.cf = data||[];
+}
+async function loadVentas() {
+  const {data} = await db.from('ventas').select('*').order('created_at',{ascending:false});
+  C.ventas = data||[];
+}
+async function loadRecs() {
+  const {data} = await db.from('recordatorios').select('*').eq('completado',false).order('fecha',{ascending:true});
+  C.recs = data||[];
+}
+
+// =============================================
+// DASHBOARD
+// =============================================
+async function loadDash() {
+  await Promise.all([loadLeadsA(),loadLeadsT(),loadCLT(),loadVeh(),loadCajaV(),loadCajaT(),loadCF(),loadRecs()]);
+  updateStats();
+  renderDashRecs();
+  renderDashLeads();
+}
+
+function updateStats() {
+  const la = C.leadsA.filter(l=>l.estado!=='Cerrado'&&l.estado!=='Perdido').length;
+  const lt = C.leadsT.filter(l=>l.estado!=='Entregado'&&l.estado!=='Perdido').length;
+  const it = C.cajat.filter(m=>m.tipo==='ingreso').reduce((a,m)=>a+(m.monto||0),0) - C.cajat.filter(m=>m.tipo==='egreso').reduce((a,m)=>a+(m.monto||0),0);
+  const iv = C.cajav.filter(m=>m.tipo==='ingreso').reduce((a,m)=>a+(m.monto||0),0) - C.cajav.filter(m=>m.tipo==='egreso').reduce((a,m)=>a+(m.monto||0),0);
+  const cf = C.cf.filter(c=>c.estado==='activo').reduce((a,c)=>a+(c.monto||0),0);
+  const neto = it+iv-cf;
+  const set = (id,v,col) => { const el=document.getElementById(id); if(el){el.textContent=v; if(col!==undefined)el.style.color=col;} };
+  set('s-la',la); set('s-lt',lt); set('s-clt',C.clt.length);
+  set('s-neto',fmt(neto),neto>=0?'var(--success)':'var(--danger)');
+  set('s-ct',fmt(it),it>=0?'var(--success)':'var(--danger)');
+  set('s-cv',fmt(iv),iv>=0?'var(--success)':'var(--danger)');
+  set('s-cf',fmt(cf));
+}
+
+function renderDashRecs() {
+  const sem = new Date(); sem.setDate(sem.getDate()+7);
+  const semStr = sem.toISOString().split('T')[0];
+  const pend = C.recs.filter(r=>r.fecha<=semStr).slice(0,4);
+  const el = document.getElementById('dash-rec');
+  el.innerHTML = pend.length ? pend.map(r=>{
+    const d=Math.ceil((new Date(r.fecha)-new Date(hoyD()))/(864e5));
+    const cls=d<=0?'vh':d<=3?'vp':'vok';
+    return `<div class="ot-item"><div class="dot ${d<=0?'dr':d<=3?'da':'db'}"></div><div class="oi"><div class="on">${r.nombre}</div><div class="om">${r.motivo}</div></div><span class="${cls}">${d<=0?'HOY':d+'d'}</span></div>`;
+  }).join('') : '<div class="empty"><i class="ti ti-bell"></i>Sin recordatorios esta semana</div>';
+}
+
+function renderDashLeads() {
+  const cal = [...C.leadsA.filter(l=>['Conversando','Visita agendada','Oferta enviada'].includes(l.estado)).map(l=>({...l,_t:'auto'})),...C.leadsT.filter(l=>['Presupuesto enviado','Turno agendado','Trabajo en proceso'].includes(l.estado)).map(l=>({...l,_t:'taller'}))].slice(0,4);
+  const el = document.getElementById('dash-leads');
+  el.innerHTML = cal.length ? cal.map(l=>`<div class="ot-item"><div class="dot ${l._t==='auto'?'db':'da'}"></div><div class="oi"><div class="on">${l.nombre}</div><div class="om">${l._t==='auto'?(l.interes||'—'):(l.servicio||'—')} · ${b(l._t==='auto'?'bb':'ba',l._t==='auto'?'Auto':'Taller')}</div></div></div>`).join('') : '<div class="empty"><i class="ti ti-users"></i>Sin leads calientes</div>';
+}
+
+// =============================================
+// RECORDATORIOS
+// =============================================
+function recTab(f,el) {
+  C.recFiltro=f;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderRecs();
+}
+function renderRecs() {
+  const today=hoyD(); const sem=new Date();sem.setDate(sem.getDate()+7);const semStr=sem.toISOString().split('T')[0];
+  let lista=[...C.recs];
+  if(C.recFiltro==='hoy')lista=lista.filter(r=>r.fecha===today);
+  else if(C.recFiltro==='semana')lista=lista.filter(r=>r.fecha<=semStr);
+  else if(C.recFiltro==='auto')lista=lista.filter(r=>r.tipo==='auto');
+  else if(C.recFiltro==='manual')lista=lista.filter(r=>r.tipo==='manual');
+  const cont=document.getElementById('rec-list');
+  cont.innerHTML = lista.length ? '<div>'+lista.map(r=>{
+    const d=Math.ceil((new Date(r.fecha)-new Date(today))/(864e5));
+    const cls=d<=0?'vh':d<=3?'vp':'vok';
+    const txt=d<=0?'VENCIDO':`${r.fecha} (${d}d)`;
+    return `<div class="rec-item"><div class="dot ${d<=0?'dr':d<=3?'da':'db'}"></div><div class="rec-info"><div class="rec-n">${r.nombre}</div><div class="rec-m">${r.motivo} · ${b(r.tipo==='auto'?'bb':'bp',r.tipo==='auto'?'Auto':'Manual')}</div></div><span class="${cls}">${txt}</span><button class="btn btn-primary" style="font-size:10px;padding:3px 8px" onclick="completarRec(${r.id})">✓ Hecho</button></div>`;
+  }).join('')+'</div>' : '<div class="empty"><i class="ti ti-bell"></i>Sin recordatorios pendientes.</div>';
+  updateBadge();
+}
+async function completarRec(id) {
+  setSyncStatus('syncing');
+  const r = C.recs.find(x=>x.id===id);
+  await db.from('recordatorios').update({completado:true}).eq('id',id);
+  if(r?.tipo==='auto'&&r?.cliente_id) {
+    const cli = C.clt.find(c=>c.id===r.cliente_id);
+    if(cli?.rec_meses) {
+      const d=new Date(r.fecha);d.setMonth(d.getMonth()+cli.rec_meses);
+      const nf=d.toISOString().split('T')[0];
+      await db.from('recordatorios').insert({tipo:'auto',cliente_id:cli.id,nombre:cli.nombre,motivo:r.motivo,fecha:nf,completado:false});
+      await db.from('clientes_taller').update({prox_recordatorio:nf}).eq('id',cli.id);
+    }
+  }
+  setSyncStatus('ok');
+  await loadRecs(); renderRecs();
+}
+function abrirRecM() {
+  const todos=[...C.leadsA,...C.leadsT,...C.clt];
+  document.getElementById('rec-cl').innerHTML=todos.map(x=>`<option value="${x.nombre}">${x.nombre}</option>`).join('');
+  document.getElementById('rec-fecha').value=hoyD();
+  openM('m-rec');
+}
+async function guardarRec() {
+  const n=document.getElementById('rec-cl').value;
+  const mot=document.getElementById('rec-mot').value;
+  const fecha=document.getElementById('rec-fecha').value;
+  if(!mot||!fecha)return alert('Completá motivo y fecha');
+  setSyncStatus('syncing');
+  await db.from('recordatorios').insert({tipo:'manual',nombre:n,motivo:mot,fecha,completado:false});
+  setSyncStatus('ok');
+  closeM('m-rec');
+  document.getElementById('rec-mot').value='';
+  await loadRecs(); renderRecs(); updateBadge();
+}
+function updateBadge() {
+  const sem=new Date();sem.setDate(sem.getDate()+7);const semStr=sem.toISOString().split('T')[0];
+  const n=C.recs.filter(r=>r.fecha<=semStr).length;
+  const el=document.getElementById('badge-rec');
+  el.textContent=n; el.style.display=n?'inline':'none';
+}
+
+// =============================================
+// KANBAN
+// =============================================
+function renderKanban(tipo) {
+  const esA=tipo==='autos';
+  const estados=esA?EA:ET; const badge=esA?BA:BT; const lista=esA?C.leadsA:C.leadsT;
+  const q=((document.getElementById(esA?'la-q':'lt-q')||{}).value||'').toLowerCase();
+  const fi=(document.getElementById(esA?'la-origen':'lt-svc')||{}).value||'';
+  const board=document.getElementById(esA?'kanban-autos':'kanban-taller'); if(!board)return;
+  const fil=lista.filter(l=>{
+    if(q&&!(l.nombre+(l.interes||l.servicio||'')).toLowerCase().includes(q))return false;
+    if(fi){if(esA&&l.origen!==fi)return false;if(!esA&&l.servicio!==fi)return false;}
+    return true;
+  });
+  board.innerHTML=estados.map(est=>{
+    const ls=fil.filter(l=>l.estado===est);
+    return`<div class="kcol"><div class="khdr"><span class="kht">${est}</span><span class="kcnt">${ls.length}</span></div><div class="kcards">${ls.length?ls.map(l=>{
+      const v=esA&&l.vehiculo_id?C.veh.find(x=>x.id===l.vehiculo_id):null;
+      const sub=esA?(l.interes||'—'):(l.servicio+(l.vehiculo_cliente?` · ${l.vehiculo_cliente}`:''));
+      return`<div class="kcard" onclick="openDetail('${esA?'la':'lt'}',${l.id})"><div class="kn">${l.nombre}</div><div class="km">${sub}</div><div class="ktags">${b(badge[l.estado]||'bgr',l.estado)} ${l.telefono?`<span class="badge bgr">${l.telefono}</span>`:''}</div></div>`;
+    }).join(''):'<div class="kempty">Sin leads</div>'}</div></div>`;
+  }).join('');
+}
+
+function renderContactosAutos() {
+  const q=((document.getElementById('ca-q')||{}).value||'').toLowerCase();
+  const tb=document.getElementById('tb-ca');
+  const lista=q?C.leadsA.filter(l=>(l.nombre+l.telefono).toLowerCase().includes(q)):C.leadsA;
+  tb.innerHTML=lista.length?lista.map(l=>`<tr><td><strong>${l.nombre}</strong></td><td>${l.telefono||'—'}</td><td>${b('bgr',l.origen||'—')}</td><td>${l.interes||'—'}</td><td>${b(BA[l.estado]||'bgr',l.estado)}</td><td style="color:var(--text3);font-size:10px">${l.created_at?.slice(0,10)||'—'}</td><td><button class="icon-btn" onclick="openDetail('la',${l.id})"><i class="ti ti-eye"></i></button></td></tr>`).join(''):'<tr><td colspan="7"><div class="empty"><i class="ti ti-users"></i>Sin contactos.</div></td></tr>';
+}
+
+function renderClientesTaller() {
+  const q=((document.getElementById('ct-q')||{}).value||'').toLowerCase();
+  const tb=document.getElementById('tb-ct');
+  const lista=q?C.clt.filter(c=>(c.nombre+c.telefono+c.vehiculo).toLowerCase().includes(q)):C.clt;
+  const today=hoyD();
+  tb.innerHTML=lista.length?lista.map(c=>{
+    const hist=c.historial||[];
+    const ult=hist.length?hist[hist.length-1]:null;
+    let rtxt='—',rcls='vok';
+    if(c.prox_recordatorio){const d=Math.ceil((new Date(c.prox_recordatorio)-new Date(today))/(864e5));if(d<=0){rtxt='VENCIDO';rcls='vh';}else if(d<=7){rtxt=`${d}d`;rcls='vp';}else rtxt=c.prox_recordatorio;}
+    return`<tr><td><strong>${c.nombre}</strong></td><td>${c.telefono||'—'}</td><td>${c.vehiculo||'—'}${c.patente?` <span style="font-size:9px;color:var(--text3)">${c.patente}</span>`:''}</td><td style="font-size:10px;color:var(--text3)">${ult?ult.fecha:'—'}</td><td>${ult?ult.svcs.map(s=>b('bgr',s)).join(' '):'—'}</td><td class="${rcls}" style="font-size:10px;font-weight:700">${rtxt}</td><td><button class="icon-btn" onclick="openDetail('clt',${c.id})"><i class="ti ti-eye"></i></button></td></tr>`;
+  }).join(''):'<tr><td colspan="7"><div class="empty"><i class="ti ti-user-check"></i>Sin clientes.</div></td></tr>';
+}
+
+// =============================================
+// GUARDAR LEADS
+// =============================================
+function abrirLA() {
+  const s=document.getElementById('la-v');
+  s.innerHTML='<option value="">— ninguno —</option>'+C.veh.filter(v=>v.estado!=='vendido').map(v=>`<option value="${v.id}">${v.marca} ${v.modelo} ${v.anio}</option>`).join('');
+  openM('m-la');
+}
+async function guardarLA() {
+  const n=document.getElementById('la-n').value; if(!n)return alert('Completá el nombre');
+  const nota=document.getElementById('la-nota').value;
+  const seg=nota?[{fecha:hoy(),txt:nota}]:[];
+  const vid=document.getElementById('la-v').value;
+  setSyncStatus('syncing');
+  await db.from('leads_autos').insert({nombre:n,telefono:document.getElementById('la-t').value,origen:document.getElementById('la-o').value,estado:document.getElementById('la-e').value,interes:document.getElementById('la-i').value,vehiculo_id:vid?parseInt(vid):null,seguimiento:seg});
+  setSyncStatus('ok');
+  closeM('m-la');
+  ['la-n','la-t','la-i','la-nota'].forEach(id=>document.getElementById(id).value='');
+  await loadLeadsA(); renderKanban('autos'); renderContactosAutos();
+}
+
+async function guardarLT() {
+  const n=document.getElementById('lt-n').value; if(!n)return alert('Completá el nombre');
+  const nota=document.getElementById('lt-nota').value;
+  const seg=nota?[{fecha:hoy(),txt:nota}]:[];
+  setSyncStatus('syncing');
+  await db.from('leads_taller').insert({nombre:n,telefono:document.getElementById('lt-t').value,origen:document.getElementById('lt-o').value,estado:document.getElementById('lt-e').value,servicio:document.getElementById('lt-svc-tipo').value,vehiculo_cliente:document.getElementById('lt-v').value,seguimiento:seg});
+  setSyncStatus('ok');
+  closeM('m-lt');
+  ['lt-n','lt-t','lt-v','lt-nota'].forEach(id=>document.getElementById(id).value='');
+  await loadLeadsT(); renderKanban('taller');
+}
+
+async function guardarCLT() {
+  const n=document.getElementById('clt-n').value; if(!n)return alert('Completá el nombre');
+  const svcs=svcsGet('cs-');
+  const recM=document.getElementById('clt-rec').value;
+  const recMot=document.getElementById('clt-rec-mot').value;
+  let proxRec=null;
+  if(recM){const d=new Date();d.setMonth(d.getMonth()+parseInt(recM));proxRec=d.toISOString().split('T')[0];}
+  const hist=svcs.length?[{fecha:hoy(),svcs,desc:document.getElementById('clt-desc').value}]:[];
+  setSyncStatus('syncing');
+  const {data} = await db.from('clientes_taller').insert({nombre:n,telefono:document.getElementById('clt-t').value,vehiculo:document.getElementById('clt-v').value,patente:document.getElementById('clt-pat').value,historial:hist,seguimiento:[],rec_meses:recM?parseInt(recM):null,rec_motivo:recMot,prox_recordatorio:proxRec}).select().single();
+  if(data&&proxRec&&recMot){
+    await db.from('recordatorios').insert({tipo:'auto',cliente_id:data.id,nombre:n,motivo:recMot,fecha:proxRec,completado:false});
+  }
+  setSyncStatus('ok');
+  closeM('m-clt');
+  ['clt-n','clt-t','clt-v','clt-pat','clt-desc','clt-rec-mot'].forEach(id=>document.getElementById(id).value='');
+  svcsReset('cs-');
+  await loadCLT(); renderClientesTaller(); updateBadge();
+}
+
+// =============================================
+// GUARDAR NUEVO SVC
+// =============================================
+async function guardarNSvc() {
+  const c=C.clt.find(x=>x.id===C.activeId); if(!c)return;
+  const svcs=svcsGet('ns-'); if(!svcs.length)return alert('Seleccioná al menos un servicio');
+  const hist=[...(c.historial||[]),{fecha:hoy(),svcs,desc:document.getElementById('ns-desc').value}];
+  let proxRec=c.prox_recordatorio;
+  const recs_update=[];
+  if(c.rec_meses){const d=new Date();d.setMonth(d.getMonth()+c.rec_meses);proxRec=d.toISOString().split('T')[0];}
+  setSyncStatus('syncing');
+  await db.from('clientes_taller').update({historial:hist,prox_recordatorio:proxRec}).eq('id',c.id);
+  if(c.rec_meses&&c.rec_motivo){
+    await db.from('recordatorios').update({completado:true}).eq('cliente_id',c.id).eq('tipo','auto').eq('completado',false);
+    await db.from('recordatorios').insert({tipo:'auto',cliente_id:c.id,nombre:c.nombre,motivo:c.rec_motivo,fecha:proxRec,completado:false});
+  }
+  setSyncStatus('ok');
+  closeM('m-nsvc');
+  svcsReset('ns-'); document.getElementById('ns-desc').value='';
+  await loadCLT(); openDetail('clt',c.id); renderClientesTaller(); updateBadge();
+}
+
+// =============================================
+// VEHÍCULOS
+// =============================================
+const costoTotal = v => (parseFloat(v.costo)||0)+(parseFloat(v.prep)||0)+(parseFloat(v.gestoria)||0)+(parseFloat(v.otros_costos)||0);
+
+async function guardarVeh() {
+  const marca=document.getElementById('v-marca').value; const modelo=document.getElementById('v-modelo').value;
+  if(!marca||!modelo)return alert('Completá marca y modelo');
+  const data={marca,modelo,anio:parseInt(document.getElementById('v-anio').value)||null,km:parseInt(document.getElementById('v-km').value)||null,color:document.getElementById('v-color').value,costo:parseFloat(document.getElementById('v-costo').value)||0,fuente:document.getElementById('v-fuente').value,prep:parseFloat(document.getElementById('v-prep').value)||0,gestoria:parseFloat(document.getElementById('v-gest').value)||0,otros_costos:parseFloat(document.getElementById('v-otros').value)||0,precio_venta:parseFloat(document.getElementById('v-precio').value)||0,estado:document.getElementById('v-estado').value,notas:document.getElementById('v-notas').value};
+  setSyncStatus('syncing');
+  const {data:veh} = await db.from('vehiculos').insert(data).select().single();
+  const ct=costoTotal(veh);
+  if(ct>0) await db.from('caja_vehiculos').insert({descripcion:`Compra ${marca} ${modelo}`,tipo:'egreso',categoria:'Compra vehículo',vehiculo:`${marca} ${modelo}`,monto:ct});
+  setSyncStatus('ok');
+  closeM('m-veh');
+  ['v-marca','v-modelo','v-anio','v-km','v-color','v-costo','v-prep','v-gest','v-otros','v-precio','v-notas'].forEach(id=>document.getElementById(id).value='');
+  await loadVeh(); renderInv();
+}
+
+function renderInv() {
+  const tb=document.getElementById('tb-inv');
+  const bm={'disponible':['bg','Disponible'],'reservado':['ba','Reservado'],'preparacion':['bb','En preparación'],'vendido':['bgr','Vendido']};
+  tb.innerHTML=C.veh.length?C.veh.map(v=>{const ct=costoTotal(v);const mg=(parseFloat(v.precio_venta)||0)-ct;const[bc,bt]=bm[v.estado]||['bgr',v.estado];return`<tr><td><strong>${v.marca} ${v.modelo}</strong>${v.color?` <span style="font-size:9px;color:var(--text3)">${v.color}</span>`:''}</td><td>${v.anio||'—'}</td><td>${v.km?Number(v.km).toLocaleString('es-AR')+' km':'—'}</td><td>${fmt(ct)}</td><td>${fmt(v.precio_venta)}</td><td class="${mg>=0?'ing':'eg'}">${fmt(mg)}</td><td><span class="badge bgr" style="font-size:9px">${v.fuente||'—'}</span></td><td>${b(bc,bt)}</td><td><button class="icon-btn" onclick="elimVeh(${v.id})"><i class="ti ti-trash"></i></button></td></tr>`}).join(''):'<tr><td colspan="9"><div class="empty"><i class="ti ti-car"></i>Sin vehículos.</div></td></tr>';
+}
+async function elimVeh(id){setSyncStatus('syncing');await db.from('vehiculos').delete().eq('id',id);setSyncStatus('ok');await loadVeh();renderInv();}
+
+// =============================================
+// ÓRDENES
+// =============================================
+async function guardarOT() {
+  const cliente=document.getElementById('ot-cl').value; if(!cliente)return alert('Completá el cliente');
+  const svcs=svcsGet('os-');
+  const ins=parseFloat(document.getElementById('ot-ins').value)||0;
+  const mo=parseFloat(document.getElementById('ot-mo').value)||0;
+  const pr=parseFloat(document.getElementById('ot-pr').value)||0;
+  setSyncStatus('syncing');
+  const {data:ot} = await db.from('ordenes_trabajo').insert({cliente,responsable:document.getElementById('ot-resp').value,estado:document.getElementById('ot-est').value,servicios:svcs.length?svcs:['General'],insumos:ins,mano_obra:mo,precio_cobrado:pr,descripcion:document.getElementById('ot-desc').value}).select().single();
+  if(pr>0) await db.from('caja_taller').insert({descripcion:`OT #${ot.id} — ${cliente}`,tipo:'ingreso',categoria:'Cobro trabajo',monto:pr});
+  if(ins>0) await db.from('caja_taller').insert({descripcion:`Insumos OT #${ot.id}`,tipo:'egreso',categoria:'Insumos',monto:ins});
+  setSyncStatus('ok');
+  closeM('m-ot');
+  ['ot-cl','ot-ins','ot-mo','ot-pr','ot-desc'].forEach(id=>document.getElementById(id).value='');
+  svcsReset('os-');
+  await loadOT(); renderOT();
+}
+
+function renderOT() {
+  const tb=document.getElementById('tb-ot');
+  const bm={'Ingresado':'bgr','En proceso':'bb','Listo':'bg','Entregado':'bgr'};
+  tb.innerHTML=C.ots.length?C.ots.map(o=>`<tr><td style="color:var(--text3);font-size:10px">#${o.id}</td><td><strong>${o.cliente}</strong></td><td>${(o.servicios||[]).map(s=>b('bgr',s)).join(' ')}</td><td style="font-size:10px">${o.responsable||'—'}</td><td class="eg">${fmt((o.insumos||0)+(o.mano_obra||0))}</td><td class="ing">${fmt(o.precio_cobrado)}</td><td class="${((o.precio_cobrado||0)-(o.insumos||0)-(o.mano_obra||0))>=0?'ing':'eg'}">${fmt((o.precio_cobrado||0)-(o.insumos||0)-(o.mano_obra||0))}</td><td>${b(bm[o.estado]||'bgr',o.estado)}</td><td><button class="icon-btn" onclick="elimOT(${o.id})"><i class="ti ti-trash"></i></button></td></tr>`).join(''):'<tr><td colspan="9"><div class="empty"><i class="ti ti-tool"></i>Sin órdenes.</div></td></tr>';
+}
+async function elimOT(id){setSyncStatus('syncing');await db.from('ordenes_trabajo').delete().eq('id',id);setSyncStatus('ok');await loadOT();renderOT();}
+
+// =============================================
+// CAJAS
+// =============================================
+async function guardarCajaV() {
+  const desc=document.getElementById('cv-desc').value; const monto=parseFloat(document.getElementById('cv-monto').value)||0;
+  if(!desc||!monto)return alert('Completá descripción y monto');
+  setSyncStatus('syncing');
+  await db.from('caja_vehiculos').insert({descripcion:desc,tipo:document.getElementById('cv-tipo').value,categoria:document.getElementById('cv-cat').value,vehiculo:document.getElementById('cv-veh').value,monto});
+  setSyncStatus('ok');
+  closeM('m-cajav');
+  ['cv-desc','cv-veh','cv-monto'].forEach(id=>document.getElementById(id).value='');
+  await loadCajaV(); renderCajaV();
+}
+function renderCajaV() {
+  const ing=C.cajav.filter(m=>m.tipo==='ingreso').reduce((a,m)=>a+(m.monto||0),0);
+  const eg=C.cajav.filter(m=>m.tipo==='egreso').reduce((a,m)=>a+(m.monto||0),0);
+  const s=ing-eg;
+  ['cv-ing','cv-eg'].forEach((id,i)=>{ const el=document.getElementById(id); if(el)el.textContent=fmt([ing,eg][i]); });
+  const es=document.getElementById('cv-saldo'); if(es){es.textContent=fmt(s);es.style.color=s>=0?'var(--success)':'var(--danger)';}
+  const tb=document.getElementById('tb-cajav');
+  tb.innerHTML=C.cajav.length?C.cajav.map(m=>`<tr><td style="color:var(--text3);font-size:10px">${m.created_at?.slice(0,10)||'—'}</td><td>${m.descripcion}</td><td style="color:var(--text3);font-size:10px">${m.vehiculo||'—'}</td><td>${b('bgr',m.categoria||'—')}</td><td>${m.tipo==='ingreso'?b('bg','Ingreso'):b('br','Egreso')}</td><td class="${m.tipo==='ingreso'?'ing':'eg'}">${m.tipo==='egreso'?'-':'+'}${fmt(m.monto)}</td></tr>`).join(''):'<tr><td colspan="6"><div class="empty"><i class="ti ti-cash"></i>Sin movimientos.</div></td></tr>';
+}
+
+async function guardarCajaT() {
+  const desc=document.getElementById('ct-desc').value; const monto=parseFloat(document.getElementById('ct-monto').value)||0;
+  if(!desc||!monto)return alert('Completá descripción y monto');
+  setSyncStatus('syncing');
+  await db.from('caja_taller').insert({descripcion:desc,tipo:document.getElementById('ct-tipo').value,categoria:document.getElementById('ct-cat').value,monto});
+  setSyncStatus('ok');
+  closeM('m-cajat');
+  document.getElementById('ct-desc').value=''; document.getElementById('ct-monto').value='';
+  await loadCajaT(); renderCajaT();
+}
+function renderCajaT() {
+  const ing=C.cajat.filter(m=>m.tipo==='ingreso').reduce((a,m)=>a+(m.monto||0),0);
+  const eg=C.cajat.filter(m=>m.tipo==='egreso').reduce((a,m)=>a+(m.monto||0),0);
+  const s=ing-eg;
+  ['ctt-ing','ctt-eg'].forEach((id,i)=>{ const el=document.getElementById(id); if(el)el.textContent=fmt([ing,eg][i]); });
+  const es=document.getElementById('ctt-saldo'); if(es){es.textContent=fmt(s);es.style.color=s>=0?'var(--success)':'var(--danger)';}
+  const tb=document.getElementById('tb-cajat');
+  tb.innerHTML=C.cajat.length?C.cajat.map(m=>`<tr><td style="color:var(--text3);font-size:10px">${m.created_at?.slice(0,10)||'—'}</td><td>${m.descripcion}</td><td>${b('bgr',m.categoria||'—')}</td><td>${m.tipo==='ingreso'?b('bg','Ingreso'):b('br','Egreso')}</td><td class="${m.tipo==='ingreso'?'ing':'eg'}">${m.tipo==='egreso'?'-':'+'}${fmt(m.monto)}</td></tr>`).join(''):'<tr><td colspan="5"><div class="empty"><i class="ti ti-cash"></i>Sin movimientos.</div></td></tr>';
+}
+
+// =============================================
+// COSTOS FIJOS
+// =============================================
+async function guardarCF() {
+  const nombre=document.getElementById('cf-n').value; const monto=parseFloat(document.getElementById('cf-m').value)||0;
+  if(!nombre||!monto)return alert('Completá nombre y monto');
+  setSyncStatus('syncing');
+  await db.from('costos_fijos').insert({nombre,categoria:document.getElementById('cf-cat').value,monto,dia_vencimiento:parseInt(document.getElementById('cf-dia').value)||null,estado:document.getElementById('cf-est').value,notas:document.getElementById('cf-notas').value});
+  setSyncStatus('ok');
+  closeM('m-cf');
+  ['cf-n','cf-m','cf-dia','cf-notas'].forEach(id=>document.getElementById(id).value='');
+  await loadCF(); renderCF();
+}
+function renderCF() {
+  const total=C.cf.filter(c=>c.estado==='activo').reduce((a,c)=>a+(c.monto||0),0);
+  const e1=document.getElementById('cf-total'),e2=document.getElementById('cf-activos'),e3=document.getElementById('cf-prox');
+  if(e1)e1.textContent=fmt(total); if(e2)e2.textContent=C.cf.filter(c=>c.estado==='activo').length;
+  const cd=C.cf.filter(c=>c.dia_vencimiento).sort((a,c2)=>a.dia_vencimiento-c2.dia_vencimiento);
+  if(e3)e3.textContent=cd.length?`Día ${cd[0].dia_vencimiento} — ${cd[0].nombre}`:'—';
+  const cl={alquiler:'Alquiler',proveedor:'Proveedor',servicio:'Servicio',otro:'Otro'};
+  const tb=document.getElementById('tb-cf');
+  tb.innerHTML=C.cf.length?C.cf.map(c=>`<tr><td><strong>${c.nombre}</strong>${c.notas?`<br><span style="font-size:9px;color:var(--text3)">${c.notas}</span>`:''}</td><td>${b('bgr',cl[c.categoria]||c.categoria)}</td><td class="eg">${fmt(c.monto)}</td><td style="color:var(--text3);font-size:10px">${c.dia_vencimiento?'Día '+c.dia_vencimiento:'—'}</td><td>${b(c.estado==='activo'?'bg':'ba',c.estado==='activo'?'Activo':'Pausado')}</td><td><button class="icon-btn" onclick="elimCF(${c.id})"><i class="ti ti-trash"></i></button></td></tr>`).join(''):'<tr><td colspan="6"><div class="empty"><i class="ti ti-file-invoice"></i>Sin costos fijos.</div></td></tr>';
+}
+async function elimCF(id){setSyncStatus('syncing');await db.from('costos_fijos').delete().eq('id',id);setSyncStatus('ok');await loadCF();renderCF();}
+
+// =============================================
+// VENTAS
+// =============================================
+function abrirVenta() {
+  const d=C.veh.filter(v=>v.estado!=='vendido');
+  if(!d.length)return alert('Sin vehículos disponibles');
+  document.getElementById('vt-v').innerHTML=d.map(v=>`<option value="${v.id}">${v.marca} ${v.modelo} ${v.anio}</option>`).join('');
+  openM('m-venta');
+}
+async function guardarVenta() {
+  const vid=parseInt(document.getElementById('vt-v').value);
+  const veh=C.veh.find(v=>v.id===vid);
+  const pr=parseFloat(document.getElementById('vt-p').value)||0;
+  const comp=document.getElementById('vt-c').value; if(!comp)return alert('Completá el comprador');
+  const ct=veh?costoTotal(veh):0;
+  setSyncStatus('syncing');
+  await db.from('ventas').insert({vehiculo_id:vid,vehiculo_texto:veh?`${veh.marca} ${veh.modelo} ${veh.anio}`:'—',comprador:comp,precio:pr,costo:ct,estado:document.getElementById('vt-e').value});
+  await db.from('vehiculos').update({estado:'vendido'}).eq('id',vid);
+  if(pr>0) await db.from('caja_vehiculos').insert({descripcion:`Venta ${veh?.marca} ${veh?.modelo} — ${comp}`,tipo:'ingreso',categoria:'Venta vehículo',vehiculo:veh?`${veh.marca} ${veh.modelo}`:''  ,monto:pr});
+  setSyncStatus('ok');
+  closeM('m-venta');
+  document.getElementById('vt-c').value=''; document.getElementById('vt-p').value='';
+  await loadVentas(); await loadVeh(); renderVentas(); renderInv();
+}
+function renderVentas() {
+  const bm={'Seña':'ba','Cerrado':'bg','Entregado':'bgr'};
+  const tb=document.getElementById('tb-ventas');
+  tb.innerHTML=C.ventas.length?C.ventas.map(v=>{const g=(v.precio||0)-(v.costo||0);return`<tr><td><strong>${v.vehiculo_texto||'—'}</strong></td><td>${v.comprador}</td><td class="ing">${fmt(v.precio)}</td><td class="eg">${fmt(v.costo)}</td><td class="${g>=0?'ing':'eg'}">${fmt(g)}</td><td style="color:var(--text3);font-size:10px">${v.created_at?.slice(0,10)||'—'}</td><td>${b(bm[v.estado]||'bgr',v.estado)}</td></tr>`}).join(''):'<tr><td colspan="7"><div class="empty"><i class="ti ti-transfer"></i>Sin ventas.</div></td></tr>';
+}
+
+// =============================================
+// PANEL DETALLE
+// =============================================
+async function openDetail(tipo, id) {
+  C.activeId=id; C.activeType=tipo;
+  const panel=document.getElementById('detail-panel'); panel.classList.add('open');
+  if(tipo==='la') {
+    const l=C.leadsA.find(x=>x.id===id); if(!l)return;
+    document.getElementById('dp-nombre').textContent=l.nombre;
+    const v=l.vehiculo_id?C.veh.find(x=>x.id===l.vehiculo_id):null;
+    document.getElementById('dp-main').innerHTML=`
+      <div style="margin-bottom:14px">
+        <div class="dpst">Lead — venta auto</div>
+        <div class="dpf"><span class="dpfl">Teléfono</span><span class="dpfv">${l.telefono||'—'}</span></div>
+        <div class="dpf"><span class="dpfl">Origen</span><span class="dpfv">${l.origen||'—'}</span></div>
+        <div class="dpf"><span class="dpfl">Busca</span><span class="dpfv">${l.interes||'—'}</span></div>
+        <div class="dpf"><span class="dpfl">Vehículo</span><span class="dpfv">${v?`${v.marca} ${v.modelo} ${v.anio}`:'—'}</span></div>
+        <div class="dpst" style="margin-top:12px">Cambiar estado</div>
+        <select onchange="cambiarEstado('la',this.value)" style="width:100%;padding:6px 8px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-size:11px;font-family:var(--font)">
+          ${EA.map(e=>`<option ${e===l.estado?'selected':''}>${e}</option>`).join('')}
+        </select>
+      </div>`;
+    document.getElementById('dp-extra').innerHTML='';
+    renderSeg(l.seguimiento||[]);
+  } else if(tipo==='lt') {
+    const l=C.leadsT.find(x=>x.id===id); if(!l)return;
+    document.getElementById('dp-nombre').textContent=l.nombre;
+    document.getElementById('dp-main').innerHTML=`
+      <div style="margin-bottom:14px">
+        <div class="dpst">Lead — servicio taller</div>
+        <div class="dpf"><span class="dpfl">Teléfono</span><span class="dpfv">${l.telefono||'—'}</span></div>
+        <div class="dpf"><span class="dpfl">Origen</span><span class="dpfv">${l.origen||'—'}</span></div>
+        <div class="dpf"><span class="dpfl">Servicio</span><span class="dpfv">${l.servicio||'—'}</span></div>
+        <div class="dpf"><span class="dpfl">Vehículo</span><span class="dpfv">${l.vehiculo_cliente||'—'}</span></div>
+        <div class="dpst" style="margin-top:12px">Cambiar estado</div>
+        <select onchange="cambiarEstado('lt',this.value)" style="width:100%;padding:6px 8px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-size:11px;font-family:var(--font)">
+          ${ET.map(e=>`<option ${e===l.estado?'selected':''}>${e}</option>`).join('')}
+        </select>
+      </div>`;
+    document.getElementById('dp-extra').innerHTML='';
+    renderSeg(l.seguimiento||[]);
+  } else if(tipo==='clt') {
+    const c=C.clt.find(x=>x.id===id); if(!c)return;
+    document.getElementById('dp-nombre').textContent=c.nombre;
+    document.getElementById('dp-main').innerHTML=`
+      <div style="margin-bottom:14px">
+        <div class="dpst">Cliente taller</div>
+        <div class="dpf"><span class="dpfl">Teléfono</span><span class="dpfv">${c.telefono||'—'}</span></div>
+        <div class="dpf"><span class="dpfl">Vehículo</span><span class="dpfv">${c.vehiculo||'—'}</span></div>
+        <div class="dpf"><span class="dpfl">Patente</span><span class="dpfv">${c.patente||'—'}</span></div>
+        <div class="dpf"><span class="dpfl">Recordatorio</span><span class="dpfv">${c.rec_meses?`Cada ${c.rec_meses} mes(es)`:'—'}</span></div>
+        <div class="dpf"><span class="dpfl">Próximo</span><span class="dpfv">${c.prox_recordatorio||'—'}</span></div>
+        <div style="margin-top:10px"><button class="btn btn-primary" style="width:100%;font-size:11px" onclick="openM('m-nsvc')"><i class="ti ti-plus"></i> Agregar servicio</button></div>
+      </div>`;
+    const hist=c.historial||[];
+    let h='<div style="margin-bottom:14px"><div class="dpst">Historial de servicios</div>';
+    h+=hist.length?[...hist].reverse().map(x=>`<div class="hist-item"><div class="hist-fecha">${x.fecha}</div><div class="hist-svc">${x.svcs.join(', ')}</div>${x.desc?`<div class="hist-det">${x.desc}</div>`:''}</div>`).join(''):'<div style="font-size:11px;color:var(--text3);padding:6px 0">Sin historial.</div>';
+    h+='</div>';
+    document.getElementById('dp-extra').innerHTML=h;
+    renderSeg(c.seguimiento||[]);
+  }
+}
+
+function renderSeg(segs) {
+  const cont=document.getElementById('dp-seg');
+  cont.innerHTML=segs&&segs.length?[...segs].reverse().map(s=>`<div class="seg-item"><div class="seg-fecha">${s.fecha}</div><div style="color:var(--text)">${s.txt}</div></div>`).join(''):'<div style="font-size:11px;color:var(--text3);padding:6px 0">Sin notas.</div>';
+}
+
+async function cambiarEstado(tipo, val) {
+  const tabla=tipo==='la'?'leads_autos':'leads_taller';
+  setSyncStatus('syncing');
+  await db.from(tabla).update({estado:val}).eq('id',C.activeId);
+  setSyncStatus('ok');
+  if(tipo==='la'){await loadLeadsA();renderKanban('autos');renderContactosAutos();}
+  else{await loadLeadsT();renderKanban('taller');}
+}
+
+async function agregarNota() {
+  const txt=document.getElementById('seg-input').value.trim(); if(!txt)return;
+  const tablas={'la':'leads_autos','lt':'leads_taller','clt':'clientes_taller'};
+  const listas={'la':C.leadsA,'lt':C.leadsT,'clt':C.clt};
+  const tabla=tablas[C.activeType]; const lista=listas[C.activeType];
+  const item=lista.find(x=>x.id===C.activeId); if(!item)return;
+  const seg=[...(item.seguimiento||[]),{fecha:hoy(),txt}];
+  setSyncStatus('syncing');
+  await db.from(tabla).update({seguimiento:seg}).eq('id',C.activeId);
+  setSyncStatus('ok');
+  item.seguimiento=seg;
+  renderSeg(seg);
+  document.getElementById('seg-input').value='';
+}
+
+function closeDetail() {
+  document.getElementById('detail-panel').classList.remove('open');
+  C.activeId=null; C.activeType=null;
+}
+
+// =============================================
+// INIT
+// =============================================
+loadDash();
+</script>
+</body>
+</html>

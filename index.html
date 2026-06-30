@@ -83,6 +83,7 @@ tr:hover td{background:var(--s2)}
 .fr textarea{min-height:60px;resize:vertical}
 .fg2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .fg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.fg4{display:grid;grid-template-columns:1fr 1.5fr 1fr auto;gap:10px}
 .ma{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
 .divider{border:none;border-top:1px solid var(--bd);margin:12px 0}
 .sub-label{font-size:9px;color:var(--tx3);margin:8px 0 4px;text-transform:uppercase;letter-spacing:.07em}
@@ -700,9 +701,10 @@ tr:hover td{background:var(--s2)}
   </div>
   <div class="sub-label">Debe — ítems del trabajo / trato</div>
   <div class="tw" style="margin-bottom:10px">
-    <table><thead><tr><th>Descripción</th><th>Valor</th><th></th></tr></thead><tbody id="ccd-items"></tbody></table>
+    <table><thead><tr><th>Fecha</th><th>Descripción</th><th>Valor</th><th></th></tr></thead><tbody id="ccd-items"></tbody></table>
   </div>
-  <div class="fg3" style="margin-bottom:14px">
+  <div class="fg4" style="margin-bottom:14px">
+    <div class="fr" style="margin-bottom:0"><input id="ccd-item-fecha" type="date"></div>
     <div class="fr" style="margin-bottom:0"><input id="ccd-item-desc" placeholder="Descripción del ítem"></div>
     <div class="fr" style="margin-bottom:0"><input id="ccd-item-valor" type="number" placeholder="Valor $"></div>
     <button class="btn btn-p" onclick="agregarItemCC()" style="height:34px"><i class="ti ti-plus"></i> Agregar</button>
@@ -1004,25 +1006,26 @@ function renderDetalleCC(){
   document.getElementById('ccd-deuda').textContent=fmt(t.deuda);
   document.getElementById('ccd-deuda').style.color=t.deuda>0?'var(--er)':'var(--ok)';
   const items=c.items||[];
-  document.getElementById('ccd-items').innerHTML=items.length?items.map((it,idx)=>`<tr><td>${it.descripcion}</td><td>${fmt(it.valor)}</td><td><button class="icon-btn" onclick="elimItemCC(${idx})"><i class="ti ti-trash"></i></button></td></tr>`).join(''):'<tr><td colspan="3"><div class="empty" style="padding:14px"><i class="ti ti-list"></i>Sin ítems.</div></td></tr>';
+  document.getElementById('ccd-items').innerHTML=items.length?items.map((it,idx)=>`<tr><td style="font-size:10px;color:var(--tx3)">${it.fecha||'—'}</td><td>${it.descripcion}</td><td>${fmt(it.valor)}</td><td><button class="icon-btn" onclick="elimItemCC(${idx})"><i class="ti ti-trash"></i></button></td></tr>`).join(''):'<tr><td colspan="4"><div class="empty" style="padding:14px"><i class="ti ti-list"></i>Sin ítems.</div></td></tr>';
   const pagos=c.pagos||[];
   document.getElementById('ccd-pagos').innerHTML=pagos.length?pagos.map((p,idx)=>{const caja=CAJAS.find(x=>x.n===p.subcuenta);return`<tr><td style="font-size:10px;color:var(--tx3)">${p.fecha}</td><td>${b('bgr',caja?.nombre||'—')}</td><td class="ing">${fmt(p.monto)}</td><td style="font-size:10px;color:var(--tx3)">${p.nota||'—'}</td><td><button class="icon-btn" onclick="elimPagoCC(${idx})"><i class="ti ti-trash"></i></button></td></tr>`}).join(''):'<tr><td colspan="5"><div class="empty" style="padding:14px"><i class="ti ti-cash"></i>Sin pagos registrados.</div></td></tr>';
 }
 async function agregarItemCC(){
   const desc=document.getElementById('ccd-item-desc').value;
   const valor=parseFloat(document.getElementById('ccd-item-valor').value)||0;
+  const fecha=document.getElementById('ccd-item-fecha').value||hoyD();
   if(!desc||!valor)return alert('Completá descripción y valor');
   const id=parseInt(document.getElementById('ccd-id').value);
   const tipo=document.getElementById('ccd-tipo').value;
   const tabla=tipo==='taller'?'cc_taller':'cc_vehiculos';
   const lista=tipo==='taller'?C.cct:C.ccv;
   const c=lista.find(x=>x.id===id);if(!c)return;
-  const items=[...(c.items||[]),{descripcion:desc,valor}];
+  const items=[...(c.items||[]),{descripcion:desc,valor,fecha}];
   setSyncStatus('syncing');
   await db.from(tabla).update({items}).eq('id',id);
   c.items=items;
   setSyncStatus('ok');
-  document.getElementById('ccd-item-desc').value='';document.getElementById('ccd-item-valor').value='';
+  document.getElementById('ccd-item-desc').value='';document.getElementById('ccd-item-valor').value='';document.getElementById('ccd-item-fecha').value='';
   renderDetalleCC();
 }
 async function elimItemCC(idx){

@@ -866,31 +866,39 @@ function renderMes(){
   if(cardsEl)cardsEl.innerHTML=CAJAS.map(c=>{const s=saldosMes[c.n]||0;const cls=s>0?'pos':s<0?'neg':'zer';return`<div class="caja-card"><div class="caja-num">${String(c.n).padStart(3,'0')}</div><div class="caja-nombre">${c.nombre}</div><div class="caja-saldo ${cls}">${fmt(s)}</div><div class="caja-sub">del mes</div></div>`;}).join('');
   const diasMap={};
   movsMes.forEach(x=>{if(!diasMap[x.fecha])diasMap[x.fecha]=[];diasMap[x.fecha].push(x);});
-  const diasOrdenados=Object.keys(diasMap).sort((a,b)=>b.localeCompare(a));
+  const diasOrdenadosAsc=Object.keys(diasMap).sort((a,c)=>a.localeCompare(c));
   const cont=document.getElementById('mes-dias');if(!cont)return;
-  if(!diasOrdenados.length){cont.innerHTML='<div class="empty"><i class="ti ti-calendar"></i>Sin movimientos este mes.</div>';return;}
-  cont.innerHTML=diasOrdenados.map(fecha=>{
+  if(!diasOrdenadosAsc.length){cont.innerHTML='<div class="empty"><i class="ti ti-calendar"></i>Sin movimientos este mes.</div>';return;}
+  let acumulado=0;
+  const bloques=diasOrdenadosAsc.map(fecha=>{
     const movsDia=diasMap[fecha].filter(x=>!x.tipo_mov||x.tipo_mov==='movimiento');
     const sueldosDia=diasMap[fecha].filter(x=>x.tipo_mov==='sueldo'||x.tipo_mov==='gasto_fijo');
     const cobDia=movsDia.reduce((a,x)=>a+(parseFloat(x.cobrado)||0),0);
     const pagDia=movsDia.reduce((a,x)=>a+(parseFloat(x.pagado)||0),0);
     const sueldoDia=sueldosDia.reduce((a,x)=>a+(parseFloat(x.pagado)||0),0);
     const netoDia=cobDia-pagDia-sueldoDia;
+    const aperturaDia=acumulado;
+    acumulado+=netoDia;
+    const cierreDia=acumulado;
     const d=new Date(fecha+'T12:00:00');
     const diasSemana=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
     return`<div class="dia-bloque">
       <div class="dia-bloque-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
         <span class="dia-bloque-fecha">${diasSemana[d.getDay()]} ${d.getDate()} de ${MESES[d.getMonth()]}</span>
-        <div class="dia-bloque-resumen">${cobDia?`<span class="dia-bloque-stat ing">+${fmt(cobDia)}</span>`:''}${(pagDia+sueldoDia)?`<span class="dia-bloque-stat eg">-${fmt(pagDia+sueldoDia)}</span>`:''}<span class="dia-bloque-stat" style="color:${netoDia>=0?'var(--ok)':'var(--er)'};font-weight:700">${fmt(netoDia)}</span></div>
+        <div class="dia-bloque-resumen">
+          <span class="dia-bloque-stat" style="color:var(--tx3)">apertura ${fmt(aperturaDia)}</span>
+          ${cobDia?`<span class="dia-bloque-stat ing">+${fmt(cobDia)}</span>`:''}${(pagDia+sueldoDia)?`<span class="dia-bloque-stat eg">-${fmt(pagDia+sueldoDia)}</span>`:''}
+          <span class="dia-bloque-stat" style="color:var(--ac);font-weight:700">cierre ${fmt(cierreDia)}</span>
+        </div>
       </div>
       <div style="display:none">
         <div class="mov-hdr"><div class="mov-hdr-cell">Caja</div><div class="mov-hdr-cell">Detalle</div><div class="mov-hdr-cell">Tipo</div><div class="mov-hdr-cell">Cobrado</div><div class="mov-hdr-cell">Pagado</div><div class="mov-hdr-cell"></div></div>
         ${diasMap[fecha].map(x=>{const caja=CAJAS.find(c=>c.n===x.subcuenta);const esSueldo=x.tipo_mov==='sueldo'||x.tipo_mov==='gasto_fijo';const tipoBadge=x.tipo_mov==='sueldo'?b('ba','Sueldo'):x.tipo_mov==='gasto_fijo'?b('bgr','Gasto fijo'):b('bgr',x.categoria||'Movimiento');return`<div class="mov-row"><div class="mov-cell"><span class="num-caja ${esSueldo?'sueldo':''}">${x.subcuenta}</span></div><div class="mov-cell"><strong>${x.detalle}</strong><br><span style="font-size:9px;color:var(--tx3)">${caja?.nombre||'—'}</span></div><div class="mov-cell muted">${tipoBadge}</div><div class="mov-cell cobrado">${(x.cobrado&&x.cobrado>0)?fmt(x.cobrado):'—'}</div><div class="mov-cell pagado">${(x.pagado&&x.pagado>0)?fmt(x.pagado):'—'}</div><div class="mov-cell"><button class="icon-btn" onclick="elimMovDia(${x.id})"><i class="ti ti-trash"></i></button></div></div>`;}).join('')}
       </div>
     </div>`;
-  }).join('');
+  });
+  cont.innerHTML=bloques.reverse().join('');
 }
-
 function abrirMovDia(){document.getElementById('ct-fecha').value=C.diaActual;document.getElementById('ct-tipo-mov').value='movimiento';document.getElementById('cajat-title').textContent='Nuevo movimiento — caja taller';openM('m-cajat');}
 function abrirSueldo(){document.getElementById('su-fecha').value=C.diaActual;openM('m-sueldo');}
 
@@ -984,29 +992,38 @@ function renderMesV(){
   if(cardsEl)cardsEl.innerHTML=CAJAS.map(c=>{const s=saldosMes[c.n]||0;const cls=s>0?'pos':s<0?'neg':'zer';return`<div class="caja-card"><div class="caja-num">${String(c.n).padStart(3,'0')}</div><div class="caja-nombre">${c.nombre}</div><div class="caja-saldo ${cls}">${fmt(s)}</div><div class="caja-sub">del mes</div></div>`;}).join('');
   const diasMap={};
   movsMes.forEach(x=>{if(!diasMap[x.fecha])diasMap[x.fecha]=[];diasMap[x.fecha].push(x);});
-  const diasOrdenados=Object.keys(diasMap).sort((a,b)=>b.localeCompare(a));
+  const diasOrdenadosAsc=Object.keys(diasMap).sort((a,c)=>a.localeCompare(c));
   const cont=document.getElementById('mesv-dias');if(!cont)return;
-  if(!diasOrdenados.length){cont.innerHTML='<div class="empty"><i class="ti ti-calendar"></i>Sin movimientos este mes.</div>';return;}
-  cont.innerHTML=diasOrdenados.map(fecha=>{
+  if(!diasOrdenadosAsc.length){cont.innerHTML='<div class="empty"><i class="ti ti-calendar"></i>Sin movimientos este mes.</div>';return;}
+  let acumuladoV=0;
+  const bloquesV=diasOrdenadosAsc.map(fecha=>{
     const movsDia=diasMap[fecha].filter(x=>!x.tipo_mov||x.tipo_mov==='movimiento');
     const sueldosDia=diasMap[fecha].filter(x=>x.tipo_mov==='sueldo'||x.tipo_mov==='gasto_fijo');
     const cobDia=movsDia.reduce((a,x)=>a+(parseFloat(x.cobrado)||0),0);
     const pagDia=movsDia.reduce((a,x)=>a+(parseFloat(x.pagado)||0),0);
     const sueldoDia=sueldosDia.reduce((a,x)=>a+(parseFloat(x.pagado)||0),0);
     const netoDia=cobDia-pagDia-sueldoDia;
+    const aperturaDia=acumuladoV;
+    acumuladoV+=netoDia;
+    const cierreDia=acumuladoV;
     const d=new Date(fecha+'T12:00:00');
     const diasSemana=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
     return`<div class="dia-bloque">
       <div class="dia-bloque-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
         <span class="dia-bloque-fecha">${diasSemana[d.getDay()]} ${d.getDate()} de ${MESES[d.getMonth()]}</span>
-        <div class="dia-bloque-resumen">${cobDia?`<span class="dia-bloque-stat ing">+${fmt(cobDia)}</span>`:''}${(pagDia+sueldoDia)?`<span class="dia-bloque-stat eg">-${fmt(pagDia+sueldoDia)}</span>`:''}<span class="dia-bloque-stat" style="color:${netoDia>=0?'var(--ok)':'var(--er)'};font-weight:700">${fmt(netoDia)}</span></div>
+        <div class="dia-bloque-resumen">
+          <span class="dia-bloque-stat" style="color:var(--tx3)">apertura ${fmt(aperturaDia)}</span>
+          ${cobDia?`<span class="dia-bloque-stat ing">+${fmt(cobDia)}</span>`:''}${(pagDia+sueldoDia)?`<span class="dia-bloque-stat eg">-${fmt(pagDia+sueldoDia)}</span>`:''}
+          <span class="dia-bloque-stat" style="color:var(--ac);font-weight:700">cierre ${fmt(cierreDia)}</span>
+        </div>
       </div>
       <div style="display:none">
         <div class="mov-hdr"><div class="mov-hdr-cell">Caja</div><div class="mov-hdr-cell">Detalle</div><div class="mov-hdr-cell">Tipo</div><div class="mov-hdr-cell">Cobrado</div><div class="mov-hdr-cell">Pagado</div><div class="mov-hdr-cell"></div></div>
         ${diasMap[fecha].map(x=>{const caja=CAJAS.find(c=>c.n===x.subcuenta);const esSueldo=x.tipo_mov==='sueldo'||x.tipo_mov==='gasto_fijo';const tipoBadge=x.tipo_mov==='sueldo'?b('ba','Sueldo'):x.tipo_mov==='gasto_fijo'?b('bgr','Gasto fijo'):b('bgr',x.categoria||'Movimiento');return`<div class="mov-row"><div class="mov-cell"><span class="num-caja ${esSueldo?'sueldo':''}">${x.subcuenta}</span></div><div class="mov-cell"><strong>${x.detalle}</strong><br><span style="font-size:9px;color:var(--tx3)">${caja?.nombre||'—'}</span></div><div class="mov-cell muted">${tipoBadge}</div><div class="mov-cell cobrado">${(x.cobrado&&x.cobrado>0)?fmt(x.cobrado):'—'}</div><div class="mov-cell pagado">${(x.pagado&&x.pagado>0)?fmt(x.pagado):'—'}</div><div class="mov-cell"><button class="icon-btn" onclick="elimMovDiaV(${x.id})"><i class="ti ti-trash"></i></button></div></div>`;}).join('')}
       </div>
     </div>`;
-  }).join('');
+  });
+  cont.innerHTML=bloquesV.reverse().join('');
 }
 function abrirMovDiaV(){document.getElementById('cv-fecha').value=C.diaVActual;document.getElementById('cv-tipo-mov').value='movimiento';document.getElementById('cajav-title').textContent='Nuevo movimiento — caja vehículos';openM('m-cajav');}
 function abrirSueldoV(){document.getElementById('suv-fecha').value=C.diaVActual;openM('m-sueldov');}

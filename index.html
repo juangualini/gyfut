@@ -663,7 +663,10 @@ function cerrarSesion(){localStorage.removeItem('gyfut_session');SESSION=null;do
 
 function aplicarPermisos(){
   const esAdmin=SESSION.rol==='admin';
-  document.querySelectorAll('[data-perm="admin"]').forEach(el=>{el.style.display=esAdmin?'':'none';});
+  document.querySelectorAll('[data-perm="admin"]').forEach(el=>{
+    if(esAdmin){el.classList.remove('restricted-hide');el.style.display='';}
+    else{el.classList.add('restricted-hide');}
+  });
   document.getElementById('user-name').textContent=SESSION.nombre;
   document.getElementById('user-rol').textContent=esAdmin?'Administrador':'Operador taller';
   document.getElementById('user-avatar').textContent=SESSION.nombre.charAt(0).toUpperCase();

@@ -221,6 +221,7 @@ tr:hover td{background:var(--s2)}
     <div class="nl">CRM — Taller</div>
     <div class="ni" onclick="navTo('leads-taller',this)"><i class="ti ti-filter"></i> Pipeline servicios</div>
     <div class="ni" onclick="navTo('clientes-taller',this)"><i class="ti ti-user-check"></i> Clientes</div>
+    <div class="ni" onclick="navTo('cc-taller',this)"><i class="ti ti-receipt-2"></i> Cuenta corriente</div>
   </div>
   <div style="padding:4px 0" data-perm="admin">
     <div class="nl">Vehículos</div>
@@ -228,6 +229,7 @@ tr:hover td{background:var(--s2)}
     <div class="ni" onclick="navTo('ventas',this)"><i class="ti ti-transfer"></i> Ventas</div>
     <div class="ni" onclick="navTo('caja-vehiculos',this)"><i class="ti ti-cash"></i> Caja vehículos</div>
     <div class="ni" onclick="navTo('gestoria',this)"><i class="ti ti-file-certificate"></i> Gestoría</div>
+    <div class="ni" onclick="navTo('cc-vehiculos',this)"><i class="ti ti-receipt-2"></i> Cuenta corriente</div>
   </div>
   <div style="padding:4px 0">
     <div class="nl">Taller</div>
@@ -328,6 +330,30 @@ tr:hover td{background:var(--s2)}
       </div>
       <div class="tw">
         <table><thead><tr><th>Vehículo</th><th>Trámite</th><th>Estado</th><th>Deuda multa</th><th>Deuda patente</th><th>Al día</th><th>Terminado</th><th>Transferencia</th><th></th></tr></thead><tbody id="tb-gestoria"></tbody></table>
+      </div>
+    </div>
+
+    <!-- CUENTA CORRIENTE TALLER -->
+    <div class="page" id="page-cc-taller">
+      <div class="sg g3" style="margin-bottom:18px">
+        <div class="sc"><div class="sl">Cuentas abiertas</div><div class="sv eg" id="cct-abiertas">—</div></div>
+        <div class="sc"><div class="sl">Total adeudado</div><div class="sv eg" id="cct-deuda">—</div></div>
+        <div class="sc"><div class="sl">Cuentas saldadas</div><div class="sv ing" id="cct-saldadas">—</div></div>
+      </div>
+      <div class="tw">
+        <table><thead><tr><th>Cliente</th><th>Total</th><th>Pagado</th><th>Deuda</th><th>Estado</th><th></th></tr></thead><tbody id="tb-cc-taller"></tbody></table>
+      </div>
+    </div>
+
+    <!-- CUENTA CORRIENTE VEHÍCULOS -->
+    <div class="page" id="page-cc-vehiculos">
+      <div class="sg g3" style="margin-bottom:18px">
+        <div class="sc"><div class="sl">Cuentas abiertas</div><div class="sv eg" id="ccv-abiertas">—</div></div>
+        <div class="sc"><div class="sl">Total adeudado</div><div class="sv eg" id="ccv-deuda">—</div></div>
+        <div class="sc"><div class="sl">Cuentas saldadas</div><div class="sv ing" id="ccv-saldadas">—</div></div>
+      </div>
+      <div class="tw">
+        <table><thead><tr><th>Cliente</th><th>Vehículo</th><th>Total</th><th>Pagado</th><th>Deuda</th><th>Estado</th><th></th></tr></thead><tbody id="tb-cc-vehiculos"></tbody></table>
       </div>
     </div>
 
@@ -645,6 +671,62 @@ tr:hover td{background:var(--s2)}
   <div class="ma"><button class="btn" onclick="closeM('m-gestoria')">Cancelar</button><button class="btn btn-p" onclick="guardarGestoria()">Guardar</button></div>
 </div></div>
 
+<!-- NUEVA CUENTA CORRIENTE TALLER -->
+<div class="mo" id="m-cct"><div class="modal">
+  <div class="mt">Nueva cuenta corriente — taller</div>
+  <div class="fr"><label>Cliente</label><select id="cct-cliente"><option value="">— elegir cliente —</option></select></div>
+  <div class="fr"><label>O escribí el nombre</label><input id="cct-cliente-texto" placeholder="Si no está en la lista..."></div>
+  <div class="ma"><button class="btn" onclick="closeM('m-cct')">Cancelar</button><button class="btn btn-p" onclick="guardarCCT()">Crear cuenta</button></div>
+</div></div>
+
+<!-- NUEVA CUENTA CORRIENTE VEHÍCULOS -->
+<div class="mo" id="m-ccv"><div class="modal">
+  <div class="mt">Nueva cuenta corriente — vehículos</div>
+  <div class="fr"><label>Vehículo del inventario</label><select id="ccv-veh"><option value="">— elegir vehículo —</option></select></div>
+  <div class="fr"><label>O escribí el vehículo</label><input id="ccv-veh-texto" placeholder="Si no está en inventario..."></div>
+  <div class="fr"><label>Cliente / comprador</label><input id="ccv-cliente-texto" placeholder="Nombre del comprador"></div>
+  <div class="ma"><button class="btn" onclick="closeM('m-ccv')">Cancelar</button><button class="btn btn-p" onclick="guardarCCV()">Crear cuenta</button></div>
+</div></div>
+
+<!-- DETALLE CUENTA CORRIENTE (debe y haber) -->
+<div class="mo" id="m-cc-detalle"><div class="modal" style="width:620px">
+  <div class="mt" id="ccd-titulo">Cuenta corriente</div>
+  <input type="hidden" id="ccd-id" value="">
+  <input type="hidden" id="ccd-tipo" value="">
+  <div class="sg g3" style="margin-bottom:14px">
+    <div class="sc" style="padding:10px 12px"><div class="sl">Total</div><div class="sv" id="ccd-total" style="font-size:16px">$0</div></div>
+    <div class="sc" style="padding:10px 12px"><div class="sl">Pagado</div><div class="sv ing" id="ccd-pagado" style="font-size:16px">$0</div></div>
+    <div class="sc" style="padding:10px 12px"><div class="sl">Deuda</div><div class="sv eg" id="ccd-deuda" style="font-size:16px">$0</div></div>
+  </div>
+  <div class="sub-label">Debe — ítems del trabajo / trato</div>
+  <div class="tw" style="margin-bottom:10px">
+    <table><thead><tr><th>Descripción</th><th>Valor</th><th></th></tr></thead><tbody id="ccd-items"></tbody></table>
+  </div>
+  <div class="fg3" style="margin-bottom:14px">
+    <div class="fr" style="margin-bottom:0"><input id="ccd-item-desc" placeholder="Descripción del ítem"></div>
+    <div class="fr" style="margin-bottom:0"><input id="ccd-item-valor" type="number" placeholder="Valor $"></div>
+    <button class="btn btn-p" onclick="agregarItemCC()" style="height:34px"><i class="ti ti-plus"></i> Agregar</button>
+  </div>
+  <hr class="divider">
+  <div class="sub-label">Haber — pagos recibidos</div>
+  <div class="tw" style="margin-bottom:10px">
+    <table><thead><tr><th>Fecha</th><th>Caja</th><th>Monto</th><th>Nota</th><th></th></tr></thead><tbody id="ccd-pagos"></tbody></table>
+  </div>
+  <div class="fg3">
+    <div class="fr" style="margin-bottom:0"><input id="ccd-pago-monto" type="number" placeholder="Monto $"></div>
+    <div class="fr" style="margin-bottom:0">
+      <select id="ccd-pago-caja">
+        <option value="1">1 — Efectivo</option><option value="2">2 — Banco</option><option value="3">3 — Jorge</option>
+        <option value="4">4 — Cheque</option><option value="5">5 — Mariana</option><option value="6">6 — Martín</option>
+        <option value="7">7 — Lucho</option><option value="8">8 — USD</option>
+      </select>
+    </div>
+    <button class="btn btn-p" onclick="agregarPagoCC()" style="height:34px"><i class="ti ti-plus"></i> Registrar pago</button>
+  </div>
+  <div class="fr" style="margin-top:8px"><input id="ccd-pago-nota" placeholder="Nota del pago (opcional)"></div>
+  <div class="ma"><button class="btn" onclick="closeM('m-cc-detalle')">Cerrar</button></div>
+</div></div>
+
 <script>
 const SURL='https://qmhijhbyludxsdieaeyg.supabase.co';
 const SKEY='sb_publishable_cGmh1uuQrwnL1wpRR6QaOw_QZB78aFy';
@@ -655,7 +737,7 @@ const CAJAS=[{n:1,nombre:'Efectivo'},{n:2,nombre:'Banco'},{n:3,nombre:'Jorge'},{
 const MESES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
 let SESSION=null;
-let C={leadsA:[],leadsT:[],clt:[],veh:[],ots:[],cajav:[],cajat:[],cf:[],ventas:[],recs:[],gestoria:[],activeId:null,activeType:null,recFiltro:'todos',diaActual:new Date().toISOString().split('T')[0],mesActual:{y:new Date().getFullYear(),m:new Date().getMonth()},diaVActual:new Date().toISOString().split('T')[0],mesVActual:{y:new Date().getFullYear(),m:new Date().getMonth()},cajaVistaActual:'dia',cajaVVistaActual:'dia'};
+let C={leadsA:[],leadsT:[],clt:[],veh:[],ots:[],cajav:[],cajat:[],cf:[],ventas:[],recs:[],gestoria:[],cct:[],ccv:[],activeId:null,activeType:null,recFiltro:'todos',diaActual:new Date().toISOString().split('T')[0],mesActual:{y:new Date().getFullYear(),m:new Date().getMonth()},diaVActual:new Date().toISOString().split('T')[0],mesVActual:{y:new Date().getFullYear(),m:new Date().getMonth()},cajaVistaActual:'dia',cajaVVistaActual:'dia'};
 
 const fmt=n=>'$'+Number(n||0).toLocaleString('es-AR');
 const hoy=()=>new Date().toLocaleDateString('es-AR');
@@ -717,7 +799,7 @@ window.addEventListener('DOMContentLoaded',()=>{
 
 function setSyncStatus(s){const d=document.getElementById('sdot'),t=document.getElementById('stxt');if(s==='ok'){d.className='sdot';t.textContent='Conectado';}else if(s==='syncing'){d.className='sdot spin';t.textContent='Guardando...';}else{d.className='sdot err';t.textContent='Error';}}
 
-const titles={dashboard:'Dashboard',recordatorios:'Recordatorios','leads-autos':'Pipeline — ventas de autos','contactos-autos':'Contactos leads autos','leads-taller':'Pipeline — servicios de taller','clientes-taller':'Clientes de taller',inventario:'Inventario',ventas:'Ventas','caja-vehiculos':'Caja — vehículos',gestoria:'Gestoría',ordenes:'Órdenes de trabajo','caja-taller':'Caja — taller','costos-fijos':'Costos fijos'};
+const titles={dashboard:'Dashboard',recordatorios:'Recordatorios','leads-autos':'Pipeline — ventas de autos','contactos-autos':'Contactos leads autos','leads-taller':'Pipeline — servicios de taller','clientes-taller':'Clientes de taller',inventario:'Inventario',ventas:'Ventas','caja-vehiculos':'Caja — vehículos',gestoria:'Gestoría',ordenes:'Órdenes de trabajo','caja-taller':'Caja — taller','costos-fijos':'Costos fijos','cc-taller':'Cuenta corriente — taller','cc-vehiculos':'Cuenta corriente — vehículos'};
 
 function getActions(pg){
   const esAdmin=SESSION.rol==='admin';
@@ -735,6 +817,8 @@ function getActions(pg){
     return`<button class="btn btn-p" onclick="abrirMovDia()"><i class="ti ti-plus"></i> Movimiento</button>`;
   }
   if(pg==='costos-fijos')return'<button class="btn btn-p" onclick="openM(\'m-cf\')"><i class="ti ti-plus"></i> Agregar costo</button>';
+  if(pg==='cc-taller')return'<button class="btn btn-p" onclick="abrirCCT()"><i class="ti ti-plus"></i> Nueva cuenta</button>';
+  if(pg==='cc-vehiculos')return'<button class="btn btn-p" onclick="abrirCCV()"><i class="ti ti-plus"></i> Nueva cuenta</button>';
   return'';
 }
 
@@ -746,7 +830,7 @@ async function navTo(pg,el){
   document.getElementById('topbar-title').textContent=titles[pg]||pg;
   document.getElementById('topbar-actions').innerHTML=getActions(pg);
   closeDetail();
-  const r={dashboard:loadDash,'leads-autos':()=>loadLeadsA().then(()=>renderKanban('autos')),'contactos-autos':()=>loadLeadsA().then(renderContactosAutos),'leads-taller':()=>loadLeadsT().then(()=>renderKanban('taller')),'clientes-taller':()=>loadCLT().then(renderClientesTaller),inventario:()=>loadVeh().then(renderInv),ventas:()=>loadVentas().then(renderVentas),gestoria:()=>Promise.all([loadGestoria(),loadVeh()]).then(renderGestoria),'caja-vehiculos':loadCajaVehiculos,ordenes:()=>Promise.all([loadOT(),loadCLT()]).then(()=>renderOT()),'caja-taller':loadCajaTaller,'costos-fijos':()=>loadCF().then(renderCF),recordatorios:()=>loadRecs().then(renderRecs)};
+  const r={dashboard:loadDash,'leads-autos':()=>loadLeadsA().then(()=>renderKanban('autos')),'contactos-autos':()=>loadLeadsA().then(renderContactosAutos),'leads-taller':()=>loadLeadsT().then(()=>renderKanban('taller')),'clientes-taller':()=>loadCLT().then(renderClientesTaller),inventario:()=>loadVeh().then(renderInv),ventas:()=>loadVentas().then(renderVentas),gestoria:()=>Promise.all([loadGestoria(),loadVeh()]).then(renderGestoria),'caja-vehiculos':loadCajaVehiculos,ordenes:()=>Promise.all([loadOT(),loadCLT()]).then(()=>renderOT()),'caja-taller':loadCajaTaller,'costos-fijos':()=>loadCF().then(renderCF),recordatorios:()=>loadRecs().then(renderRecs),'cc-taller':()=>Promise.all([loadCCT(),loadCLT()]).then(()=>renderCCT()),'cc-vehiculos':()=>Promise.all([loadCCV(),loadVeh()]).then(()=>renderCCVList())};
   if(r[pg])await r[pg]();
 }
 
@@ -819,6 +903,184 @@ function renderGestoria(){
   </tr>`).join('');
 }
 async function elimGestoria(id){if(!confirm('¿Eliminar trámite?'))return;setSyncStatus('syncing');await db.from('gestoria').delete().eq('id',id);setSyncStatus('ok');await loadGestoria();renderGestoria();}
+
+// ============ CUENTA CORRIENTE — TALLER ============
+const loadCCT=async()=>{const{data}=await db.from('cc_taller').select('*').order('created_at',{ascending:false});C.cct=data||[];};
+function totalesCC(cuenta){
+  const items=cuenta.items||[];const pagos=cuenta.pagos||[];
+  const total=items.reduce((a,i)=>a+(parseFloat(i.valor)||0),0);
+  const pagado=pagos.reduce((a,p)=>a+(parseFloat(p.monto)||0),0);
+  return{total,pagado,deuda:total-pagado};
+}
+function abrirCCT(){
+  const sel=document.getElementById('cct-cliente');
+  sel.innerHTML='<option value="">— elegir cliente —</option>'+C.clt.map(c=>`<option value="${c.id}">${c.nombre}${c.vehiculo?' — '+c.vehiculo:''}</option>`).join('');
+  document.getElementById('cct-cliente-texto').value='';
+  openM('m-cct');
+}
+async function guardarCCT(){
+  const selId=document.getElementById('cct-cliente').value;
+  const texto=document.getElementById('cct-cliente-texto').value;
+  let clienteId=null,nombre='';
+  if(selId){const c=C.clt.find(x=>String(x.id)===selId);clienteId=c?.id||null;nombre=c?.nombre||'';}
+  else if(texto){nombre=texto;}
+  else return alert('Elegí un cliente o escribí el nombre');
+  setSyncStatus('syncing');
+  await db.from('cc_taller').insert({cliente_id:clienteId,cliente_texto:nombre,items:[],pagos:[],estado:'abierta'});
+  setSyncStatus('ok');closeM('m-cct');
+  await loadCCT();renderCCT();
+}
+function renderCCT(){
+  const abiertas=C.cct.filter(c=>c.estado==='abierta');
+  const saldadas=C.cct.filter(c=>c.estado==='saldada');
+  const deudaTotal=abiertas.reduce((a,c)=>a+totalesCC(c).deuda,0);
+  document.getElementById('cct-abiertas').textContent=abiertas.length;
+  document.getElementById('cct-deuda').textContent=fmt(deudaTotal);
+  document.getElementById('cct-saldadas').textContent=saldadas.length;
+  const tb=document.getElementById('tb-cc-taller');
+  if(!C.cct.length){tb.innerHTML='<tr><td colspan="6"><div class="empty"><i class="ti ti-receipt-2"></i>Sin cuentas corrientes.</div></td></tr>';return;}
+  tb.innerHTML=C.cct.map(c=>{
+    const t=totalesCC(c);
+    return`<tr style="cursor:pointer" onclick="abrirDetalleCC(${c.id},'taller')"><td><strong>${c.cliente_texto}</strong></td><td>${fmt(t.total)}</td><td class="ing">${fmt(t.pagado)}</td><td class="${t.deuda>0?'eg':'ing'}">${fmt(t.deuda)}</td><td>${b(c.estado==='saldada'?'bg':'ba',c.estado==='saldada'?'Saldada':'Abierta')}</td><td onclick="event.stopPropagation()"><button class="icon-btn" onclick="elimCC(${c.id},'taller')"><i class="ti ti-trash"></i></button></td></tr>`;
+  }).join('');
+}
+async function elimCC(id,tipo){if(!confirm('¿Eliminar cuenta corriente?'))return;setSyncStatus('syncing');await db.from(tipo==='taller'?'cc_taller':'cc_vehiculos').delete().eq('id',id);setSyncStatus('ok');if(tipo==='taller'){await loadCCT();renderCCT();}else{await loadCCV();renderCCVList();}}
+
+// ============ CUENTA CORRIENTE — VEHÍCULOS ============
+const loadCCV=async()=>{const{data}=await db.from('cc_vehiculos').select('*').order('created_at',{ascending:false});C.ccv=data||[];};
+function abrirCCV(){
+  const sel=document.getElementById('ccv-veh');
+  sel.innerHTML='<option value="">— elegir vehículo —</option>'+C.veh.map(v=>`<option value="${v.id}">${v.marca} ${v.modelo} ${v.anio}</option>`).join('');
+  document.getElementById('ccv-veh-texto').value='';
+  document.getElementById('ccv-cliente-texto').value='';
+  openM('m-ccv');
+}
+async function guardarCCV(){
+  const selId=document.getElementById('ccv-veh').value;
+  const vtexto=document.getElementById('ccv-veh-texto').value;
+  const cliente=document.getElementById('ccv-cliente-texto').value;
+  if(!cliente)return alert('Completá el cliente/comprador');
+  let vehiculoId=null,vehiculoTexto='';
+  if(selId){const v=C.veh.find(x=>x.id===parseInt(selId));vehiculoId=v?.id||null;vehiculoTexto=v?`${v.marca} ${v.modelo} ${v.anio}`:'';}
+  else vehiculoTexto=vtexto;
+  setSyncStatus('syncing');
+  await db.from('cc_vehiculos').insert({vehiculo_id:vehiculoId,vehiculo_texto:vehiculoTexto,cliente_texto:cliente,items:[],pagos:[],estado:'abierta'});
+  setSyncStatus('ok');closeM('m-ccv');
+  await loadCCV();renderCCVList();
+}
+function renderCCVList(){
+  const abiertas=C.ccv.filter(c=>c.estado==='abierta');
+  const saldadas=C.ccv.filter(c=>c.estado==='saldada');
+  const deudaTotal=abiertas.reduce((a,c)=>a+totalesCC(c).deuda,0);
+  document.getElementById('ccv-abiertas').textContent=abiertas.length;
+  document.getElementById('ccv-deuda').textContent=fmt(deudaTotal);
+  document.getElementById('ccv-saldadas').textContent=saldadas.length;
+  const tb=document.getElementById('tb-cc-vehiculos');
+  if(!C.ccv.length){tb.innerHTML='<tr><td colspan="6"><div class="empty"><i class="ti ti-receipt-2"></i>Sin cuentas corrientes.</div></td></tr>';return;}
+  tb.innerHTML=C.ccv.map(c=>{
+    const t=totalesCC(c);
+    return`<tr style="cursor:pointer" onclick="abrirDetalleCC(${c.id},'vehiculos')"><td><strong>${c.cliente_texto}</strong></td><td>${c.vehiculo_texto||'—'}</td><td>${fmt(t.total)}</td><td class="ing">${fmt(t.pagado)}</td><td class="${t.deuda>0?'eg':'ing'}">${fmt(t.deuda)}</td><td onclick="event.stopPropagation()"><button class="icon-btn" onclick="elimCC(${c.id},'vehiculos')"><i class="ti ti-trash"></i></button></td></tr>`;
+  }).join('');
+}
+
+// ============ DETALLE CUENTA CORRIENTE (debe y haber) ============
+function abrirDetalleCC(id,tipo){
+  document.getElementById('ccd-id').value=id;
+  document.getElementById('ccd-tipo').value=tipo;
+  const lista=tipo==='taller'?C.cct:C.ccv;
+  const c=lista.find(x=>x.id===id);if(!c)return;
+  document.getElementById('ccd-titulo').textContent=`${c.cliente_texto}${c.vehiculo_texto?' — '+c.vehiculo_texto:''}`;
+  renderDetalleCC();
+  openM('m-cc-detalle');
+}
+function renderDetalleCC(){
+  const id=parseInt(document.getElementById('ccd-id').value);
+  const tipo=document.getElementById('ccd-tipo').value;
+  const lista=tipo==='taller'?C.cct:C.ccv;
+  const c=lista.find(x=>x.id===id);if(!c)return;
+  const t=totalesCC(c);
+  document.getElementById('ccd-total').textContent=fmt(t.total);
+  document.getElementById('ccd-pagado').textContent=fmt(t.pagado);
+  document.getElementById('ccd-deuda').textContent=fmt(t.deuda);
+  document.getElementById('ccd-deuda').style.color=t.deuda>0?'var(--er)':'var(--ok)';
+  const items=c.items||[];
+  document.getElementById('ccd-items').innerHTML=items.length?items.map((it,idx)=>`<tr><td>${it.descripcion}</td><td>${fmt(it.valor)}</td><td><button class="icon-btn" onclick="elimItemCC(${idx})"><i class="ti ti-trash"></i></button></td></tr>`).join(''):'<tr><td colspan="3"><div class="empty" style="padding:14px"><i class="ti ti-list"></i>Sin ítems.</div></td></tr>';
+  const pagos=c.pagos||[];
+  document.getElementById('ccd-pagos').innerHTML=pagos.length?pagos.map((p,idx)=>{const caja=CAJAS.find(x=>x.n===p.subcuenta);return`<tr><td style="font-size:10px;color:var(--tx3)">${p.fecha}</td><td>${b('bgr',caja?.nombre||'—')}</td><td class="ing">${fmt(p.monto)}</td><td style="font-size:10px;color:var(--tx3)">${p.nota||'—'}</td><td><button class="icon-btn" onclick="elimPagoCC(${idx})"><i class="ti ti-trash"></i></button></td></tr>`}).join(''):'<tr><td colspan="5"><div class="empty" style="padding:14px"><i class="ti ti-cash"></i>Sin pagos registrados.</div></td></tr>';
+}
+async function agregarItemCC(){
+  const desc=document.getElementById('ccd-item-desc').value;
+  const valor=parseFloat(document.getElementById('ccd-item-valor').value)||0;
+  if(!desc||!valor)return alert('Completá descripción y valor');
+  const id=parseInt(document.getElementById('ccd-id').value);
+  const tipo=document.getElementById('ccd-tipo').value;
+  const tabla=tipo==='taller'?'cc_taller':'cc_vehiculos';
+  const lista=tipo==='taller'?C.cct:C.ccv;
+  const c=lista.find(x=>x.id===id);if(!c)return;
+  const items=[...(c.items||[]),{descripcion:desc,valor}];
+  setSyncStatus('syncing');
+  await db.from(tabla).update({items}).eq('id',id);
+  c.items=items;
+  setSyncStatus('ok');
+  document.getElementById('ccd-item-desc').value='';document.getElementById('ccd-item-valor').value='';
+  renderDetalleCC();
+}
+async function elimItemCC(idx){
+  const id=parseInt(document.getElementById('ccd-id').value);
+  const tipo=document.getElementById('ccd-tipo').value;
+  const tabla=tipo==='taller'?'cc_taller':'cc_vehiculos';
+  const lista=tipo==='taller'?C.cct:C.ccv;
+  const c=lista.find(x=>x.id===id);if(!c)return;
+  const items=[...(c.items||[])];items.splice(idx,1);
+  setSyncStatus('syncing');
+  await db.from(tabla).update({items}).eq('id',id);
+  c.items=items;setSyncStatus('ok');
+  renderDetalleCC();
+}
+async function agregarPagoCC(){
+  const monto=parseFloat(document.getElementById('ccd-pago-monto').value)||0;
+  if(!monto)return alert('Ingresá el monto del pago');
+  const subcuenta=parseInt(document.getElementById('ccd-pago-caja').value);
+  const nota=document.getElementById('ccd-pago-nota').value;
+  const id=parseInt(document.getElementById('ccd-id').value);
+  const tipo=document.getElementById('ccd-tipo').value;
+  const tabla=tipo==='taller'?'cc_taller':'cc_vehiculos';
+  const lista=tipo==='taller'?C.cct:C.ccv;
+  const c=lista.find(x=>x.id===id);if(!c)return;
+  const fecha=hoyD();
+  const pagos=[...(c.pagos||[]),{fecha,monto,subcuenta,nota}];
+  setSyncStatus('syncing');
+  // actualizar cuenta corriente
+  await db.from(tabla).update({pagos}).eq('id',id);
+  c.pagos=pagos;
+  // sincronizar con caja diaria correspondiente
+  const cajaTabla=tipo==='taller'?'caja_taller':'caja_vehiculos';
+  const descCaja=`Pago CC — ${c.cliente_texto}${nota?' ('+nota+')':''}`;
+  if(tipo==='taller'){
+    await db.from('caja_taller').insert({detalle:descCaja,subcuenta,categoria:'Cobro trabajo',cobrado:monto,pagado:0,fecha,tipo_mov:'movimiento'});
+  } else {
+    await db.from('caja_vehiculos').insert({detalle:descCaja,subcuenta,categoria:'Venta vehículo',cobrado:monto,pagado:0,vehiculo:c.vehiculo_texto||'',fecha,tipo_mov:'movimiento'});
+  }
+  // marcar saldada si corresponde
+  const t=totalesCC(c);
+  if(t.deuda<=0&&c.estado!=='saldada'){await db.from(tabla).update({estado:'saldada'}).eq('id',id);c.estado='saldada';}
+  setSyncStatus('ok');
+  document.getElementById('ccd-pago-monto').value='';document.getElementById('ccd-pago-nota').value='';
+  renderDetalleCC();
+  if(tipo==='taller'){await loadCajaT();}else{await loadCajaV();}
+}
+async function elimPagoCC(idx){
+  const id=parseInt(document.getElementById('ccd-id').value);
+  const tipo=document.getElementById('ccd-tipo').value;
+  const tabla=tipo==='taller'?'cc_taller':'cc_vehiculos';
+  const lista=tipo==='taller'?C.cct:C.ccv;
+  const c=lista.find(x=>x.id===id);if(!c)return;
+  const pagos=[...(c.pagos||[])];pagos.splice(idx,1);
+  setSyncStatus('syncing');
+  await db.from(tabla).update({pagos,estado:'abierta'}).eq('id',id);
+  c.pagos=pagos;c.estado='abierta';setSyncStatus('ok');
+  renderDetalleCC();
+}
 
 // ============ CAJA TALLER (diaria + mensual) ============
 async function loadCajaTaller(){await loadCajaT();if(C.cajaVistaActual==='dia')renderDia();else renderMes();}

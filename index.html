@@ -388,7 +388,7 @@ tr:hover td{background:var(--s2)}
 
     <!-- ÓRDENES -->
     <div class="page" id="page-ordenes">
-      <div class="tw"><table><thead><tr><th>N°</th><th>Cliente</th><th>Servicios</th><th>Asignado</th><th class="restricted-hide" data-perm="admin">Costo</th><th class="restricted-hide" data-perm="admin">Cobrado</th><th class="restricted-hide" data-perm="admin">Margen</th><th>Estado</th><th></th></tr></thead><tbody id="tb-ot"></tbody></table></div>
+      <div class="tw"><table><thead><tr><th>N°</th><th>Cliente</th><th>Servicios</th><th>Asignado</th><th>Ingreso</th><th>Entrega</th><th class="restricted-hide" data-perm="admin">Costo</th><th class="restricted-hide" data-perm="admin">Cobrado</th><th class="restricted-hide" data-perm="admin">Margen</th><th>Pagó</th><th>Estado</th><th></th></tr></thead><tbody id="tb-ot"></tbody></table></div>
     </div>
 
     <!-- CAJA TALLER -->
@@ -524,10 +524,12 @@ tr:hover td{background:var(--s2)}
   <div class="mt">Nueva orden de trabajo</div>
   <div class="fr"><label>Cliente / vehículo</label><input id="ot-cl"></div>
   <div class="fg2"><div class="fr"><label>Asignado a</label><select id="ot-resp"><option>Martín (mecánica)</option><option>Theo (detailing/PPF)</option><option>Ambos</option></select></div><div class="fr"><label>Estado</label><select id="ot-est"><option>Ingresado</option><option>En proceso</option><option>Listo</option><option>Entregado</option></select></div></div>
+  <div class="fg2"><div class="fr"><label>Fecha de ingreso</label><input id="ot-fing" type="date"></div><div class="fr"><label>Fecha de entrega</label><input id="ot-fent" type="date"></div></div>
   <div class="sub-label">Servicios</div>
   <div class="chk-group"><label class="chk-label"><input type="checkbox" id="os-mec"> Mecánica</label><label class="chk-label"><input type="checkbox" id="os-det"> Detailing</label><label class="chk-label"><input type="checkbox" id="os-ppf"> PPF</label><label class="chk-label"><input type="checkbox" id="os-lav"> Lavado</label><label class="chk-label"><input type="checkbox" id="os-otro"> Otro</label></div>
   <hr class="divider">
-  <div class="fg3" id="ot-costos-row"><div class="fr"><label>Insumos ($)</label><input id="ot-ins" type="number" placeholder="0"></div><div class="fr"><label>Mano de obra ($)</label><input id="ot-mo" type="number" placeholder="0"></div><div class="fr"><label>Precio cobrado ($)</label><input id="ot-pr" type="number" placeholder="0"></div></div>
+  <div class="fg3" id="ot-costos-row"><div class="fr"><label>Insumos ($)</label><input id="ot-ins" type="number" placeholder="0"></div><div class="fr"><label>Mano de obra ($)</label><input id="ot-mo" type="number" placeholder="0"></div><div class="fr"><label>Precio del servicio ($)</label><input id="ot-pr" type="number" placeholder="0"></div></div>
+  <div class="fr" id="ot-pago-row"><label>¿Pagó?</label><select id="ot-pagado"><option value="false">No</option><option value="true">Sí</option></select></div>
   <div class="fr"><label>Descripción</label><textarea id="ot-desc"></textarea></div>
   <div class="ma"><button class="btn" onclick="closeM('m-ot')">Cancelar</button><button class="btn btn-p" onclick="guardarOT()">Guardar</button></div>
 </div></div>
@@ -704,7 +706,7 @@ function getActions(pg){
   if(pg==='ventas')return'<button class="btn btn-p" onclick="abrirVenta()"><i class="ti ti-plus"></i> Registrar venta</button>';
   if(pg==='gestoria')return'<button class="btn btn-p" onclick="abrirGestoria()"><i class="ti ti-plus"></i> Nuevo trámite</button>';
   if(pg==='caja-vehiculos')return`<div style="display:flex;gap:6px"><button class="btn btn-p" onclick="abrirMovDiaV()"><i class="ti ti-plus"></i> Movimiento</button><button class="btn btn-wa" onclick="abrirSueldoV()"><i class="ti ti-users"></i> Sueldo / gasto</button></div>`;
-  if(pg==='ordenes')return'<button class="btn btn-p" onclick="openM(\'m-ot\')"><i class="ti ti-plus"></i> Nueva orden</button>';
+  if(pg==='ordenes')return'<button class="btn btn-p" onclick="abrirOT()"><i class="ti ti-plus"></i> Nueva orden</button>';
   if(pg==='caja-taller'){
     if(esAdmin)return`<div style="display:flex;gap:6px"><button class="btn btn-p" onclick="abrirMovDia()"><i class="ti ti-plus"></i> Movimiento</button><button class="btn btn-wa" onclick="abrirSueldo()"><i class="ti ti-users"></i> Sueldo / gasto</button></div>`;
     return`<button class="btn btn-p" onclick="abrirMovDia()"><i class="ti ti-plus"></i> Movimiento</button>`;
@@ -1128,15 +1130,16 @@ function renderInv(){const tb=document.getElementById('tb-inv');const bm={'dispo
 async function elimVeh(id){if(!confirm('¿Eliminar vehículo?'))return;setSyncStatus('syncing');await db.from('vehiculos').delete().eq('id',id);setSyncStatus('ok');await loadVeh();renderInv();}
 
 // OT
-async function guardarOT(){const cliente=document.getElementById('ot-cl').value;if(!cliente)return alert('Completá el cliente');const svcs=svcsGet('os-');const ins=parseFloat(document.getElementById('ot-ins').value)||0,mo=parseFloat(document.getElementById('ot-mo').value)||0,pr=parseFloat(document.getElementById('ot-pr').value)||0;setSyncStatus('syncing');await db.from('ordenes_trabajo').insert({cliente,responsable:document.getElementById('ot-resp').value,estado:document.getElementById('ot-est').value,servicios:svcs.length?svcs:['General'],insumos:ins,mano_obra:mo,precio_cobrado:pr,descripcion:document.getElementById('ot-desc').value});setSyncStatus('ok');closeM('m-ot');['ot-cl','ot-ins','ot-mo','ot-pr','ot-desc'].forEach(id=>document.getElementById(id).value='');svcsReset('os-');await loadOT();renderOT();}
+function abrirOT(){document.getElementById('ot-fing').value=hoyD();openM('m-ot');}
+async function guardarOT(){const cliente=document.getElementById('ot-cl').value;if(!cliente)return alert('Completá el cliente');const svcs=svcsGet('os-');const ins=parseFloat(document.getElementById('ot-ins').value)||0,mo=parseFloat(document.getElementById('ot-mo').value)||0,pr=parseFloat(document.getElementById('ot-pr').value)||0;setSyncStatus('syncing');await db.from('ordenes_trabajo').insert({cliente,responsable:document.getElementById('ot-resp').value,estado:document.getElementById('ot-est').value,servicios:svcs.length?svcs:['General'],insumos:ins,mano_obra:mo,precio_cobrado:pr,descripcion:document.getElementById('ot-desc').value,fecha_ingreso:document.getElementById('ot-fing').value||hoyD(),fecha_entrega:document.getElementById('ot-fent').value||null,pagado:document.getElementById('ot-pagado').value==='true'});setSyncStatus('ok');closeM('m-ot');['ot-cl','ot-ins','ot-mo','ot-pr','ot-desc','ot-fing','ot-fent'].forEach(id=>document.getElementById(id).value='');document.getElementById('ot-pagado').value='false';svcsReset('os-');await loadOT();renderOT();}
 function renderOT(){
   const esAdmin=SESSION.rol==='admin';
   const tb=document.getElementById('tb-ot');
   const bm={'Ingresado':'bgr','En proceso':'bb','Listo':'bg','Entregado':'bgr'};
   tb.innerHTML=C.ots.length?C.ots.map(o=>{
     const margen=(o.precio_cobrado||0)-(o.insumos||0)-(o.mano_obra||0);
-    return`<tr><td style="color:var(--tx3);font-size:10px">#${o.id}</td><td><strong>${o.cliente}</strong></td><td>${(o.servicios||[]).map(s=>b('bgr',s)).join(' ')}</td><td style="font-size:10px">${o.responsable||'—'}</td>${esAdmin?`<td class="eg">${fmt((o.insumos||0)+(o.mano_obra||0))}</td><td class="ing">${fmt(o.precio_cobrado)}</td><td class="${margen>=0?'ing':'eg'}">${fmt(margen)}</td>`:''}<td>${b(bm[o.estado]||'bgr',o.estado)}</td><td><button class="icon-btn" onclick="elimOT(${o.id})"><i class="ti ti-trash"></i></button></td></tr>`;
-  }).join(''):'<tr><td colspan="9"><div class="empty"><i class="ti ti-tool"></i>Sin órdenes.</div></td></tr>';
+    return`<tr><td style="color:var(--tx3);font-size:10px">#${o.id}</td><td><strong>${o.cliente}</strong></td><td>${(o.servicios||[]).map(s=>b('bgr',s)).join(' ')}</td><td style="font-size:10px">${o.responsable||'—'}</td><td style="font-size:10px;color:var(--tx3)">${o.fecha_ingreso||'—'}</td><td style="font-size:10px;color:var(--tx3)">${o.fecha_entrega||'—'}</td>${esAdmin?`<td class="eg">${fmt((o.insumos||0)+(o.mano_obra||0))}</td><td class="ing">${fmt(o.precio_cobrado)}</td><td class="${margen>=0?'ing':'eg'}">${fmt(margen)}</td>`:''}<td>${o.pagado?b('bg','Sí'):b('br','No')}</td><td>${b(bm[o.estado]||'bgr',o.estado)}</td><td><button class="icon-btn" onclick="elimOT(${o.id})"><i class="ti ti-trash"></i></button></td></tr>`;
+  }).join(''):'<tr><td colspan="11"><div class="empty"><i class="ti ti-tool"></i>Sin órdenes.</div></td></tr>';
 }
 async function elimOT(id){if(!confirm('¿Eliminar orden?'))return;setSyncStatus('syncing');await db.from('ordenes_trabajo').delete().eq('id',id);setSyncStatus('ok');await loadOT();renderOT();}
 

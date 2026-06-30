@@ -11,6 +11,12 @@
 :root{--bg:#0f1117;--s1:#161b27;--s2:#1e2535;--s3:#252d3d;--bd:#2a3347;--bd2:#364158;--tx:#e8eaf0;--tx2:#9aa3b8;--tx3:#5c677d;--ac:#3b82f6;--ac2:#1d4ed8;--ok:#22c55e;--wa:#f59e0b;--er:#ef4444;--pu:#a855f7;--r:8px;--f:'Inter',system-ui,sans-serif}
 body{font-family:var(--f);background:var(--bg);color:var(--tx);height:100vh;overflow:hidden}
 .app{display:flex;height:100vh}
+/* LOGIN */
+.login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:500}
+.login-box{background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:36px;width:340px}
+.login-logo{font-size:22px;font-weight:700;color:var(--tx);text-align:center;margin-bottom:4px}
+.login-sub{font-size:11px;color:var(--tx3);text-align:center;margin-bottom:28px;text-transform:uppercase;letter-spacing:.08em}
+.login-err{font-size:11px;color:var(--er);margin-top:8px;text-align:center}
 .sidebar{width:220px;background:var(--s1);border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
 .logo{padding:20px 16px 14px;border-bottom:1px solid var(--bd)}
 .logo-name{font-size:16px;font-weight:700;color:var(--tx)}
@@ -21,6 +27,11 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);height:100vh;over
 .ni.active{background:rgba(59,130,246,.12);color:var(--ac);border-left-color:var(--ac);font-weight:500}
 .ni i{font-size:15px;flex-shrink:0}
 .nb{margin-left:auto;background:var(--er);color:#fff;font-size:9px;padding:1px 6px;border-radius:10px;font-weight:700}
+.user-box{margin-top:auto;padding:12px 14px;border-top:1px solid var(--bd);display:flex;align-items:center;gap:8px}
+.user-avatar{width:28px;height:28px;border-radius:50%;background:var(--ac);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:11px;font-weight:600;color:var(--tx)}
+.user-rol{font-size:9px;color:var(--tx3)}
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .topbar{padding:12px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;background:var(--s1);flex-shrink:0}
 .tb-title{font-size:14px;font-weight:600;color:var(--tx)}
@@ -36,6 +47,7 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);height:100vh;over
 .btn-p:hover{background:var(--ac2)}
 .btn-wa{background:rgba(245,158,11,.15);color:var(--wa);border-color:rgba(245,158,11,.3)}
 .btn-sm{padding:3px 8px;font-size:10px}
+.btn-full{width:100%;justify-content:center;padding:9px}
 .content{flex:1;overflow-y:auto;padding:20px}
 .page{display:none}.page.active{display:block}
 .sg{display:grid;gap:10px;margin-bottom:18px}
@@ -58,7 +70,6 @@ tr:hover td{background:var(--s2)}
 .bgr{background:var(--s2);color:var(--tx2);border:1px solid var(--bd)}
 .br{background:rgba(239,68,68,.15);color:#f87171}
 .bp{background:rgba(168,85,247,.15);color:#c084fc}
-.bwa{background:rgba(245,158,11,.15);color:#fbbf24}
 .icon-btn{background:none;border:none;cursor:pointer;color:var(--tx3);padding:4px;border-radius:5px;font-size:14px}
 .icon-btn:hover{color:var(--tx);background:var(--s3)}
 .mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center}
@@ -130,7 +141,6 @@ tr:hover td{background:var(--s2)}
 .chk-group{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
 .chk-label{display:flex;align-items:center;gap:5px;font-size:11px;cursor:pointer;color:var(--tx2)}
 .chk-label input[type=checkbox]{accent-color:var(--ac)}
-/* CAJAS */
 .caja-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
 .caja-card{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:14px}
 .caja-num{font-size:9px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
@@ -138,12 +148,8 @@ tr:hover td{background:var(--s2)}
 .caja-saldo{font-size:18px;font-weight:700}
 .caja-saldo.pos{color:var(--ok)}.caja-saldo.neg{color:var(--er)}.caja-saldo.zer{color:var(--tx3)}
 .caja-sub{font-size:9px;color:var(--tx3);margin-top:3px}
-.caja-total-bar{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:10px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
-.caja-total-label{font-size:11px;color:var(--tx2);font-weight:500}
-.caja-total-val{font-size:22px;font-weight:700;color:var(--ac)}
 .num-caja{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--ac);color:#fff;font-size:10px;font-weight:700;flex-shrink:0}
 .num-caja.sueldo{background:var(--wa)}
-/* CAJA DIARIA */
 .dia-nav{display:flex;align-items:center;gap:12px;margin-bottom:20px}
 .dia-fecha{font-size:16px;font-weight:700;color:var(--tx)}
 .dia-sub{font-size:11px;color:var(--tx3);margin-top:2px}
@@ -151,7 +157,7 @@ tr:hover td{background:var(--s2)}
 .dia-section-hdr{padding:12px 16px;background:var(--s2);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
 .dia-section-title{font-size:11px;font-weight:600;color:var(--tx);text-transform:uppercase;letter-spacing:.06em}
 .dia-section-total{font-size:13px;font-weight:700}
-.mov-row{display:grid;grid-template-columns:36px 1fr 90px 90px 90px 36px;align-items:center;border-bottom:1px solid var(--bd);padding:0}
+.mov-row{display:grid;grid-template-columns:36px 1fr 90px 90px 90px 36px;align-items:center;border-bottom:1px solid var(--bd)}
 .mov-row:last-child{border-bottom:none}
 .mov-row:hover{background:var(--s2)}
 .mov-cell{padding:10px 12px;font-size:11px;color:var(--tx)}
@@ -160,7 +166,6 @@ tr:hover td{background:var(--s2)}
 .mov-cell.pagado{color:var(--er);font-weight:600}
 .mov-hdr{display:grid;grid-template-columns:36px 1fr 90px 90px 90px 36px;background:var(--s2);border-bottom:1px solid var(--bd)}
 .mov-hdr-cell{padding:8px 12px;font-size:9px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.07em}
-/* RESUMEN MES */
 .mes-nav{display:flex;align-items:center;gap:12px;margin-bottom:20px}
 .mes-label{font-size:16px;font-weight:700;color:var(--tx)}
 .dia-bloque{background:var(--s1);border:1px solid var(--bd);border-radius:10px;margin-bottom:12px;overflow:hidden}
@@ -168,7 +173,6 @@ tr:hover td{background:var(--s2)}
 .dia-bloque-fecha{font-size:12px;font-weight:600;color:var(--tx)}
 .dia-bloque-resumen{display:flex;gap:16px}
 .dia-bloque-stat{font-size:11px}
-.dia-bloque-content{padding:0}
 .loading{text-align:center;padding:40px;color:var(--tx3);font-size:12px}
 .loading i{font-size:24px;display:block;margin-bottom:10px;animation:spin 1s linear infinite;opacity:.5}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
@@ -178,41 +182,69 @@ tr:hover td{background:var(--s2)}
 .cierre-item{text-align:center}
 .cierre-item-label{font-size:9px;color:var(--tx3);margin-bottom:3px;text-transform:uppercase;letter-spacing:.05em}
 .cierre-item-val{font-size:16px;font-weight:700}
+/* GESTORÍA */
+.al-dia-si{color:var(--ok);font-weight:700;font-size:11px;display:flex;align-items:center;gap:3px}
+.al-dia-no{color:var(--er);font-weight:700;font-size:11px;display:flex;align-items:center;gap:3px}
+/* hide-for-restricted */
+.restricted-hide{display:none !important}
 </style>
 </head>
 <body>
-<div class="app">
+
+<!-- LOGIN -->
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">Gyfut</div>
+    <div class="login-sub">Sistema de gestión</div>
+    <div class="fr"><label>Usuario</label><input id="login-user" placeholder="juan" onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()"></div>
+    <div class="fr"><label>Contraseña</label><input id="login-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')hacerLogin()"></div>
+    <button class="btn btn-p btn-full" onclick="hacerLogin()" style="margin-top:8px"><i class="ti ti-login"></i> Ingresar</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
+
+<div class="app" id="main-app" style="display:none">
+
 <div class="sidebar">
   <div class="logo"><div class="logo-name">Gyfut</div><div class="logo-sub">Sistema de gestión</div></div>
-  <div style="padding:4px 0">
+  <div style="padding:4px 0" id="nav-general">
     <div class="nl">General</div>
     <div class="ni active" onclick="navTo('dashboard',this)"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
-    <div class="ni" onclick="navTo('recordatorios',this)"><i class="ti ti-bell"></i> Recordatorios <span class="nb" id="badge-rec" style="display:none">0</span></div>
+    <div class="ni restricted-hide" data-perm="admin" onclick="navTo('recordatorios',this)"><i class="ti ti-bell"></i> Recordatorios <span class="nb" id="badge-rec" style="display:none">0</span></div>
   </div>
-  <div style="padding:4px 0">
+  <div style="padding:4px 0" data-perm="admin">
     <div class="nl">CRM — Autos</div>
     <div class="ni" onclick="navTo('leads-autos',this)"><i class="ti ti-filter"></i> Pipeline ventas</div>
     <div class="ni" onclick="navTo('contactos-autos',this)"><i class="ti ti-users"></i> Contactos</div>
   </div>
-  <div style="padding:4px 0">
+  <div style="padding:4px 0" data-perm="admin">
     <div class="nl">CRM — Taller</div>
     <div class="ni" onclick="navTo('leads-taller',this)"><i class="ti ti-filter"></i> Pipeline servicios</div>
     <div class="ni" onclick="navTo('clientes-taller',this)"><i class="ti ti-user-check"></i> Clientes</div>
   </div>
-  <div style="padding:4px 0">
+  <div style="padding:4px 0" data-perm="admin">
     <div class="nl">Vehículos</div>
     <div class="ni" onclick="navTo('inventario',this)"><i class="ti ti-car"></i> Inventario</div>
     <div class="ni" onclick="navTo('ventas',this)"><i class="ti ti-transfer"></i> Ventas</div>
     <div class="ni" onclick="navTo('caja-vehiculos',this)"><i class="ti ti-cash"></i> Caja vehículos</div>
+    <div class="ni" onclick="navTo('gestoria',this)"><i class="ti ti-file-certificate"></i> Gestoría</div>
   </div>
   <div style="padding:4px 0">
     <div class="nl">Taller</div>
     <div class="ni" onclick="navTo('ordenes',this)"><i class="ti ti-tool"></i> Órdenes de trabajo</div>
     <div class="ni" onclick="navTo('caja-taller',this)"><i class="ti ti-cash"></i> Caja taller</div>
   </div>
-  <div style="padding:4px 0">
+  <div style="padding:4px 0" data-perm="admin">
     <div class="nl">Admin</div>
     <div class="ni" onclick="navTo('costos-fijos',this)"><i class="ti ti-file-invoice"></i> Costos fijos</div>
+  </div>
+  <div class="user-box">
+    <div class="user-avatar" id="user-avatar">J</div>
+    <div class="user-info">
+      <div class="user-name" id="user-name">—</div>
+      <div class="user-rol" id="user-rol">—</div>
+    </div>
+    <button class="icon-btn" onclick="cerrarSesion()" aria-label="Cerrar sesión"><i class="ti ti-logout"></i></button>
   </div>
 </div>
 
@@ -228,23 +260,25 @@ tr:hover td{background:var(--s2)}
 
     <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
-      <div class="sg g4">
+      <div class="sg g4" data-perm="admin">
         <div class="sc"><div class="sl">Leads autos</div><div class="sv" id="s-la">—</div><div class="ss">en pipeline</div></div>
         <div class="sc"><div class="sl">Leads taller</div><div class="sv" id="s-lt">—</div><div class="ss">en pipeline</div></div>
         <div class="sc"><div class="sl">Clientes taller</div><div class="sv" id="s-clt">—</div></div>
         <div class="sc"><div class="sl">Stock disponible</div><div class="sv" id="s-stock">—</div><div class="ss">vehículos</div></div>
       </div>
-      <div class="sg g2" style="margin-bottom:18px">
+      <div class="sg g2" style="margin-bottom:18px" data-perm="admin">
         <div class="sc"><div class="sl">Caja taller hoy</div><div class="sv ing" id="s-ct">—</div></div>
         <div class="sc"><div class="sl">Caja vehículos</div><div class="sv ing" id="s-cv">—</div></div>
       </div>
-      <div class="two-col">
+      <div class="two-col" data-perm="admin">
         <div class="card"><div class="card-title">⚡ Recordatorios esta semana</div><div id="dash-rec"><div class="loading"><i class="ti ti-loader-2"></i>Cargando...</div></div></div>
         <div class="card"><div class="card-title">🔥 Leads calientes</div><div id="dash-leads"><div class="loading"><i class="ti ti-loader-2"></i>Cargando...</div></div></div>
       </div>
+      <div id="dash-operador" style="display:none">
+        <div class="card"><div class="card-title"><i class="ti ti-tool"></i> Órdenes de trabajo activas</div><div id="dash-ot-operador"></div></div>
+      </div>
     </div>
 
-    <!-- RECORDATORIOS -->
     <div class="page" id="page-recordatorios">
       <div class="tab-bar">
         <div class="tab active" onclick="recTab('todos',this)">Todos</div>
@@ -256,91 +290,121 @@ tr:hover td{background:var(--s2)}
       <div class="tw" id="rec-list"></div>
     </div>
 
-    <!-- PIPELINE AUTOS -->
     <div class="page" id="page-leads-autos">
-      <div class="sbar">
-        <input id="la-q" placeholder="Buscar lead..." oninput="renderKanban('autos')">
-        <select id="la-origen" onchange="renderKanban('autos')">
-          <option value="">Todos los orígenes</option>
-          <option>Instagram</option><option>WhatsApp</option><option>Referido</option><option>Visita directa</option><option>Otro</option>
-        </select>
-      </div>
+      <div class="sbar"><input id="la-q" placeholder="Buscar lead..." oninput="renderKanban('autos')"><select id="la-origen" onchange="renderKanban('autos')"><option value="">Todos los orígenes</option><option>Instagram</option><option>WhatsApp</option><option>Referido</option><option>Visita directa</option><option>Otro</option></select></div>
       <div class="kanban" id="kanban-autos"></div>
     </div>
 
-    <!-- CONTACTOS AUTOS -->
     <div class="page" id="page-contactos-autos">
       <div class="sbar"><input id="ca-q" placeholder="Buscar..." oninput="renderContactosAutos()"></div>
       <div class="tw"><table><thead><tr><th>Nombre</th><th>Teléfono</th><th>Origen</th><th>Busca</th><th>Estado</th><th>Creado</th><th></th></tr></thead><tbody id="tb-ca"></tbody></table></div>
     </div>
 
-    <!-- PIPELINE TALLER -->
     <div class="page" id="page-leads-taller">
-      <div class="sbar">
-        <input id="lt-q" placeholder="Buscar lead..." oninput="renderKanban('taller')">
-        <select id="lt-svc" onchange="renderKanban('taller')">
-          <option value="">Todos los servicios</option>
-          <option>PPF</option><option>Detailing</option><option>Mecánica</option><option>Lavado</option><option>Otro</option>
-        </select>
-      </div>
+      <div class="sbar"><input id="lt-q" placeholder="Buscar lead..." oninput="renderKanban('taller')"><select id="lt-svc" onchange="renderKanban('taller')"><option value="">Todos los servicios</option><option>PPF</option><option>Detailing</option><option>Mecánica</option><option>Lavado</option><option>Otro</option></select></div>
       <div class="kanban" id="kanban-taller"></div>
     </div>
 
-    <!-- CLIENTES TALLER -->
     <div class="page" id="page-clientes-taller">
       <div class="sbar"><input id="ct-q" placeholder="Buscar cliente..." oninput="renderClientesTaller()"></div>
       <div class="tw"><table><thead><tr><th>Cliente</th><th>Teléfono</th><th>Vehículo</th><th>Último servicio</th><th>Servicios</th><th>Próx. recordatorio</th><th></th></tr></thead><tbody id="tb-ct"></tbody></table></div>
     </div>
 
-    <!-- INVENTARIO -->
     <div class="page" id="page-inventario">
       <div class="tw"><table><thead><tr><th>Vehículo</th><th>Año</th><th>Km</th><th>Costo total</th><th>Precio venta</th><th>Margen</th><th>Fuente</th><th>Estado</th><th></th></tr></thead><tbody id="tb-inv"></tbody></table></div>
     </div>
 
-    <!-- VENTAS -->
     <div class="page" id="page-ventas">
       <div class="tw"><table><thead><tr><th>Vehículo</th><th>Comprador</th><th>Precio</th><th>Costo</th><th>Ganancia</th><th>Fecha</th><th>Estado</th></tr></thead><tbody id="tb-ventas"></tbody></table></div>
     </div>
 
-    <!-- CAJA VEHÍCULOS -->
-    <div class="page" id="page-caja-vehiculos">
-      <div class="caja-total-bar">
-        <div><div class="caja-total-label"><i class="ti ti-car" style="font-size:14px;vertical-align:-2px;margin-right:5px"></i>Total caja vehículos</div></div>
-        <div class="caja-total-val" id="cv-total">$0</div>
+    <!-- GESTORÍA -->
+    <div class="page" id="page-gestoria">
+      <div class="sg g4" style="margin-bottom:18px">
+        <div class="sc"><div class="sl">Trámites activos</div><div class="sv" id="g-activos">—</div></div>
+        <div class="sc"><div class="sl">Al día</div><div class="sv ing" id="g-aldia">—</div></div>
+        <div class="sc"><div class="sl">Con deuda</div><div class="sv eg" id="g-deuda">—</div></div>
+        <div class="sc"><div class="sl">Terminados</div><div class="sv" id="g-term">—</div></div>
       </div>
-      <div class="caja-grid" id="cv-cards"></div>
       <div class="tw">
-        <div class="mov-hdr"><div class="mov-hdr-cell">Caja</div><div class="mov-hdr-cell">Detalle</div><div class="mov-hdr-cell">Categoría</div><div class="mov-hdr-cell">Cobrado</div><div class="mov-hdr-cell">Pagado</div><div class="mov-hdr-cell"></div></div>
-        <div id="tb-cajav"></div>
+        <table><thead><tr><th>Vehículo</th><th>Trámite</th><th>Estado</th><th>Deuda multa</th><th>Deuda patente</th><th>Al día</th><th>Terminado</th><th>Transferencia</th><th></th></tr></thead><tbody id="tb-gestoria"></tbody></table>
+      </div>
+    </div>
+
+    <!-- CAJA VEHÍCULOS (diaria + mensual) -->
+    <div class="page" id="page-caja-vehiculos">
+      <div class="tab-bar" id="cajav-tabs">
+        <div class="tab active" onclick="cajaVTab('dia',this)"><i class="ti ti-calendar-day" style="font-size:12px;margin-right:4px"></i>Vista diaria</div>
+        <div class="tab" onclick="cajaVTab('mes',this)"><i class="ti ti-calendar-month" style="font-size:12px;margin-right:4px"></i>Vista mensual</div>
+      </div>
+      <div id="cajav-vista-dia">
+        <div class="dia-nav">
+          <button class="btn" onclick="cambiarDiaV(-1)"><i class="ti ti-chevron-left"></i></button>
+          <div><div class="dia-fecha" id="diav-titulo">—</div><div class="dia-sub" id="diav-sub">—</div></div>
+          <button class="btn" onclick="cambiarDiaV(1)"><i class="ti ti-chevron-right"></i></button>
+          <button class="btn" onclick="irHoyV()"><i class="ti ti-home"></i> Hoy</button>
+        </div>
+        <div class="cierre-box">
+          <div class="cierre-title">Resumen del día</div>
+          <div class="cierre-grid">
+            <div class="cierre-item"><div class="cierre-item-label">Cobrado</div><div class="cierre-item-val ing" id="diav-cobrado">$0</div></div>
+            <div class="cierre-item"><div class="cierre-item-label">Pagado</div><div class="cierre-item-val eg" id="diav-pagado">$0</div></div>
+            <div class="cierre-item"><div class="cierre-item-label">Sueldos/gastos</div><div class="cierre-item-val wa-txt" id="diav-sueldos">$0</div></div>
+            <div class="cierre-item"><div class="cierre-item-label">Neto del día</div><div class="cierre-item-val" id="diav-neto">$0</div></div>
+          </div>
+        </div>
+        <div class="dia-section">
+          <div class="dia-section-hdr"><span class="dia-section-title"><i class="ti ti-arrow-up-right" style="color:var(--ok);margin-right:4px"></i>Movimientos del día</span><span class="dia-section-total ing" id="diav-mov-total">$0</span></div>
+          <div class="mov-hdr"><div class="mov-hdr-cell">Caja</div><div class="mov-hdr-cell">Detalle</div><div class="mov-hdr-cell">Categoría</div><div class="mov-hdr-cell">Cobrado</div><div class="mov-hdr-cell">Pagado</div><div class="mov-hdr-cell"></div></div>
+          <div id="diav-movs"></div>
+        </div>
+        <div class="dia-section">
+          <div class="dia-section-hdr"><span class="dia-section-title"><i class="ti ti-users" style="color:var(--wa);margin-right:4px"></i>Sueldos y gastos</span><span class="dia-section-total wa-txt" id="diav-sueldos-total">$0</span></div>
+          <div class="mov-hdr"><div class="mov-hdr-cell">Caja</div><div class="mov-hdr-cell">Descripción</div><div class="mov-hdr-cell">Tipo</div><div class="mov-hdr-cell">Cobrado</div><div class="mov-hdr-cell">Pagado</div><div class="mov-hdr-cell"></div></div>
+          <div id="diav-sueldos-list"></div>
+        </div>
+        <div style="margin-bottom:8px;font-size:11px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em">Saldo por caja — solo de hoy</div>
+        <div class="caja-grid" id="diav-saldos-cards"></div>
+      </div>
+      <div id="cajav-vista-mes" style="display:none">
+        <div class="mes-nav">
+          <button class="btn" onclick="cambiarMesV(-1)"><i class="ti ti-chevron-left"></i></button>
+          <div class="mes-label" id="mesv-titulo">—</div>
+          <button class="btn" onclick="cambiarMesV(1)"><i class="ti ti-chevron-right"></i></button>
+        </div>
+        <div class="cierre-box">
+          <div class="cierre-title">Resumen del mes</div>
+          <div class="cierre-grid">
+            <div class="cierre-item"><div class="cierre-item-label">Total cobrado</div><div class="cierre-item-val ing" id="mesv-cobrado">$0</div></div>
+            <div class="cierre-item"><div class="cierre-item-label">Total pagado</div><div class="cierre-item-val eg" id="mesv-pagado">$0</div></div>
+            <div class="cierre-item"><div class="cierre-item-label">Sueldos/gastos</div><div class="cierre-item-val wa-txt" id="mesv-sueldos">$0</div></div>
+            <div class="cierre-item"><div class="cierre-item-label">Neto del mes</div><div class="cierre-item-val" id="mesv-neto">$0</div></div>
+          </div>
+        </div>
+        <div class="caja-grid" id="mesv-saldos-cards" style="margin-bottom:20px"></div>
+        <div id="mesv-dias"></div>
       </div>
     </div>
 
     <!-- ÓRDENES -->
     <div class="page" id="page-ordenes">
-      <div class="tw"><table><thead><tr><th>N°</th><th>Cliente</th><th>Servicios</th><th>Asignado</th><th>Costo</th><th>Cobrado</th><th>Margen</th><th>Estado</th><th></th></tr></thead><tbody id="tb-ot"></tbody></table></div>
+      <div class="tw"><table><thead><tr><th>N°</th><th>Cliente</th><th>Servicios</th><th>Asignado</th><th class="restricted-hide" data-perm="admin">Costo</th><th class="restricted-hide" data-perm="admin">Cobrado</th><th class="restricted-hide" data-perm="admin">Margen</th><th>Estado</th><th></th></tr></thead><tbody id="tb-ot"></tbody></table></div>
     </div>
 
     <!-- CAJA TALLER -->
     <div class="page" id="page-caja-taller">
       <div class="tab-bar" id="caja-tabs">
         <div class="tab active" onclick="cajaTab('dia',this)"><i class="ti ti-calendar-day" style="font-size:12px;margin-right:4px"></i>Vista diaria</div>
-        <div class="tab" onclick="cajaTab('mes',this)"><i class="ti ti-calendar-month" style="font-size:12px;margin-right:4px"></i>Vista mensual</div>
+        <div class="tab restricted-hide" data-perm="admin" onclick="cajaTab('mes',this)"><i class="ti ti-calendar-month" style="font-size:12px;margin-right:4px"></i>Vista mensual</div>
       </div>
-
-      <!-- VISTA DIARIA -->
       <div id="caja-vista-dia">
         <div class="dia-nav">
           <button class="btn" onclick="cambiarDia(-1)"><i class="ti ti-chevron-left"></i></button>
-          <div>
-            <div class="dia-fecha" id="dia-titulo">—</div>
-            <div class="dia-sub" id="dia-sub">—</div>
-          </div>
+          <div><div class="dia-fecha" id="dia-titulo">—</div><div class="dia-sub" id="dia-sub">—</div></div>
           <button class="btn" onclick="cambiarDia(1)"><i class="ti ti-chevron-right"></i></button>
           <button class="btn" onclick="irHoy()"><i class="ti ti-home"></i> Hoy</button>
         </div>
-
-        <!-- RESUMEN DEL DÍA -->
-        <div class="cierre-box" id="cierre-dia">
+        <div class="cierre-box restricted-hide" data-perm="admin" id="cierre-dia">
           <div class="cierre-title">Resumen del día</div>
           <div class="cierre-grid">
             <div class="cierre-item"><div class="cierre-item-label">Cobrado</div><div class="cierre-item-val ing" id="dia-cobrado">$0</div></div>
@@ -349,41 +413,28 @@ tr:hover td{background:var(--s2)}
             <div class="cierre-item"><div class="cierre-item-label">Neto del día</div><div class="cierre-item-val" id="dia-neto">$0</div></div>
           </div>
         </div>
-
-        <!-- MOVIMIENTOS DEL DÍA -->
         <div class="dia-section">
-          <div class="dia-section-hdr">
-            <span class="dia-section-title"><i class="ti ti-arrow-up-right" style="color:var(--ok);margin-right:4px"></i>Movimientos del día</span>
-            <span class="dia-section-total ing" id="dia-mov-total">$0</span>
-          </div>
+          <div class="dia-section-hdr"><span class="dia-section-title"><i class="ti ti-arrow-up-right" style="color:var(--ok);margin-right:4px"></i>Movimientos del día</span><span class="dia-section-total ing restricted-hide" data-perm="admin" id="dia-mov-total">$0</span></div>
           <div class="mov-hdr"><div class="mov-hdr-cell">Caja</div><div class="mov-hdr-cell">Detalle</div><div class="mov-hdr-cell">Categoría</div><div class="mov-hdr-cell">Cobrado</div><div class="mov-hdr-cell">Pagado</div><div class="mov-hdr-cell"></div></div>
           <div id="dia-movs"></div>
         </div>
-
-        <!-- SUELDOS Y GASTOS DEL DÍA -->
-        <div class="dia-section">
-          <div class="dia-section-hdr">
-            <span class="dia-section-title"><i class="ti ti-users" style="color:var(--wa);margin-right:4px"></i>Sueldos y gastos</span>
-            <span class="dia-section-total wa-txt" id="dia-sueldos-total">$0</span>
-          </div>
+        <div class="dia-section restricted-hide" data-perm="admin">
+          <div class="dia-section-hdr"><span class="dia-section-title"><i class="ti ti-users" style="color:var(--wa);margin-right:4px"></i>Sueldos y gastos</span><span class="dia-section-total wa-txt" id="dia-sueldos-total">$0</span></div>
           <div class="mov-hdr"><div class="mov-hdr-cell">Caja</div><div class="mov-hdr-cell">Descripción</div><div class="mov-hdr-cell">Tipo</div><div class="mov-hdr-cell">Cobrado</div><div class="mov-hdr-cell">Pagado</div><div class="mov-hdr-cell"></div></div>
           <div id="dia-sueldos-list"></div>
         </div>
-
-        <!-- SALDOS POR SUBCUENTA HOY -->
-        <div style="margin-bottom:8px;font-size:11px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em">Saldos acumulados por caja</div>
-        <div class="caja-grid" id="dia-saldos-cards"></div>
+        <div class="restricted-hide" data-perm="admin">
+          <div style="margin-bottom:8px;font-size:11px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em">Saldo por caja — solo de hoy</div>
+          <div class="caja-grid" id="dia-saldos-cards"></div>
+        </div>
       </div>
-
-      <!-- VISTA MENSUAL -->
       <div id="caja-vista-mes" style="display:none">
         <div class="mes-nav">
           <button class="btn" onclick="cambiarMes(-1)"><i class="ti ti-chevron-left"></i></button>
           <div class="mes-label" id="mes-titulo">—</div>
           <button class="btn" onclick="cambiarMes(1)"><i class="ti ti-chevron-right"></i></button>
         </div>
-        <!-- RESUMEN MES -->
-        <div class="cierre-box" id="mes-resumen">
+        <div class="cierre-box">
           <div class="cierre-title">Resumen del mes</div>
           <div class="cierre-grid">
             <div class="cierre-item"><div class="cierre-item-label">Total cobrado</div><div class="cierre-item-val ing" id="mes-cobrado">$0</div></div>
@@ -392,14 +443,11 @@ tr:hover td{background:var(--s2)}
             <div class="cierre-item"><div class="cierre-item-label">Neto del mes</div><div class="cierre-item-val" id="mes-neto">$0</div></div>
           </div>
         </div>
-        <!-- SALDOS POR SUBCUENTA MES -->
         <div class="caja-grid" id="mes-saldos-cards" style="margin-bottom:20px"></div>
-        <!-- DETALLE POR DÍA -->
         <div id="mes-dias"></div>
       </div>
     </div>
 
-    <!-- COSTOS FIJOS -->
     <div class="page" id="page-costos-fijos">
       <div class="sg g3" style="margin-bottom:18px">
         <div class="sc"><div class="sl">Total/mes</div><div class="sv eg" id="cf-total">—</div></div>
@@ -412,7 +460,6 @@ tr:hover td{background:var(--s2)}
   </div>
 </div>
 
-<!-- PANEL LATERAL -->
 <div class="dp" id="detail-panel">
   <div class="dph"><span class="dpn" id="dp-nombre"></span><button class="icon-btn" onclick="closeDetail()"><i class="ti ti-x"></i></button></div>
   <div class="dpb"><div id="dp-main"></div><div id="dp-extra"></div><div style="margin-top:14px"><div class="dpst">Notas de seguimiento</div><div id="dp-seg"></div></div></div>
@@ -423,9 +470,9 @@ tr:hover td{background:var(--s2)}
 <!-- MODALES -->
 <div class="mo" id="m-la"><div class="modal">
   <div class="mt">Nuevo lead — venta de auto</div>
-  <div class="fg2"><div class="fr"><label>Nombre</label><input id="la-n" placeholder="Juan Pérez"></div><div class="fr"><label>Teléfono</label><input id="la-t" placeholder="341..."></div></div>
+  <div class="fg2"><div class="fr"><label>Nombre</label><input id="la-n"></div><div class="fr"><label>Teléfono</label><input id="la-t"></div></div>
   <div class="fg2"><div class="fr"><label>Origen</label><select id="la-o"><option>Instagram</option><option>WhatsApp</option><option>Referido</option><option>Visita directa</option><option>Otro</option></select></div><div class="fr"><label>Estado</label><select id="la-e"><option>Nuevo contacto</option><option>Conversando</option><option>Visita agendada</option></select></div></div>
-  <div class="fr"><label>¿Qué busca?</label><input id="la-i" placeholder="Hilux 4x4 / Ranger..."></div>
+  <div class="fr"><label>¿Qué busca?</label><input id="la-i"></div>
   <div class="fr"><label>Vehículo del inventario</label><select id="la-v"><option value="">— ninguno —</option></select></div>
   <div class="fr"><label>Nota inicial</label><textarea id="la-nota"></textarea></div>
   <div class="ma"><button class="btn" onclick="closeM('m-la')">Cancelar</button><button class="btn btn-p" onclick="guardarLA()">Guardar</button></div>
@@ -445,22 +492,11 @@ tr:hover td{background:var(--s2)}
   <div class="mt">Nuevo cliente de taller</div>
   <div class="fg2"><div class="fr"><label>Nombre</label><input id="clt-n"></div><div class="fr"><label>Teléfono</label><input id="clt-t"></div></div>
   <div class="fg2"><div class="fr"><label>Vehículo</label><input id="clt-v"></div><div class="fr"><label>Patente</label><input id="clt-pat"></div></div>
-  <hr class="divider">
-  <div class="sub-label">Primer servicio</div>
-  <div class="chk-group">
-    <label class="chk-label"><input type="checkbox" id="cs-mec"> Mecánica</label>
-    <label class="chk-label"><input type="checkbox" id="cs-det"> Detailing</label>
-    <label class="chk-label"><input type="checkbox" id="cs-ppf"> PPF</label>
-    <label class="chk-label"><input type="checkbox" id="cs-lav"> Lavado</label>
-    <label class="chk-label"><input type="checkbox" id="cs-otro"> Otro</label>
-  </div>
+  <hr class="divider"><div class="sub-label">Primer servicio</div>
+  <div class="chk-group"><label class="chk-label"><input type="checkbox" id="cs-mec"> Mecánica</label><label class="chk-label"><input type="checkbox" id="cs-det"> Detailing</label><label class="chk-label"><input type="checkbox" id="cs-ppf"> PPF</label><label class="chk-label"><input type="checkbox" id="cs-lav"> Lavado</label><label class="chk-label"><input type="checkbox" id="cs-otro"> Otro</label></div>
   <div class="fr"><label>Descripción</label><textarea id="clt-desc"></textarea></div>
-  <hr class="divider">
-  <div class="sub-label">Recordatorio automático</div>
-  <div class="fg2">
-    <div class="fr"><label>Cada cuántos meses</label><select id="clt-rec"><option value="">Sin recordatorio</option><option value="1">1 mes</option><option value="2">2 meses</option><option value="3">3 meses</option><option value="6">6 meses</option><option value="12">12 meses</option></select></div>
-    <div class="fr"><label>Motivo</label><input id="clt-rec-mot"></div>
-  </div>
+  <hr class="divider"><div class="sub-label">Recordatorio automático</div>
+  <div class="fg2"><div class="fr"><label>Cada cuántos meses</label><select id="clt-rec"><option value="">Sin recordatorio</option><option value="1">1 mes</option><option value="2">2 meses</option><option value="3">3 meses</option><option value="6">6 meses</option><option value="12">12 meses</option></select></div><div class="fr"><label>Motivo</label><input id="clt-rec-mot"></div></div>
   <div class="ma"><button class="btn" onclick="closeM('m-clt')">Cancelar</button><button class="btn btn-p" onclick="guardarCLT()">Guardar</button></div>
 </div></div>
 
@@ -489,88 +525,50 @@ tr:hover td{background:var(--s2)}
   <div class="fr"><label>Cliente / vehículo</label><input id="ot-cl"></div>
   <div class="fg2"><div class="fr"><label>Asignado a</label><select id="ot-resp"><option>Martín (mecánica)</option><option>Theo (detailing/PPF)</option><option>Ambos</option></select></div><div class="fr"><label>Estado</label><select id="ot-est"><option>Ingresado</option><option>En proceso</option><option>Listo</option><option>Entregado</option></select></div></div>
   <div class="sub-label">Servicios</div>
-  <div class="chk-group">
-    <label class="chk-label"><input type="checkbox" id="os-mec"> Mecánica</label>
-    <label class="chk-label"><input type="checkbox" id="os-det"> Detailing</label>
-    <label class="chk-label"><input type="checkbox" id="os-ppf"> PPF</label>
-    <label class="chk-label"><input type="checkbox" id="os-lav"> Lavado</label>
-    <label class="chk-label"><input type="checkbox" id="os-otro"> Otro</label>
-  </div>
+  <div class="chk-group"><label class="chk-label"><input type="checkbox" id="os-mec"> Mecánica</label><label class="chk-label"><input type="checkbox" id="os-det"> Detailing</label><label class="chk-label"><input type="checkbox" id="os-ppf"> PPF</label><label class="chk-label"><input type="checkbox" id="os-lav"> Lavado</label><label class="chk-label"><input type="checkbox" id="os-otro"> Otro</label></div>
   <hr class="divider">
-  <div class="fg3"><div class="fr"><label>Insumos ($)</label><input id="ot-ins" type="number" placeholder="0"></div><div class="fr"><label>Mano de obra ($)</label><input id="ot-mo" type="number" placeholder="0"></div><div class="fr"><label>Precio cobrado ($)</label><input id="ot-pr" type="number" placeholder="0"></div></div>
+  <div class="fg3" id="ot-costos-row"><div class="fr"><label>Insumos ($)</label><input id="ot-ins" type="number" placeholder="0"></div><div class="fr"><label>Mano de obra ($)</label><input id="ot-mo" type="number" placeholder="0"></div><div class="fr"><label>Precio cobrado ($)</label><input id="ot-pr" type="number" placeholder="0"></div></div>
   <div class="fr"><label>Descripción</label><textarea id="ot-desc"></textarea></div>
   <div class="ma"><button class="btn" onclick="closeM('m-ot')">Cancelar</button><button class="btn btn-p" onclick="guardarOT()">Guardar</button></div>
 </div></div>
 
-<!-- MODAL CAJA TALLER (movimiento normal) -->
 <div class="mo" id="m-cajat"><div class="modal">
   <div class="mt" id="cajat-title">Nuevo movimiento — caja taller</div>
   <div class="fr"><label>Detalle</label><input id="ct-det" placeholder="Cobro PPF / Insumos..."></div>
-  <div class="fg2">
-    <div class="fr"><label>Caja</label>
-      <select id="ct-caja">
-        <option value="1">1 — Efectivo</option><option value="2">2 — Banco</option><option value="3">3 — Jorge</option>
-        <option value="4">4 — Cheque</option><option value="5">5 — Mariana</option><option value="6">6 — Martín</option>
-        <option value="7">7 — Lucho</option><option value="8">8 — USD</option>
-      </select>
-    </div>
-    <div class="fr"><label>Categoría</label>
-      <select id="ct-cat"><option>Cobro trabajo</option><option>Insumos</option><option>Herramientas</option><option>Lavado</option><option>Otro</option></select>
-    </div>
-  </div>
-  <div class="fg2">
-    <div class="fr"><label>Cobrado ($)</label><input id="ct-cobrado" type="number" placeholder="0"></div>
-    <div class="fr"><label>Pagado ($)</label><input id="ct-pagado" type="number" placeholder="0"></div>
-  </div>
+  <div class="fg2"><div class="fr"><label>Caja</label><select id="ct-caja"><option value="1">1 — Efectivo</option><option value="2">2 — Banco</option><option value="3">3 — Jorge</option><option value="4">4 — Cheque</option><option value="5">5 — Mariana</option><option value="6">6 — Martín</option><option value="7">7 — Lucho</option><option value="8">8 — USD</option></select></div><div class="fr"><label>Categoría</label><select id="ct-cat"><option>Cobro trabajo</option><option>Insumos</option><option>Herramientas</option><option>Lavado</option><option>Otro</option></select></div></div>
+  <div class="fg2"><div class="fr"><label>Cobrado ($)</label><input id="ct-cobrado" type="number" placeholder="0"></div><div class="fr"><label>Pagado ($)</label><input id="ct-pagado" type="number" placeholder="0"></div></div>
   <div class="fr"><label>Fecha</label><input id="ct-fecha" type="date"></div>
   <input type="hidden" id="ct-tipo-mov" value="movimiento">
   <div class="ma"><button class="btn" onclick="closeM('m-cajat')">Cancelar</button><button class="btn btn-p" onclick="guardarCajaT()">Guardar</button></div>
 </div></div>
 
-<!-- MODAL SUELDO/GASTO -->
 <div class="mo" id="m-sueldo"><div class="modal">
   <div class="mt">Registrar sueldo / gasto</div>
-  <div class="fr"><label>Descripción</label><input id="su-det" placeholder="Sueldo Martín / Sueldo Theo / Limpieza..."></div>
-  <div class="fg2">
-    <div class="fr"><label>Caja</label>
-      <select id="su-caja">
-        <option value="1">1 — Efectivo</option><option value="2">2 — Banco</option><option value="3">3 — Jorge</option>
-        <option value="4">4 — Cheque</option><option value="5">5 — Mariana</option><option value="6">6 — Martín</option>
-        <option value="7">7 — Lucho</option><option value="8">8 — USD</option>
-      </select>
-    </div>
-    <div class="fr"><label>Tipo</label>
-      <select id="su-tipo"><option value="sueldo">Sueldo</option><option value="gasto_fijo">Gasto fijo</option></select>
-    </div>
-  </div>
+  <div class="fr"><label>Descripción</label><input id="su-det" placeholder="Sueldo Martín / Sueldo Theo..."></div>
+  <div class="fg2"><div class="fr"><label>Caja</label><select id="su-caja"><option value="1">1 — Efectivo</option><option value="2">2 — Banco</option><option value="3">3 — Jorge</option><option value="4">4 — Cheque</option><option value="5">5 — Mariana</option><option value="6">6 — Martín</option><option value="7">7 — Lucho</option><option value="8">8 — USD</option></select></div><div class="fr"><label>Tipo</label><select id="su-tipo"><option value="sueldo">Sueldo</option><option value="gasto_fijo">Gasto fijo</option></select></div></div>
   <div class="fr"><label>Monto pagado ($)</label><input id="su-monto" type="number" placeholder="0"></div>
   <div class="fr"><label>Fecha</label><input id="su-fecha" type="date"></div>
   <div class="ma"><button class="btn" onclick="closeM('m-sueldo')">Cancelar</button><button class="btn btn-wa" onclick="guardarSueldo()"><i class="ti ti-users"></i> Guardar</button></div>
 </div></div>
 
-<!-- CAJA VEHÍCULOS MOVIMIENTO -->
 <div class="mo" id="m-cajav"><div class="modal">
-  <div class="mt">Nuevo movimiento — caja vehículos</div>
+  <div class="mt" id="cajav-title">Nuevo movimiento — caja vehículos</div>
   <div class="fr"><label>Detalle</label><input id="cv-det" placeholder="Venta Hilux / Compra Ranger..."></div>
-  <div class="fg2">
-    <div class="fr"><label>Caja</label>
-      <select id="cv-caja">
-        <option value="1">1 — Efectivo</option><option value="2">2 — Banco</option><option value="3">3 — Jorge</option>
-        <option value="4">4 — Cheque</option><option value="5">5 — Mariana</option><option value="6">6 — Martín</option>
-        <option value="7">7 — Lucho</option><option value="8">8 — USD</option>
-      </select>
-    </div>
-    <div class="fr"><label>Categoría</label>
-      <select id="cv-cat"><option>Venta vehículo</option><option>Compra vehículo</option><option>Preparación</option><option>Gestoría</option><option>Comisión</option><option>Otro</option></select>
-    </div>
-  </div>
-  <div class="fg2">
-    <div class="fr"><label>Cobrado ($)</label><input id="cv-cobrado" type="number" placeholder="0"></div>
-    <div class="fr"><label>Pagado ($)</label><input id="cv-pagado" type="number" placeholder="0"></div>
-  </div>
+  <div class="fg2"><div class="fr"><label>Caja</label><select id="cv-caja"><option value="1">1 — Efectivo</option><option value="2">2 — Banco</option><option value="3">3 — Jorge</option><option value="4">4 — Cheque</option><option value="5">5 — Mariana</option><option value="6">6 — Martín</option><option value="7">7 — Lucho</option><option value="8">8 — USD</option></select></div><div class="fr"><label>Categoría</label><select id="cv-cat"><option>Venta vehículo</option><option>Compra vehículo</option><option>Preparación</option><option>Gestoría</option><option>Comisión</option><option>Otro</option></select></div></div>
+  <div class="fg2"><div class="fr"><label>Cobrado ($)</label><input id="cv-cobrado" type="number" placeholder="0"></div><div class="fr"><label>Pagado ($)</label><input id="cv-pagado" type="number" placeholder="0"></div></div>
   <div class="fr"><label>Vehículo</label><input id="cv-veh"></div>
   <div class="fr"><label>Fecha</label><input id="cv-fecha" type="date"></div>
+  <input type="hidden" id="cv-tipo-mov" value="movimiento">
   <div class="ma"><button class="btn" onclick="closeM('m-cajav')">Cancelar</button><button class="btn btn-p" onclick="guardarCajaV()">Guardar</button></div>
+</div></div>
+
+<div class="mo" id="m-sueldov"><div class="modal">
+  <div class="mt">Registrar sueldo / gasto — vehículos</div>
+  <div class="fr"><label>Descripción</label><input id="suv-det" placeholder="Comisión vendedor / Gasto..."></div>
+  <div class="fg2"><div class="fr"><label>Caja</label><select id="suv-caja"><option value="1">1 — Efectivo</option><option value="2">2 — Banco</option><option value="3">3 — Jorge</option><option value="4">4 — Cheque</option><option value="5">5 — Mariana</option><option value="6">6 — Martín</option><option value="7">7 — Lucho</option><option value="8">8 — USD</option></select></div><div class="fr"><label>Tipo</label><select id="suv-tipo"><option value="sueldo">Sueldo / Comisión</option><option value="gasto_fijo">Gasto fijo</option></select></div></div>
+  <div class="fr"><label>Monto pagado ($)</label><input id="suv-monto" type="number" placeholder="0"></div>
+  <div class="fr"><label>Fecha</label><input id="suv-fecha" type="date"></div>
+  <div class="ma"><button class="btn" onclick="closeM('m-sueldov')">Cancelar</button><button class="btn btn-wa" onclick="guardarSueldoV()"><i class="ti ti-users"></i> Guardar</button></div>
 </div></div>
 
 <div class="mo" id="m-cf"><div class="modal">
@@ -592,15 +590,34 @@ tr:hover td{background:var(--s2)}
 
 <div class="mo" id="m-nsvc"><div class="modal">
   <div class="mt">Agregar servicio a cliente</div>
-  <div class="chk-group">
-    <label class="chk-label"><input type="checkbox" id="ns-mec"> Mecánica</label>
-    <label class="chk-label"><input type="checkbox" id="ns-det"> Detailing</label>
-    <label class="chk-label"><input type="checkbox" id="ns-ppf"> PPF</label>
-    <label class="chk-label"><input type="checkbox" id="ns-lav"> Lavado</label>
-    <label class="chk-label"><input type="checkbox" id="ns-otro"> Otro</label>
-  </div>
+  <div class="chk-group"><label class="chk-label"><input type="checkbox" id="ns-mec"> Mecánica</label><label class="chk-label"><input type="checkbox" id="ns-det"> Detailing</label><label class="chk-label"><input type="checkbox" id="ns-ppf"> PPF</label><label class="chk-label"><input type="checkbox" id="ns-lav"> Lavado</label><label class="chk-label"><input type="checkbox" id="ns-otro"> Otro</label></div>
   <div class="fr"><label>Descripción</label><textarea id="ns-desc"></textarea></div>
   <div class="ma"><button class="btn" onclick="closeM('m-nsvc')">Cancelar</button><button class="btn btn-p" onclick="guardarNSvc()">Guardar</button></div>
+</div></div>
+
+<!-- GESTORÍA MODAL -->
+<div class="mo" id="m-gestoria"><div class="modal">
+  <div class="mt">Nuevo trámite de gestoría</div>
+  <div class="fr"><label>Vehículo</label><select id="g-veh"><option value="">— vehículo del inventario —</option></select></div>
+  <div class="fr"><label>O escribí el vehículo</label><input id="g-veh-texto" placeholder="Toyota Hilux 2021 (si no está en inventario)"></div>
+  <div class="fg2">
+    <div class="fr"><label>Tipo de trámite</label><select id="g-tipo"><option value="transferencia">Transferencia</option><option value="patente">Patente</option><option value="radicacion">Radicación</option><option value="otro">Otro</option></select></div>
+    <div class="fr"><label>Estado</label><select id="g-estado"><option value="pendiente">Pendiente</option><option value="en_proceso">En proceso</option><option value="listo">Listo</option><option value="entregado">Entregado</option></select></div>
+  </div>
+  <div class="fg2">
+    <div class="fr"><label>Deuda multa ($)</label><input id="g-multa" type="number" placeholder="0"></div>
+    <div class="fr"><label>Deuda patente ($)</label><input id="g-patente" type="number" placeholder="0"></div>
+  </div>
+  <div class="fg2">
+    <div class="fr"><label>Monto pago transferencia ($)</label><input id="g-transferencia" type="number" placeholder="0"></div>
+    <div class="fr"><label>Responsable</label><input id="g-resp" placeholder="Gestoría XX"></div>
+  </div>
+  <div class="fg2">
+    <div class="fr"><label>¿Está al día?</label><select id="g-aldia"><option value="false">No</option><option value="true">Sí</option></select></div>
+    <div class="fr"><label>¿Trámite terminado?</label><select id="g-terminado"><option value="false">No</option><option value="true">Sí</option></select></div>
+  </div>
+  <div class="fr"><label>Notas</label><textarea id="g-notas"></textarea></div>
+  <div class="ma"><button class="btn" onclick="closeM('m-gestoria')">Cancelar</button><button class="btn btn-p" onclick="guardarGestoria()">Guardar</button></div>
 </div></div>
 
 <script>
@@ -612,7 +629,8 @@ const db=createClient(SURL,SKEY);
 const CAJAS=[{n:1,nombre:'Efectivo'},{n:2,nombre:'Banco'},{n:3,nombre:'Jorge'},{n:4,nombre:'Cheque'},{n:5,nombre:'Mariana'},{n:6,nombre:'Martín'},{n:7,nombre:'Lucho'},{n:8,nombre:'USD'}];
 const MESES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
-let C={leadsA:[],leadsT:[],clt:[],veh:[],ots:[],cajav:[],cajat:[],cf:[],ventas:[],recs:[],activeId:null,activeType:null,recFiltro:'todos',diaActual:new Date().toISOString().split('T')[0],mesActual:{y:new Date().getFullYear(),m:new Date().getMonth()},cajaVistaActual:'dia'};
+let SESSION=null;
+let C={leadsA:[],leadsT:[],clt:[],veh:[],ots:[],cajav:[],cajat:[],cf:[],ventas:[],recs:[],gestoria:[],activeId:null,activeType:null,recFiltro:'todos',diaActual:new Date().toISOString().split('T')[0],mesActual:{y:new Date().getFullYear(),m:new Date().getMonth()},diaVActual:new Date().toISOString().split('T')[0],mesVActual:{y:new Date().getFullYear(),m:new Date().getMonth()},cajaVistaActual:'dia',cajaVVistaActual:'dia'};
 
 const fmt=n=>'$'+Number(n||0).toLocaleString('es-AR');
 const hoy=()=>new Date().toLocaleDateString('es-AR');
@@ -628,33 +646,79 @@ const ET=['Consulta recibida','Presupuesto enviado','Turno agendado','Trabajo en
 const BA={'Nuevo contacto':'bgr','Conversando':'bb','Visita agendada':'ba','Oferta enviada':'bp','Cerrado':'bg','Perdido':'br'};
 const BT={'Consulta recibida':'bgr','Presupuesto enviado':'bb','Turno agendado':'ba','Trabajo en proceso':'bp','Entregado':'bg','Perdido':'br'};
 
-const titles={dashboard:'Dashboard',recordatorios:'Recordatorios','leads-autos':'Pipeline — ventas de autos','contactos-autos':'Contactos leads autos','leads-taller':'Pipeline — servicios de taller','clientes-taller':'Clientes de taller',inventario:'Inventario',ventas:'Ventas','caja-vehiculos':'Caja — vehículos',ordenes:'Órdenes de trabajo','caja-taller':'Caja — taller','costos-fijos':'Costos fijos'};
+// ============ LOGIN ============
+async function hacerLogin(){
+  const usuario=document.getElementById('login-user').value.trim().toLowerCase();
+  const pass=document.getElementById('login-pass').value;
+  const errEl=document.getElementById('login-err');
+  errEl.textContent='';
+  if(!usuario||!pass){errEl.textContent='Completá usuario y contraseña';return;}
+  const{data,error}=await db.from('usuarios').select('*').eq('usuario',usuario).eq('activo',true).maybeSingle();
+  if(error||!data||data.password!==pass){errEl.textContent='Usuario o contraseña incorrectos';return;}
+  SESSION={nombre:data.nombre,usuario:data.usuario,rol:data.rol};
+  localStorage.setItem('gyfut_session',JSON.stringify(SESSION));
+  iniciarApp();
+}
+function cerrarSesion(){localStorage.removeItem('gyfut_session');SESSION=null;document.getElementById('main-app').style.display='none';document.getElementById('login-screen').style.display='flex';document.getElementById('login-user').value='';document.getElementById('login-pass').value='';}
+
+function aplicarPermisos(){
+  const esAdmin=SESSION.rol==='admin';
+  document.querySelectorAll('[data-perm="admin"]').forEach(el=>{el.style.display=esAdmin?'':'none';});
+  document.getElementById('user-name').textContent=SESSION.nombre;
+  document.getElementById('user-rol').textContent=esAdmin?'Administrador':'Operador taller';
+  document.getElementById('user-avatar').textContent=SESSION.nombre.charAt(0).toUpperCase();
+  if(!esAdmin){
+    document.getElementById('dash-operador').style.display='block';
+    const otCostosRow=document.getElementById('ot-costos-row');
+    if(otCostosRow)otCostosRow.style.display='none';
+  }
+}
+
+function iniciarApp(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('main-app').style.display='flex';
+  aplicarPermisos();
+  if(SESSION.rol==='admin')navTo('dashboard',document.querySelector('.ni.active'));
+  else navTo('ordenes',document.querySelector('.ni[onclick*="ordenes"]'));
+}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  const saved=localStorage.getItem('gyfut_session');
+  if(saved){SESSION=JSON.parse(saved);iniciarApp();}
+});
+
+function setSyncStatus(s){const d=document.getElementById('sdot'),t=document.getElementById('stxt');if(s==='ok'){d.className='sdot';t.textContent='Conectado';}else if(s==='syncing'){d.className='sdot spin';t.textContent='Guardando...';}else{d.className='sdot err';t.textContent='Error';}}
+
+const titles={dashboard:'Dashboard',recordatorios:'Recordatorios','leads-autos':'Pipeline — ventas de autos','contactos-autos':'Contactos leads autos','leads-taller':'Pipeline — servicios de taller','clientes-taller':'Clientes de taller',inventario:'Inventario',ventas:'Ventas','caja-vehiculos':'Caja — vehículos',gestoria:'Gestoría',ordenes:'Órdenes de trabajo','caja-taller':'Caja — taller','costos-fijos':'Costos fijos'};
 
 function getActions(pg){
+  const esAdmin=SESSION.rol==='admin';
   if(pg==='leads-autos'||pg==='contactos-autos')return'<button class="btn btn-p" onclick="abrirLA()"><i class="ti ti-plus"></i> Nuevo lead</button>';
   if(pg==='leads-taller')return'<button class="btn btn-p" onclick="openM(\'m-lt\')"><i class="ti ti-plus"></i> Nuevo lead</button>';
   if(pg==='clientes-taller')return'<button class="btn btn-p" onclick="openM(\'m-clt\')"><i class="ti ti-plus"></i> Nuevo cliente</button>';
   if(pg==='recordatorios')return'<button class="btn btn-p" onclick="abrirRecM()"><i class="ti ti-plus"></i> Recordatorio manual</button>';
   if(pg==='inventario')return'<button class="btn btn-p" onclick="openM(\'m-veh\')"><i class="ti ti-plus"></i> Agregar vehículo</button>';
   if(pg==='ventas')return'<button class="btn btn-p" onclick="abrirVenta()"><i class="ti ti-plus"></i> Registrar venta</button>';
-  if(pg==='caja-vehiculos')return'<button class="btn btn-p" onclick="abrirCajaV()"><i class="ti ti-plus"></i> Nuevo movimiento</button>';
+  if(pg==='gestoria')return'<button class="btn btn-p" onclick="abrirGestoria()"><i class="ti ti-plus"></i> Nuevo trámite</button>';
+  if(pg==='caja-vehiculos')return`<div style="display:flex;gap:6px"><button class="btn btn-p" onclick="abrirMovDiaV()"><i class="ti ti-plus"></i> Movimiento</button><button class="btn btn-wa" onclick="abrirSueldoV()"><i class="ti ti-users"></i> Sueldo / gasto</button></div>`;
   if(pg==='ordenes')return'<button class="btn btn-p" onclick="openM(\'m-ot\')"><i class="ti ti-plus"></i> Nueva orden</button>';
-  if(pg==='caja-taller')return`<div style="display:flex;gap:6px"><button class="btn btn-p" onclick="abrirMovDia()"><i class="ti ti-plus"></i> Movimiento</button><button class="btn btn-wa" onclick="abrirSueldo()"><i class="ti ti-users"></i> Sueldo / gasto</button></div>`;
+  if(pg==='caja-taller'){
+    if(esAdmin)return`<div style="display:flex;gap:6px"><button class="btn btn-p" onclick="abrirMovDia()"><i class="ti ti-plus"></i> Movimiento</button><button class="btn btn-wa" onclick="abrirSueldo()"><i class="ti ti-users"></i> Sueldo / gasto</button></div>`;
+    return`<button class="btn btn-p" onclick="abrirMovDia()"><i class="ti ti-plus"></i> Movimiento</button>`;
+  }
   if(pg==='costos-fijos')return'<button class="btn btn-p" onclick="openM(\'m-cf\')"><i class="ti ti-plus"></i> Agregar costo</button>';
   return'';
 }
-
-function setSyncStatus(s){const d=document.getElementById('sdot'),t=document.getElementById('stxt');if(s==='ok'){d.className='sdot';t.textContent='Conectado';}else if(s==='syncing'){d.className='sdot spin';t.textContent='Guardando...';}else{d.className='sdot err';t.textContent='Error';}}
 
 async function navTo(pg,el){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+pg).classList.add('active');
-  el.classList.add('active');
+  if(el)el.classList.add('active');
   document.getElementById('topbar-title').textContent=titles[pg]||pg;
   document.getElementById('topbar-actions').innerHTML=getActions(pg);
   closeDetail();
-  const r={dashboard:loadDash,'leads-autos':()=>loadLeadsA().then(()=>renderKanban('autos')),'contactos-autos':()=>loadLeadsA().then(renderContactosAutos),'leads-taller':()=>loadLeadsT().then(()=>renderKanban('taller')),'clientes-taller':()=>loadCLT().then(renderClientesTaller),inventario:()=>loadVeh().then(renderInv),ventas:()=>loadVentas().then(renderVentas),'caja-vehiculos':()=>loadCajaV().then(renderCajaV),ordenes:()=>loadOT().then(renderOT),'caja-taller':loadCajaTaller,'costos-fijos':()=>loadCF().then(renderCF),recordatorios:()=>loadRecs().then(renderRecs)};
+  const r={dashboard:loadDash,'leads-autos':()=>loadLeadsA().then(()=>renderKanban('autos')),'contactos-autos':()=>loadLeadsA().then(renderContactosAutos),'leads-taller':()=>loadLeadsT().then(()=>renderKanban('taller')),'clientes-taller':()=>loadCLT().then(renderClientesTaller),inventario:()=>loadVeh().then(renderInv),ventas:()=>loadVentas().then(renderVentas),gestoria:()=>Promise.all([loadGestoria(),loadVeh()]).then(renderGestoria),'caja-vehiculos':loadCajaVehiculos,ordenes:()=>loadOT().then(renderOT),'caja-taller':loadCajaTaller,'costos-fijos':()=>loadCF().then(renderCF),recordatorios:()=>loadRecs().then(renderRecs)};
   if(r[pg])await r[pg]();
 }
 
@@ -664,37 +728,81 @@ const loadLeadsT=async()=>{const{data}=await db.from('leads_taller').select('*')
 const loadCLT=async()=>{const{data}=await db.from('clientes_taller').select('*').order('created_at',{ascending:false});C.clt=data||[];};
 const loadVeh=async()=>{const{data}=await db.from('vehiculos').select('*').order('created_at',{ascending:false});C.veh=data||[];};
 const loadOT=async()=>{const{data}=await db.from('ordenes_trabajo').select('*').order('created_at',{ascending:false});C.ots=data||[];};
-const loadCajaV=async()=>{const{data}=await db.from('caja_vehiculos').select('*').order('created_at',{ascending:false});C.cajav=data||[];};
+const loadCajaV=async()=>{const{data}=await db.from('caja_vehiculos').select('*').order('fecha',{ascending:false});C.cajav=data||[];};
 const loadCajaT=async()=>{const{data}=await db.from('caja_taller').select('*').order('fecha',{ascending:false});C.cajat=data||[];};
 const loadCF=async()=>{const{data}=await db.from('costos_fijos').select('*').order('created_at',{ascending:false});C.cf=data||[];};
 const loadVentas=async()=>{const{data}=await db.from('ventas').select('*').order('created_at',{ascending:false});C.ventas=data||[];};
 const loadRecs=async()=>{const{data}=await db.from('recordatorios').select('*').eq('completado',false).order('fecha',{ascending:true});C.recs=data||[];};
+const loadGestoria=async()=>{const{data}=await db.from('gestoria').select('*').order('created_at',{ascending:false});C.gestoria=data||[];};
 
-// CAJA TALLER — VISTA DIARIA Y MENSUAL
+// ============ GESTORÍA ============
+function abrirGestoria(){
+  const s=document.getElementById('g-veh');
+  s.innerHTML='<option value="">— vehículo del inventario —</option>'+C.veh.map(v=>`<option value="${v.id}">${v.marca} ${v.modelo} ${v.anio}</option>`).join('');
+  openM('m-gestoria');
+}
+async function guardarGestoria(){
+  const vid=document.getElementById('g-veh').value;
+  const vtexto=document.getElementById('g-veh-texto').value;
+  const veh=vid?C.veh.find(v=>v.id===parseInt(vid)):null;
+  const vehiculoTexto=veh?`${veh.marca} ${veh.modelo} ${veh.anio}`:vtexto;
+  if(!vehiculoTexto)return alert('Indicá el vehículo');
+  setSyncStatus('syncing');
+  await db.from('gestoria').insert({
+    vehiculo_id:vid?parseInt(vid):null,
+    vehiculo_texto:vehiculoTexto,
+    tipo_tramite:document.getElementById('g-tipo').value,
+    estado:document.getElementById('g-estado').value,
+    deuda_multa:parseFloat(document.getElementById('g-multa').value)||0,
+    deuda_patente:parseFloat(document.getElementById('g-patente').value)||0,
+    monto_transferencia:parseFloat(document.getElementById('g-transferencia').value)||0,
+    responsable:document.getElementById('g-resp').value,
+    al_dia:document.getElementById('g-aldia').value==='true',
+    tramite_terminado:document.getElementById('g-terminado').value==='true',
+    notas:document.getElementById('g-notas').value
+  });
+  setSyncStatus('ok');closeM('m-gestoria');
+  ['g-veh-texto','g-multa','g-patente','g-transferencia','g-resp','g-notas'].forEach(id=>document.getElementById(id).value='');
+  await loadGestoria();renderGestoria();
+}
+function renderGestoria(){
+  const activos=C.gestoria.filter(g=>!g.tramite_terminado).length;
+  const aldia=C.gestoria.filter(g=>g.al_dia).length;
+  const conDeuda=C.gestoria.filter(g=>(g.deuda_multa||0)>0||(g.deuda_patente||0)>0).length;
+  const term=C.gestoria.filter(g=>g.tramite_terminado).length;
+  document.getElementById('g-activos').textContent=activos;
+  document.getElementById('g-aldia').textContent=aldia;
+  document.getElementById('g-deuda').textContent=conDeuda;
+  document.getElementById('g-term').textContent=term;
+  const tb=document.getElementById('tb-gestoria');
+  const bmEstado={'pendiente':'bgr','en_proceso':'bb','listo':'ba','entregado':'bg'};
+  const tipoLabel={'transferencia':'Transferencia','patente':'Patente','radicacion':'Radicación','otro':'Otro'};
+  if(!C.gestoria.length){tb.innerHTML='<tr><td colspan="9"><div class="empty"><i class="ti ti-file-certificate"></i>Sin trámites registrados.</div></td></tr>';return;}
+  tb.innerHTML=C.gestoria.map(g=>`<tr>
+    <td><strong>${g.vehiculo_texto}</strong></td>
+    <td>${b('bgr',tipoLabel[g.tipo_tramite]||g.tipo_tramite)}</td>
+    <td>${b(bmEstado[g.estado]||'bgr',g.estado.replace('_',' '))}</td>
+    <td class="${(g.deuda_multa||0)>0?'eg':''}">${(g.deuda_multa||0)>0?fmt(g.deuda_multa):'—'}</td>
+    <td class="${(g.deuda_patente||0)>0?'eg':''}">${(g.deuda_patente||0)>0?fmt(g.deuda_patente):'—'}</td>
+    <td>${g.al_dia?'<span class="al-dia-si"><i class="ti ti-check"></i>Sí</span>':'<span class="al-dia-no"><i class="ti ti-x"></i>No</span>'}</td>
+    <td>${g.tramite_terminado?'<span class="al-dia-si"><i class="ti ti-check"></i>Sí</span>':'<span class="al-dia-no"><i class="ti ti-clock"></i>No</span>'}</td>
+    <td>${(g.monto_transferencia||0)>0?fmt(g.monto_transferencia):'—'}</td>
+    <td><button class="icon-btn" onclick="elimGestoria(${g.id})"><i class="ti ti-trash"></i></button></td>
+  </tr>`).join('');
+}
+async function elimGestoria(id){if(!confirm('¿Eliminar trámite?'))return;setSyncStatus('syncing');await db.from('gestoria').delete().eq('id',id);setSyncStatus('ok');await loadGestoria();renderGestoria();}
+
+// ============ CAJA TALLER (diaria + mensual) ============
 async function loadCajaTaller(){await loadCajaT();if(C.cajaVistaActual==='dia')renderDia();else renderMes();}
-
-function cajaTab(vista,el){
-  C.cajaVistaActual=vista;
-  document.querySelectorAll('#caja-tabs .tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('caja-vista-dia').style.display=vista==='dia'?'block':'none';
-  document.getElementById('caja-vista-mes').style.display=vista==='mes'?'block':'none';
-  if(vista==='dia')renderDia();else renderMes();
-}
-
-function cambiarDia(delta){
-  const d=new Date(C.diaActual);d.setDate(d.getDate()+delta);
-  C.diaActual=d.toISOString().split('T')[0];renderDia();
-}
+function cajaTab(vista,el){C.cajaVistaActual=vista;document.querySelectorAll('#caja-tabs .tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');document.getElementById('caja-vista-dia').style.display=vista==='dia'?'block':'none';document.getElementById('caja-vista-mes').style.display=vista==='mes'?'block':'none';if(vista==='dia')renderDia();else renderMes();}
+function cambiarDia(delta){const d=new Date(C.diaActual);d.setDate(d.getDate()+delta);C.diaActual=d.toISOString().split('T')[0];renderDia();}
 function irHoy(){C.diaActual=hoyD();renderDia();}
-function cambiarMes(delta){
-  C.mesActual.m+=delta;
-  if(C.mesActual.m>11){C.mesActual.m=0;C.mesActual.y++;}
-  if(C.mesActual.m<0){C.mesActual.m=11;C.mesActual.y--;}
-  renderMes();
-}
+function cambiarMes(delta){C.mesActual.m+=delta;if(C.mesActual.m>11){C.mesActual.m=0;C.mesActual.y++;}if(C.mesActual.m<0){C.mesActual.m=11;C.mesActual.y--;}renderMes();}
+
+function saldosCaja(movs){const s={};CAJAS.forEach(c=>s[c.n]=0);movs.forEach(m=>{s[m.subcuenta]=(s[m.subcuenta]||0)+(parseFloat(m.cobrado)||0)-(parseFloat(m.pagado)||0);});return s;}
 
 function renderDia(){
+  const esAdmin=SESSION.rol==='admin';
   const fecha=C.diaActual;
   const d=new Date(fecha+'T12:00:00');
   const diasSemana=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
@@ -702,43 +810,44 @@ function renderDia(){
   document.getElementById('dia-sub').textContent=fecha===hoyD()?'Hoy':'';
   const movsDia=C.cajat.filter(m=>m.fecha===fecha&&(!m.tipo_mov||m.tipo_mov==='movimiento'));
   const sueldosDia=C.cajat.filter(m=>m.fecha===fecha&&(m.tipo_mov==='sueldo'||m.tipo_mov==='gasto_fijo'));
-  const totalCobrado=movsDia.reduce((a,m)=>a+(parseFloat(m.cobrado)||0),0);
-  const totalPagado=movsDia.reduce((a,m)=>a+(parseFloat(m.pagado)||0),0);
-  const totalSueldos=sueldosDia.reduce((a,m)=>a+(parseFloat(m.pagado)||0),0);
-  const neto=totalCobrado-totalPagado-totalSueldos;
-  const set=(id,v,col)=>{const el=document.getElementById(id);if(el){el.textContent=v;if(col)el.style.color=col;}};
-  set('dia-cobrado',fmt(totalCobrado));set('dia-pagado',fmt(totalPagado));set('dia-sueldos',fmt(totalSueldos));
-  set('dia-neto',fmt(neto),neto>=0?'var(--ok)':neto<0?'var(--er)':'var(--tx3)');
-  set('dia-mov-total',fmt(totalCobrado-totalPagado),totalCobrado-totalPagado>=0?'var(--ok)':'var(--er)');
-  set('dia-sueldos-total',fmt(totalSueldos));
-  const renderMovList=(containerId,movs,esSueldo)=>{
-    const cont=document.getElementById(containerId);if(!cont)return;
-    if(!movs.length){cont.innerHTML='<div class="empty" style="padding:20px"><i class="ti ti-inbox"></i>Sin registros</div>';return;}
-    cont.innerHTML=movs.map(m=>{
-      const caja=CAJAS.find(c=>c.n===m.subcuenta);
-      const tipoBadge=m.tipo_mov==='sueldo'?b('ba','Sueldo'):m.tipo_mov==='gasto_fijo'?b('bgr','Gasto fijo'):b('bgr',m.categoria||'—');
-      return`<div class="mov-row">
-        <div class="mov-cell"><span class="num-caja ${esSueldo?'sueldo':''}">${m.subcuenta}</span></div>
-        <div class="mov-cell"><strong>${m.detalle}</strong><br><span style="font-size:9px;color:var(--tx3)">${caja?.nombre||'—'}</span></div>
-        <div class="mov-cell muted">${tipoBadge}</div>
-        <div class="mov-cell cobrado">${(m.cobrado&&m.cobrado>0)?fmt(m.cobrado):'—'}</div>
-        <div class="mov-cell pagado">${(m.pagado&&m.pagado>0)?fmt(m.pagado):'—'}</div>
-        <div class="mov-cell"><button class="icon-btn" onclick="elimMovDia(${m.id})"><i class="ti ti-trash"></i></button></div>
-      </div>`;
-    }).join('');
-  };
-  renderMovList('dia-movs',movsDia,false);
-  renderMovList('dia-sueldos-list',sueldosDia,true);
-  // Saldos acumulados hasta este día
-  const hasta=C.cajat.filter(m=>m.fecha<=fecha);
-  const saldos={};CAJAS.forEach(c=>saldos[c.n]=0);
-  hasta.forEach(m=>{saldos[m.subcuenta]=(saldos[m.subcuenta]||0)+(parseFloat(m.cobrado)||0)-(parseFloat(m.pagado)||0);});
-  const cont=document.getElementById('dia-saldos-cards');
-  if(cont)cont.innerHTML=CAJAS.map(c=>{const s=saldos[c.n]||0;const cls=s>0?'pos':s<0?'neg':'zer';return`<div class="caja-card"><div class="caja-num">${String(c.n).padStart(3,'0')}</div><div class="caja-nombre">${c.nombre}</div><div class="caja-saldo ${cls}">${fmt(s)}</div><div class="caja-sub">acumulado</div></div>`;}).join('');
+  if(esAdmin){
+    const totalCobrado=movsDia.reduce((a,m)=>a+(parseFloat(m.cobrado)||0),0);
+    const totalPagado=movsDia.reduce((a,m)=>a+(parseFloat(m.pagado)||0),0);
+    const totalSueldos=sueldosDia.reduce((a,m)=>a+(parseFloat(m.pagado)||0),0);
+    const neto=totalCobrado-totalPagado-totalSueldos;
+    const set=(id,v,col)=>{const el=document.getElementById(id);if(el){el.textContent=v;if(col)el.style.color=col;}};
+    set('dia-cobrado',fmt(totalCobrado));set('dia-pagado',fmt(totalPagado));set('dia-sueldos',fmt(totalSueldos));
+    set('dia-neto',fmt(neto),neto>=0?'var(--ok)':neto<0?'var(--er)':'var(--tx3)');
+    set('dia-mov-total',fmt(totalCobrado-totalPagado),totalCobrado-totalPagado>=0?'var(--ok)':'var(--er)');
+    set('dia-sueldos-total',fmt(totalSueldos));
+    const todoElDia=[...movsDia,...sueldosDia];
+    const saldos={};CAJAS.forEach(c=>saldos[c.n]=0);
+    todoElDia.forEach(m=>{saldos[m.subcuenta]=(saldos[m.subcuenta]||0)+(parseFloat(m.cobrado)||0)-(parseFloat(m.pagado)||0);});
+    const cont=document.getElementById('dia-saldos-cards');
+    if(cont)cont.innerHTML=CAJAS.map(c=>{const s=saldos[c.n]||0;const cls=s>0?'pos':s<0?'neg':'zer';return`<div class="caja-card"><div class="caja-num">${String(c.n).padStart(3,'0')}</div><div class="caja-nombre">${c.nombre}</div><div class="caja-saldo ${cls}">${fmt(s)}</div><div class="caja-sub">resultado de hoy</div></div>`;}).join('');
+    renderMovList('dia-sueldos-list',sueldosDia,true,esAdmin);
+  }
+  renderMovList('dia-movs',movsDia,false,esAdmin);
+}
+function renderMovList(containerId,movs,esSueldo,esAdmin){
+  const cont=document.getElementById(containerId);if(!cont)return;
+  if(!movs.length){cont.innerHTML='<div class="empty" style="padding:20px"><i class="ti ti-inbox"></i>Sin registros</div>';return;}
+  cont.innerHTML=movs.map(m=>{
+    const caja=CAJAS.find(c=>c.n===m.subcuenta);
+    const tipoBadge=m.tipo_mov==='sueldo'?b('ba','Sueldo'):m.tipo_mov==='gasto_fijo'?b('bgr','Gasto fijo'):b('bgr',m.categoria||'—');
+    return`<div class="mov-row">
+      <div class="mov-cell"><span class="num-caja ${esSueldo?'sueldo':''}">${m.subcuenta}</span></div>
+      <div class="mov-cell"><strong>${m.detalle}</strong><br><span style="font-size:9px;color:var(--tx3)">${caja?.nombre||'—'}</span></div>
+      <div class="mov-cell muted">${tipoBadge}</div>
+      <div class="mov-cell cobrado">${(m.cobrado&&m.cobrado>0)?fmt(m.cobrado):'—'}</div>
+      <div class="mov-cell pagado">${(m.pagado&&m.pagado>0)?fmt(m.pagado):'—'}</div>
+      <div class="mov-cell"><button class="icon-btn" onclick="elimMovDia(${m.id})"><i class="ti ti-trash"></i></button></div>
+    </div>`;
+  }).join('');
 }
 
 function renderMes(){
-  const {y,m}=C.mesActual;
+  const{y,m}=C.mesActual;
   document.getElementById('mes-titulo').textContent=`${MESES[m]} ${y}`;
   const prefijo=`${y}-${String(m+1).padStart(2,'0')}`;
   const movsMes=C.cajat.filter(mov=>mov.fecha&&mov.fecha.startsWith(prefijo));
@@ -751,17 +860,14 @@ function renderMes(){
   const set=(id,v,col)=>{const el=document.getElementById(id);if(el){el.textContent=v;if(col)el.style.color=col;}};
   set('mes-cobrado',fmt(totalCobrado));set('mes-pagado',fmt(totalPagado));set('mes-sueldos',fmt(totalSueldos));
   set('mes-neto',fmt(neto),neto>=0?'var(--ok)':neto<0?'var(--er)':'var(--tx3)');
-  // Saldos por subcuenta del mes
   const saldosMes={};CAJAS.forEach(c=>saldosMes[c.n]=0);
   movsMes.forEach(x=>{saldosMes[x.subcuenta]=(saldosMes[x.subcuenta]||0)+(parseFloat(x.cobrado)||0)-(parseFloat(x.pagado)||0);});
   const cardsEl=document.getElementById('mes-saldos-cards');
   if(cardsEl)cardsEl.innerHTML=CAJAS.map(c=>{const s=saldosMes[c.n]||0;const cls=s>0?'pos':s<0?'neg':'zer';return`<div class="caja-card"><div class="caja-num">${String(c.n).padStart(3,'0')}</div><div class="caja-nombre">${c.nombre}</div><div class="caja-saldo ${cls}">${fmt(s)}</div><div class="caja-sub">del mes</div></div>`;}).join('');
-  // Agrupar por día
   const diasMap={};
   movsMes.forEach(x=>{if(!diasMap[x.fecha])diasMap[x.fecha]=[];diasMap[x.fecha].push(x);});
   const diasOrdenados=Object.keys(diasMap).sort((a,b)=>b.localeCompare(a));
-  const cont=document.getElementById('mes-dias');
-  if(!cont)return;
+  const cont=document.getElementById('mes-dias');if(!cont)return;
   if(!diasOrdenados.length){cont.innerHTML='<div class="empty"><i class="ti ti-calendar"></i>Sin movimientos este mes.</div>';return;}
   cont.innerHTML=diasOrdenados.map(fecha=>{
     const movsDia=diasMap[fecha].filter(x=>!x.tipo_mov||x.tipo_mov==='movimiento');
@@ -775,13 +881,9 @@ function renderMes(){
     return`<div class="dia-bloque">
       <div class="dia-bloque-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
         <span class="dia-bloque-fecha">${diasSemana[d.getDay()]} ${d.getDate()} de ${MESES[d.getMonth()]}</span>
-        <div class="dia-bloque-resumen">
-          ${cobDia?`<span class="dia-bloque-stat ing">+${fmt(cobDia)}</span>`:''}
-          ${(pagDia+sueldoDia)?`<span class="dia-bloque-stat eg">-${fmt(pagDia+sueldoDia)}</span>`:''}
-          <span class="dia-bloque-stat" style="color:${netoDia>=0?'var(--ok)':'var(--er)'};font-weight:700">${fmt(netoDia)}</span>
-        </div>
+        <div class="dia-bloque-resumen">${cobDia?`<span class="dia-bloque-stat ing">+${fmt(cobDia)}</span>`:''}${(pagDia+sueldoDia)?`<span class="dia-bloque-stat eg">-${fmt(pagDia+sueldoDia)}</span>`:''}<span class="dia-bloque-stat" style="color:${netoDia>=0?'var(--ok)':'var(--er)'};font-weight:700">${fmt(netoDia)}</span></div>
       </div>
-      <div class="dia-bloque-content" style="display:none">
+      <div style="display:none">
         <div class="mov-hdr"><div class="mov-hdr-cell">Caja</div><div class="mov-hdr-cell">Detalle</div><div class="mov-hdr-cell">Tipo</div><div class="mov-hdr-cell">Cobrado</div><div class="mov-hdr-cell">Pagado</div><div class="mov-hdr-cell"></div></div>
         ${diasMap[fecha].map(x=>{const caja=CAJAS.find(c=>c.n===x.subcuenta);const esSueldo=x.tipo_mov==='sueldo'||x.tipo_mov==='gasto_fijo';const tipoBadge=x.tipo_mov==='sueldo'?b('ba','Sueldo'):x.tipo_mov==='gasto_fijo'?b('bgr','Gasto fijo'):b('bgr',x.categoria||'Movimiento');return`<div class="mov-row"><div class="mov-cell"><span class="num-caja ${esSueldo?'sueldo':''}">${x.subcuenta}</span></div><div class="mov-cell"><strong>${x.detalle}</strong><br><span style="font-size:9px;color:var(--tx3)">${caja?.nombre||'—'}</span></div><div class="mov-cell muted">${tipoBadge}</div><div class="mov-cell cobrado">${(x.cobrado&&x.cobrado>0)?fmt(x.cobrado):'—'}</div><div class="mov-cell pagado">${(x.pagado&&x.pagado>0)?fmt(x.pagado):'—'}</div><div class="mov-cell"><button class="icon-btn" onclick="elimMovDia(${x.id})"><i class="ti ti-trash"></i></button></div></div>`;}).join('')}
       </div>
@@ -789,16 +891,8 @@ function renderMes(){
   }).join('');
 }
 
-function abrirMovDia(){
-  document.getElementById('ct-fecha').value=C.diaActual;
-  document.getElementById('ct-tipo-mov').value='movimiento';
-  document.getElementById('cajat-title').textContent='Nuevo movimiento — caja taller';
-  openM('m-cajat');
-}
-function abrirSueldo(){
-  document.getElementById('su-fecha').value=C.diaActual;
-  openM('m-sueldo');
-}
+function abrirMovDia(){document.getElementById('ct-fecha').value=C.diaActual;document.getElementById('ct-tipo-mov').value='movimiento';document.getElementById('cajat-title').textContent='Nuevo movimiento — caja taller';openM('m-cajat');}
+function abrirSueldo(){document.getElementById('su-fecha').value=C.diaActual;openM('m-sueldo');}
 
 async function guardarCajaT(){
   const det=document.getElementById('ct-det').value;if(!det)return alert('Completá el detalle');
@@ -811,7 +905,6 @@ async function guardarCajaT(){
   ['ct-det','ct-cobrado','ct-pagado'].forEach(id=>document.getElementById(id).value='');
   await loadCajaT();renderDia();
 }
-
 async function guardarSueldo(){
   const det=document.getElementById('su-det').value;if(!det)return alert('Completá la descripción');
   const monto=parseFloat(document.getElementById('su-monto').value)||0;if(!monto)return alert('Ingresá el monto');
@@ -821,58 +914,150 @@ async function guardarSueldo(){
   ['su-det','su-monto'].forEach(id=>document.getElementById(id).value='');
   await loadCajaT();renderDia();if(C.cajaVistaActual==='mes')renderMes();
 }
+async function elimMovDia(id){if(!confirm('¿Eliminar este movimiento?'))return;setSyncStatus('syncing');await db.from('caja_taller').delete().eq('id',id);setSyncStatus('ok');await loadCajaT();if(C.cajaVistaActual==='dia')renderDia();else renderMes();}
 
-async function elimMovDia(id){
-  if(!confirm('¿Eliminar este movimiento?'))return;
-  setSyncStatus('syncing');
-  await db.from('caja_taller').delete().eq('id',id);
-  setSyncStatus('ok');
-  await loadCajaT();
-  if(C.cajaVistaActual==='dia')renderDia();else renderMes();
-}
+// ============ CAJA VEHÍCULOS (diaria + mensual) ============
+async function loadCajaVehiculos(){await loadCajaV();if(C.cajaVVistaActual==='dia')renderDiaV();else renderMesV();}
+function cajaVTab(vista,el){C.cajaVVistaActual=vista;document.querySelectorAll('#cajav-tabs .tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');document.getElementById('cajav-vista-dia').style.display=vista==='dia'?'block':'none';document.getElementById('cajav-vista-mes').style.display=vista==='mes'?'block':'none';if(vista==='dia')renderDiaV();else renderMesV();}
+function cambiarDiaV(delta){const d=new Date(C.diaVActual);d.setDate(d.getDate()+delta);C.diaVActual=d.toISOString().split('T')[0];renderDiaV();}
+function irHoyV(){C.diaVActual=hoyD();renderDiaV();}
+function cambiarMesV(delta){C.mesVActual.m+=delta;if(C.mesVActual.m>11){C.mesVActual.m=0;C.mesVActual.y++;}if(C.mesVActual.m<0){C.mesVActual.m=11;C.mesVActual.y--;}renderMesV();}
 
-// CAJA VEHÍCULOS
-function saldosCaja(movs){const s={};CAJAS.forEach(c=>s[c.n]=0);movs.forEach(m=>{s[m.subcuenta]=(s[m.subcuenta]||0)+(parseFloat(m.cobrado)||0)-(parseFloat(m.pagado)||0);});return s;}
-function renderCajaV(){
-  const saldos=saldosCaja(C.cajav);const total=Object.values(saldos).reduce((a,b)=>a+b,0);
-  const el=document.getElementById('cv-total');if(el){el.textContent=fmt(total);el.style.color=total>=0?'var(--ac)':total<0?'var(--er)':'var(--tx3)';}
-  const cont=document.getElementById('cv-cards');
-  if(cont)cont.innerHTML=CAJAS.map(c=>{const s=saldos[c.n]||0;const cls=s>0?'pos':s<0?'neg':'zer';return`<div class="caja-card"><div class="caja-num">${String(c.n).padStart(3,'0')}</div><div class="caja-nombre">${c.nombre}</div><div class="caja-saldo ${cls}">${fmt(s)}</div><div class="caja-sub">saldo actual</div></div>`;}).join('');
-  const tb=document.getElementById('tb-cajav');if(!tb)return;
-  if(!C.cajav.length){tb.innerHTML='<div class="empty"><i class="ti ti-cash"></i>Sin movimientos.</div>';return;}
-  tb.innerHTML=C.cajav.map(m=>{const caja=CAJAS.find(c=>c.n===m.subcuenta);return`<div class="mov-row"><div class="mov-cell"><span class="num-caja">${m.subcuenta}</span></div><div class="mov-cell"><strong>${m.detalle}</strong>${m.vehiculo?`<br><span style="font-size:9px;color:var(--tx3)">${m.vehiculo}</span>`:''}<br><span style="font-size:9px;color:var(--tx3)">${m.fecha||''} · ${m.categoria||''}</span></div><div class="mov-cell muted">${caja?.nombre||'—'}</div><div class="mov-cell cobrado">${(m.cobrado&&m.cobrado>0)?fmt(m.cobrado):'—'}</div><div class="mov-cell pagado">${(m.pagado&&m.pagado>0)?fmt(m.pagado):'—'}</div><div class="mov-cell"><button class="icon-btn" onclick="elimCajaV(${m.id})"><i class="ti ti-trash"></i></button></div></div>`;}).join('');
+function renderDiaV(){
+  const fecha=C.diaVActual;
+  const d=new Date(fecha+'T12:00:00');
+  const diasSemana=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  document.getElementById('diav-titulo').textContent=`${diasSemana[d.getDay()]} ${d.getDate()} de ${MESES[d.getMonth()]} ${d.getFullYear()}`;
+  document.getElementById('diav-sub').textContent=fecha===hoyD()?'Hoy':'';
+  const movsDia=C.cajav.filter(m=>m.fecha===fecha&&(!m.tipo_mov||m.tipo_mov==='movimiento'));
+  const sueldosDia=C.cajav.filter(m=>m.fecha===fecha&&(m.tipo_mov==='sueldo'||m.tipo_mov==='gasto_fijo'));
+  const totalCobrado=movsDia.reduce((a,m)=>a+(parseFloat(m.cobrado)||0),0);
+  const totalPagado=movsDia.reduce((a,m)=>a+(parseFloat(m.pagado)||0),0);
+  const totalSueldos=sueldosDia.reduce((a,m)=>a+(parseFloat(m.pagado)||0),0);
+  const neto=totalCobrado-totalPagado-totalSueldos;
+  const set=(id,v,col)=>{const el=document.getElementById(id);if(el){el.textContent=v;if(col)el.style.color=col;}};
+  set('diav-cobrado',fmt(totalCobrado));set('diav-pagado',fmt(totalPagado));set('diav-sueldos',fmt(totalSueldos));
+  set('diav-neto',fmt(neto),neto>=0?'var(--ok)':neto<0?'var(--er)':'var(--tx3)');
+  set('diav-mov-total',fmt(totalCobrado-totalPagado),totalCobrado-totalPagado>=0?'var(--ok)':'var(--er)');
+  set('diav-sueldos-total',fmt(totalSueldos));
+  renderMovListV('diav-movs',movsDia,false);
+  renderMovListV('diav-sueldos-list',sueldosDia,true);
+  const todoElDia=[...movsDia,...sueldosDia];
+  const saldos={};CAJAS.forEach(c=>saldos[c.n]=0);
+  todoElDia.forEach(m=>{saldos[m.subcuenta]=(saldos[m.subcuenta]||0)+(parseFloat(m.cobrado)||0)-(parseFloat(m.pagado)||0);});
+  const cont=document.getElementById('diav-saldos-cards');
+  if(cont)cont.innerHTML=CAJAS.map(c=>{const s=saldos[c.n]||0;const cls=s>0?'pos':s<0?'neg':'zer';return`<div class="caja-card"><div class="caja-num">${String(c.n).padStart(3,'0')}</div><div class="caja-nombre">${c.nombre}</div><div class="caja-saldo ${cls}">${fmt(s)}</div><div class="caja-sub">resultado de hoy</div></div>`;}).join('');
 }
-function abrirCajaV(){document.getElementById('cv-fecha').value=hoyD();openM('m-cajav');}
+function renderMovListV(containerId,movs,esSueldo){
+  const cont=document.getElementById(containerId);if(!cont)return;
+  if(!movs.length){cont.innerHTML='<div class="empty" style="padding:20px"><i class="ti ti-inbox"></i>Sin registros</div>';return;}
+  cont.innerHTML=movs.map(m=>{
+    const caja=CAJAS.find(c=>c.n===m.subcuenta);
+    const tipoBadge=m.tipo_mov==='sueldo'?b('ba','Sueldo'):m.tipo_mov==='gasto_fijo'?b('bgr','Gasto fijo'):b('bgr',m.categoria||'—');
+    return`<div class="mov-row">
+      <div class="mov-cell"><span class="num-caja ${esSueldo?'sueldo':''}">${m.subcuenta}</span></div>
+      <div class="mov-cell"><strong>${m.detalle}</strong>${m.vehiculo?`<br><span style="font-size:9px;color:var(--tx3)">${m.vehiculo}</span>`:''}<br><span style="font-size:9px;color:var(--tx3)">${caja?.nombre||'—'}</span></div>
+      <div class="mov-cell muted">${tipoBadge}</div>
+      <div class="mov-cell cobrado">${(m.cobrado&&m.cobrado>0)?fmt(m.cobrado):'—'}</div>
+      <div class="mov-cell pagado">${(m.pagado&&m.pagado>0)?fmt(m.pagado):'—'}</div>
+      <div class="mov-cell"><button class="icon-btn" onclick="elimMovDiaV(${m.id})"><i class="ti ti-trash"></i></button></div>
+    </div>`;
+  }).join('');
+}
+function renderMesV(){
+  const{y,m}=C.mesVActual;
+  document.getElementById('mesv-titulo').textContent=`${MESES[m]} ${y}`;
+  const prefijo=`${y}-${String(m+1).padStart(2,'0')}`;
+  const movsMes=C.cajav.filter(mov=>mov.fecha&&mov.fecha.startsWith(prefijo));
+  const movs=movsMes.filter(x=>!x.tipo_mov||x.tipo_mov==='movimiento');
+  const sueldos=movsMes.filter(x=>x.tipo_mov==='sueldo'||x.tipo_mov==='gasto_fijo');
+  const totalCobrado=movs.reduce((a,x)=>a+(parseFloat(x.cobrado)||0),0);
+  const totalPagado=movs.reduce((a,x)=>a+(parseFloat(x.pagado)||0),0);
+  const totalSueldos=sueldos.reduce((a,x)=>a+(parseFloat(x.pagado)||0),0);
+  const neto=totalCobrado-totalPagado-totalSueldos;
+  const set=(id,v,col)=>{const el=document.getElementById(id);if(el){el.textContent=v;if(col)el.style.color=col;}};
+  set('mesv-cobrado',fmt(totalCobrado));set('mesv-pagado',fmt(totalPagado));set('mesv-sueldos',fmt(totalSueldos));
+  set('mesv-neto',fmt(neto),neto>=0?'var(--ok)':neto<0?'var(--er)':'var(--tx3)');
+  const saldosMes={};CAJAS.forEach(c=>saldosMes[c.n]=0);
+  movsMes.forEach(x=>{saldosMes[x.subcuenta]=(saldosMes[x.subcuenta]||0)+(parseFloat(x.cobrado)||0)-(parseFloat(x.pagado)||0);});
+  const cardsEl=document.getElementById('mesv-saldos-cards');
+  if(cardsEl)cardsEl.innerHTML=CAJAS.map(c=>{const s=saldosMes[c.n]||0;const cls=s>0?'pos':s<0?'neg':'zer';return`<div class="caja-card"><div class="caja-num">${String(c.n).padStart(3,'0')}</div><div class="caja-nombre">${c.nombre}</div><div class="caja-saldo ${cls}">${fmt(s)}</div><div class="caja-sub">del mes</div></div>`;}).join('');
+  const diasMap={};
+  movsMes.forEach(x=>{if(!diasMap[x.fecha])diasMap[x.fecha]=[];diasMap[x.fecha].push(x);});
+  const diasOrdenados=Object.keys(diasMap).sort((a,b)=>b.localeCompare(a));
+  const cont=document.getElementById('mesv-dias');if(!cont)return;
+  if(!diasOrdenados.length){cont.innerHTML='<div class="empty"><i class="ti ti-calendar"></i>Sin movimientos este mes.</div>';return;}
+  cont.innerHTML=diasOrdenados.map(fecha=>{
+    const movsDia=diasMap[fecha].filter(x=>!x.tipo_mov||x.tipo_mov==='movimiento');
+    const sueldosDia=diasMap[fecha].filter(x=>x.tipo_mov==='sueldo'||x.tipo_mov==='gasto_fijo');
+    const cobDia=movsDia.reduce((a,x)=>a+(parseFloat(x.cobrado)||0),0);
+    const pagDia=movsDia.reduce((a,x)=>a+(parseFloat(x.pagado)||0),0);
+    const sueldoDia=sueldosDia.reduce((a,x)=>a+(parseFloat(x.pagado)||0),0);
+    const netoDia=cobDia-pagDia-sueldoDia;
+    const d=new Date(fecha+'T12:00:00');
+    const diasSemana=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    return`<div class="dia-bloque">
+      <div class="dia-bloque-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+        <span class="dia-bloque-fecha">${diasSemana[d.getDay()]} ${d.getDate()} de ${MESES[d.getMonth()]}</span>
+        <div class="dia-bloque-resumen">${cobDia?`<span class="dia-bloque-stat ing">+${fmt(cobDia)}</span>`:''}${(pagDia+sueldoDia)?`<span class="dia-bloque-stat eg">-${fmt(pagDia+sueldoDia)}</span>`:''}<span class="dia-bloque-stat" style="color:${netoDia>=0?'var(--ok)':'var(--er)'};font-weight:700">${fmt(netoDia)}</span></div>
+      </div>
+      <div style="display:none">
+        <div class="mov-hdr"><div class="mov-hdr-cell">Caja</div><div class="mov-hdr-cell">Detalle</div><div class="mov-hdr-cell">Tipo</div><div class="mov-hdr-cell">Cobrado</div><div class="mov-hdr-cell">Pagado</div><div class="mov-hdr-cell"></div></div>
+        ${diasMap[fecha].map(x=>{const caja=CAJAS.find(c=>c.n===x.subcuenta);const esSueldo=x.tipo_mov==='sueldo'||x.tipo_mov==='gasto_fijo';const tipoBadge=x.tipo_mov==='sueldo'?b('ba','Sueldo'):x.tipo_mov==='gasto_fijo'?b('bgr','Gasto fijo'):b('bgr',x.categoria||'Movimiento');return`<div class="mov-row"><div class="mov-cell"><span class="num-caja ${esSueldo?'sueldo':''}">${x.subcuenta}</span></div><div class="mov-cell"><strong>${x.detalle}</strong><br><span style="font-size:9px;color:var(--tx3)">${caja?.nombre||'—'}</span></div><div class="mov-cell muted">${tipoBadge}</div><div class="mov-cell cobrado">${(x.cobrado&&x.cobrado>0)?fmt(x.cobrado):'—'}</div><div class="mov-cell pagado">${(x.pagado&&x.pagado>0)?fmt(x.pagado):'—'}</div><div class="mov-cell"><button class="icon-btn" onclick="elimMovDiaV(${x.id})"><i class="ti ti-trash"></i></button></div></div>`;}).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+function abrirMovDiaV(){document.getElementById('cv-fecha').value=C.diaVActual;document.getElementById('cv-tipo-mov').value='movimiento';document.getElementById('cajav-title').textContent='Nuevo movimiento — caja vehículos';openM('m-cajav');}
+function abrirSueldoV(){document.getElementById('suv-fecha').value=C.diaVActual;openM('m-sueldov');}
 async function guardarCajaV(){
   const det=document.getElementById('cv-det').value;if(!det)return alert('Completá el detalle');
   const cobrado=parseFloat(document.getElementById('cv-cobrado').value)||0;
   const pagado=parseFloat(document.getElementById('cv-pagado').value)||0;
   if(!cobrado&&!pagado)return alert('Ingresá cobrado o pagado');
   setSyncStatus('syncing');
-  await db.from('caja_vehiculos').insert({detalle:det,subcuenta:parseInt(document.getElementById('cv-caja').value),categoria:document.getElementById('cv-cat').value,cobrado,pagado,vehiculo:document.getElementById('cv-veh').value,fecha:document.getElementById('cv-fecha').value});
-  setSyncStatus('ok');closeM('m-cajav');['cv-det','cv-cobrado','cv-pagado','cv-veh'].forEach(id=>document.getElementById(id).value='');
-  await loadCajaV();renderCajaV();
+  await db.from('caja_vehiculos').insert({detalle:det,subcuenta:parseInt(document.getElementById('cv-caja').value),categoria:document.getElementById('cv-cat').value,cobrado,pagado,vehiculo:document.getElementById('cv-veh').value,fecha:document.getElementById('cv-fecha').value,tipo_mov:'movimiento'});
+  setSyncStatus('ok');closeM('m-cajav');
+  ['cv-det','cv-cobrado','cv-pagado','cv-veh'].forEach(id=>document.getElementById(id).value='');
+  await loadCajaV();renderDiaV();
 }
-async function elimCajaV(id){if(!confirm('¿Eliminar?'))return;setSyncStatus('syncing');await db.from('caja_vehiculos').delete().eq('id',id);setSyncStatus('ok');await loadCajaV();renderCajaV();}
+async function guardarSueldoV(){
+  const det=document.getElementById('suv-det').value;if(!det)return alert('Completá la descripción');
+  const monto=parseFloat(document.getElementById('suv-monto').value)||0;if(!monto)return alert('Ingresá el monto');
+  setSyncStatus('syncing');
+  await db.from('caja_vehiculos').insert({detalle:det,subcuenta:parseInt(document.getElementById('suv-caja').value),categoria:document.getElementById('suv-tipo').value,cobrado:0,pagado:monto,fecha:document.getElementById('suv-fecha').value,tipo_mov:document.getElementById('suv-tipo').value});
+  setSyncStatus('ok');closeM('m-sueldov');
+  ['suv-det','suv-monto'].forEach(id=>document.getElementById(id).value='');
+  await loadCajaV();renderDiaV();if(C.cajaVVistaActual==='mes')renderMesV();
+}
+async function elimMovDiaV(id){if(!confirm('¿Eliminar?'))return;setSyncStatus('syncing');await db.from('caja_vehiculos').delete().eq('id',id);setSyncStatus('ok');await loadCajaV();if(C.cajaVVistaActual==='dia')renderDiaV();else renderMesV();}
 
 // DASHBOARD
 async function loadDash(){
-  await Promise.all([loadLeadsA(),loadLeadsT(),loadCLT(),loadVeh(),loadCajaV(),loadCajaT(),loadRecs()]);
-  const la=C.leadsA.filter(l=>l.estado!=='Cerrado'&&l.estado!=='Perdido').length;
-  const lt=C.leadsT.filter(l=>l.estado!=='Entregado'&&l.estado!=='Perdido').length;
-  const saldosV=saldosCaja(C.cajav);const totalV=Object.values(saldosV).reduce((a,b)=>a+b,0);
-  const hoyMovs=C.cajat.filter(m=>m.fecha===hoyD());
-  const hoyNeto=hoyMovs.reduce((a,m)=>a+(parseFloat(m.cobrado)||0)-(parseFloat(m.pagado)||0),0);
-  const set=(id,v,col)=>{const el=document.getElementById(id);if(el){el.textContent=v;if(col)el.style.color=col;}};
-  set('s-la',la);set('s-lt',lt);set('s-clt',C.clt.length);set('s-stock',C.veh.filter(v=>v.estado!=='vendido').length);
-  set('s-ct',fmt(hoyNeto),hoyNeto>=0?'var(--ok)':'var(--er)');
-  set('s-cv',fmt(totalV),totalV>=0?'var(--ok)':'var(--er)');
-  const sem=new Date();sem.setDate(sem.getDate()+7);const semStr=sem.toISOString().split('T')[0];
-  const pend=C.recs.filter(r=>r.fecha<=semStr).slice(0,4);
-  document.getElementById('dash-rec').innerHTML=pend.length?pend.map(r=>{const d=Math.ceil((new Date(r.fecha)-new Date(hoyD()))/(864e5));const cls=d<=0?'vh':d<=3?'vp':'vok';return`<div class="ot-item"><div class="dot ${d<=0?'dr':d<=3?'da':'db'}"></div><div class="oi"><div class="on">${r.nombre}</div><div class="om">${r.motivo}</div></div><span class="${cls}">${d<=0?'HOY':d+'d'}</span></div>`;}).join(''):'<div class="empty"><i class="ti ti-bell"></i>Sin recordatorios esta semana</div>';
-  const cal=[...C.leadsA.filter(l=>['Conversando','Visita agendada','Oferta enviada'].includes(l.estado)).map(l=>({...l,_t:'auto'})),...C.leadsT.filter(l=>['Presupuesto enviado','Turno agendado','Trabajo en proceso'].includes(l.estado)).map(l=>({...l,_t:'taller'}))].slice(0,4);
-  document.getElementById('dash-leads').innerHTML=cal.length?cal.map(l=>`<div class="ot-item"><div class="dot ${l._t==='auto'?'db':'da'}"></div><div class="oi"><div class="on">${l.nombre}</div><div class="om">${l._t==='auto'?(l.interes||'—'):(l.servicio||'—')} · ${b(l._t==='auto'?'bb':'ba',l._t==='auto'?'Auto':'Taller')}</div></div></div>`).join(''):'<div class="empty"><i class="ti ti-users"></i>Sin leads calientes</div>';
-  updateBadge();
+  const esAdmin=SESSION.rol==='admin';
+  if(esAdmin){
+    await Promise.all([loadLeadsA(),loadLeadsT(),loadCLT(),loadVeh(),loadCajaV(),loadCajaT(),loadRecs()]);
+    const la=C.leadsA.filter(l=>l.estado!=='Cerrado'&&l.estado!=='Perdido').length;
+    const lt=C.leadsT.filter(l=>l.estado!=='Entregado'&&l.estado!=='Perdido').length;
+    const saldosV=saldosCaja(C.cajav);const totalV=Object.values(saldosV).reduce((a,b)=>a+b,0);
+    const hoyMovs=C.cajat.filter(m=>m.fecha===hoyD());
+    const hoyNeto=hoyMovs.reduce((a,m)=>a+(parseFloat(m.cobrado)||0)-(parseFloat(m.pagado)||0),0);
+    const set=(id,v,col)=>{const el=document.getElementById(id);if(el){el.textContent=v;if(col)el.style.color=col;}};
+    set('s-la',la);set('s-lt',lt);set('s-clt',C.clt.length);set('s-stock',C.veh.filter(v=>v.estado!=='vendido').length);
+    set('s-ct',fmt(hoyNeto),hoyNeto>=0?'var(--ok)':'var(--er)');
+    set('s-cv',fmt(totalV),totalV>=0?'var(--ok)':'var(--er)');
+    const sem=new Date();sem.setDate(sem.getDate()+7);const semStr=sem.toISOString().split('T')[0];
+    const pend=C.recs.filter(r=>r.fecha<=semStr).slice(0,4);
+    document.getElementById('dash-rec').innerHTML=pend.length?pend.map(r=>{const d=Math.ceil((new Date(r.fecha)-new Date(hoyD()))/(864e5));const cls=d<=0?'vh':d<=3?'vp':'vok';return`<div class="ot-item"><div class="dot ${d<=0?'dr':d<=3?'da':'db'}"></div><div class="oi"><div class="on">${r.nombre}</div><div class="om">${r.motivo}</div></div><span class="${cls}">${d<=0?'HOY':d+'d'}</span></div>`;}).join(''):'<div class="empty"><i class="ti ti-bell"></i>Sin recordatorios esta semana</div>';
+    const cal=[...C.leadsA.filter(l=>['Conversando','Visita agendada','Oferta enviada'].includes(l.estado)).map(l=>({...l,_t:'auto'})),...C.leadsT.filter(l=>['Presupuesto enviado','Turno agendado','Trabajo en proceso'].includes(l.estado)).map(l=>({...l,_t:'taller'}))].slice(0,4);
+    document.getElementById('dash-leads').innerHTML=cal.length?cal.map(l=>`<div class="ot-item"><div class="dot ${l._t==='auto'?'db':'da'}"></div><div class="oi"><div class="on">${l.nombre}</div><div class="om">${l._t==='auto'?(l.interes||'—'):(l.servicio||'—')} · ${b(l._t==='auto'?'bb':'ba',l._t==='auto'?'Auto':'Taller')}</div></div></div>`).join(''):'<div class="empty"><i class="ti ti-users"></i>Sin leads calientes</div>';
+    updateBadge();
+  } else {
+    await loadOT();
+    const activas=C.ots.filter(o=>o.estado!=='Entregado');
+    const cont=document.getElementById('dash-ot-operador');
+    cont.innerHTML=activas.length?activas.map(o=>`<div class="ot-item"><div class="dot ${{'Ingresado':'dgr','En proceso':'db','Listo':'dg'}[o.estado]||'dgr'}"></div><div class="oi"><div class="on">${o.cliente}</div><div class="om">${(o.servicios||[]).join(', ')} · ${o.responsable||''}</div></div>${b({'Ingresado':'bgr','En proceso':'bb','Listo':'bg'}[o.estado]||'bgr',o.estado)}</div>`).join(''):'<div class="empty"><i class="ti ti-tool"></i>Sin órdenes activas</div>';
+  }
 }
 
 // RECORDATORIOS
@@ -895,7 +1080,7 @@ async function completarRec(id){
 }
 function abrirRecM(){const todos=[...C.leadsA,...C.leadsT,...C.clt];document.getElementById('rec-cl').innerHTML=todos.map(x=>`<option value="${x.nombre}">${x.nombre}</option>`).join('');document.getElementById('rec-fecha').value=hoyD();openM('m-rec');}
 async function guardarRec(){const n=document.getElementById('rec-cl').value;const mot=document.getElementById('rec-mot').value;const fecha=document.getElementById('rec-fecha').value;if(!mot||!fecha)return alert('Completá motivo y fecha');setSyncStatus('syncing');await db.from('recordatorios').insert({tipo:'manual',nombre:n,motivo:mot,fecha,completado:false});setSyncStatus('ok');closeM('m-rec');document.getElementById('rec-mot').value='';await loadRecs();renderRecs();updateBadge();}
-function updateBadge(){const sem=new Date();sem.setDate(sem.getDate()+7);const semStr=sem.toISOString().split('T')[0];const n=C.recs.filter(r=>r.fecha<=semStr).length;const el=document.getElementById('badge-rec');el.textContent=n;el.style.display=n?'inline':'none';}
+function updateBadge(){const sem=new Date();sem.setDate(sem.getDate()+7);const semStr=sem.toISOString().split('T')[0];const n=C.recs.filter(r=>r.fecha<=semStr).length;const el=document.getElementById('badge-rec');if(el){el.textContent=n;el.style.display=n?'inline':'none';}}
 
 // KANBAN
 function renderKanban(tipo){
@@ -923,8 +1108,16 @@ function renderInv(){const tb=document.getElementById('tb-inv');const bm={'dispo
 async function elimVeh(id){if(!confirm('¿Eliminar vehículo?'))return;setSyncStatus('syncing');await db.from('vehiculos').delete().eq('id',id);setSyncStatus('ok');await loadVeh();renderInv();}
 
 // OT
-async function guardarOT(){const cliente=document.getElementById('ot-cl').value;if(!cliente)return alert('Completá el cliente');const svcs=svcsGet('os-');const ins=parseFloat(document.getElementById('ot-ins').value)||0,mo=parseFloat(document.getElementById('ot-mo').value)||0,pr=parseFloat(document.getElementById('ot-pr').value)||0;setSyncStatus('syncing');const{data:ot}=await db.from('ordenes_trabajo').insert({cliente,responsable:document.getElementById('ot-resp').value,estado:document.getElementById('ot-est').value,servicios:svcs.length?svcs:['General'],insumos:ins,mano_obra:mo,precio_cobrado:pr,descripcion:document.getElementById('ot-desc').value}).select().single();setSyncStatus('ok');closeM('m-ot');['ot-cl','ot-ins','ot-mo','ot-pr','ot-desc'].forEach(id=>document.getElementById(id).value='');svcsReset('os-');await loadOT();renderOT();}
-function renderOT(){const tb=document.getElementById('tb-ot');const bm={'Ingresado':'bgr','En proceso':'bb','Listo':'bg','Entregado':'bgr'};tb.innerHTML=C.ots.length?C.ots.map(o=>`<tr><td style="color:var(--tx3);font-size:10px">#${o.id}</td><td><strong>${o.cliente}</strong></td><td>${(o.servicios||[]).map(s=>b('bgr',s)).join(' ')}</td><td style="font-size:10px">${o.responsable||'—'}</td><td class="eg">${fmt((o.insumos||0)+(o.mano_obra||0))}</td><td class="ing">${fmt(o.precio_cobrado)}</td><td class="${((o.precio_cobrado||0)-(o.insumos||0)-(o.mano_obra||0))>=0?'ing':'eg'}">${fmt((o.precio_cobrado||0)-(o.insumos||0)-(o.mana_obra||0))}</td><td>${b(bm[o.estado]||'bgr',o.estado)}</td><td><button class="icon-btn" onclick="elimOT(${o.id})"><i class="ti ti-trash"></i></button></td></tr>`).join(''):'<tr><td colspan="9"><div class="empty"><i class="ti ti-tool"></i>Sin órdenes.</div></td></tr>';}
+async function guardarOT(){const cliente=document.getElementById('ot-cl').value;if(!cliente)return alert('Completá el cliente');const svcs=svcsGet('os-');const ins=parseFloat(document.getElementById('ot-ins').value)||0,mo=parseFloat(document.getElementById('ot-mo').value)||0,pr=parseFloat(document.getElementById('ot-pr').value)||0;setSyncStatus('syncing');await db.from('ordenes_trabajo').insert({cliente,responsable:document.getElementById('ot-resp').value,estado:document.getElementById('ot-est').value,servicios:svcs.length?svcs:['General'],insumos:ins,mano_obra:mo,precio_cobrado:pr,descripcion:document.getElementById('ot-desc').value});setSyncStatus('ok');closeM('m-ot');['ot-cl','ot-ins','ot-mo','ot-pr','ot-desc'].forEach(id=>document.getElementById(id).value='');svcsReset('os-');await loadOT();renderOT();}
+function renderOT(){
+  const esAdmin=SESSION.rol==='admin';
+  const tb=document.getElementById('tb-ot');
+  const bm={'Ingresado':'bgr','En proceso':'bb','Listo':'bg','Entregado':'bgr'};
+  tb.innerHTML=C.ots.length?C.ots.map(o=>{
+    const margen=(o.precio_cobrado||0)-(o.insumos||0)-(o.mano_obra||0);
+    return`<tr><td style="color:var(--tx3);font-size:10px">#${o.id}</td><td><strong>${o.cliente}</strong></td><td>${(o.servicios||[]).map(s=>b('bgr',s)).join(' ')}</td><td style="font-size:10px">${o.responsable||'—'}</td>${esAdmin?`<td class="eg">${fmt((o.insumos||0)+(o.mano_obra||0))}</td><td class="ing">${fmt(o.precio_cobrado)}</td><td class="${margen>=0?'ing':'eg'}">${fmt(margen)}</td>`:''}<td>${b(bm[o.estado]||'bgr',o.estado)}</td><td><button class="icon-btn" onclick="elimOT(${o.id})"><i class="ti ti-trash"></i></button></td></tr>`;
+  }).join(''):'<tr><td colspan="9"><div class="empty"><i class="ti ti-tool"></i>Sin órdenes.</div></td></tr>';
+}
 async function elimOT(id){if(!confirm('¿Eliminar orden?'))return;setSyncStatus('syncing');await db.from('ordenes_trabajo').delete().eq('id',id);setSyncStatus('ok');await loadOT();renderOT();}
 
 // CF
@@ -949,8 +1142,6 @@ function renderSeg(segs){document.getElementById('dp-seg').innerHTML=segs&&segs.
 async function cambiarEstado(tipo,val){setSyncStatus('syncing');await db.from(tipo==='la'?'leads_autos':'leads_taller').update({estado:val}).eq('id',C.activeId);setSyncStatus('ok');if(tipo==='la'){await loadLeadsA();renderKanban('autos');renderContactosAutos();}else{await loadLeadsT();renderKanban('taller');}}
 async function agregarNota(){const txt=document.getElementById('seg-input').value.trim();if(!txt)return;const tablas={'la':'leads_autos','lt':'leads_taller','clt':'clientes_taller'};const listas={'la':C.leadsA,'lt':C.leadsT,'clt':C.clt};const tabla=tablas[C.activeType];const lista=listas[C.activeType];const item=lista.find(x=>x.id===C.activeId);if(!item)return;const seg=[...(item.seguimiento||[]),{fecha:hoy(),txt}];setSyncStatus('syncing');await db.from(tabla).update({seguimiento:seg}).eq('id',C.activeId);setSyncStatus('ok');item.seguimiento=seg;renderSeg(seg);document.getElementById('seg-input').value='';}
 function closeDetail(){document.getElementById('detail-panel').classList.remove('open');C.activeId=null;C.activeType=null;}
-
-loadDash();
 </script>
 </body>
 </html>

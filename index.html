@@ -522,7 +522,23 @@ tr:hover td{background:var(--s2)}
 
 <div class="mo" id="m-ot"><div class="modal">
   <div class="mt">Nueva orden de trabajo</div>
-  <div class="fr"><label>Cliente / vehículo</label><input id="ot-cl"></div>
+  <div class="tab-bar" style="margin-bottom:14px">
+    <div class="tab active" id="ot-tab-existente" onclick="otTabCliente('existente')">Cliente existente</div>
+    <div class="tab" id="ot-tab-nuevo" onclick="otTabCliente('nuevo')">Cliente nuevo</div>
+  </div>
+  <div id="ot-bloque-existente">
+    <div class="fr"><label>Cliente</label><select id="ot-cliente-sel" onchange="otSeleccionarCliente()"><option value="">— elegir cliente —</option></select></div>
+    <div id="ot-cliente-info" style="display:none;background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);padding:10px 12px;margin-bottom:11px;font-size:11px">
+      <div class="dpf"><span class="dpfl">Teléfono</span><span class="dpfv" id="ot-info-tel">—</span></div>
+      <div class="dpf"><span class="dpfl">Vehículo</span><span class="dpfv" id="ot-info-veh">—</span></div>
+      <div class="dpf"><span class="dpfl">Patente</span><span class="dpfv" id="ot-info-pat">—</span></div>
+    </div>
+  </div>
+  <div id="ot-bloque-nuevo" style="display:none">
+    <div class="fg2"><div class="fr"><label>Nombre</label><input id="ot-nuevo-nombre" placeholder="Juan Pérez"></div><div class="fr"><label>Teléfono</label><input id="ot-nuevo-tel" placeholder="341..."></div></div>
+    <div class="fg2"><div class="fr"><label>Vehículo</label><input id="ot-nuevo-veh" placeholder="VW Vento 2019"></div><div class="fr"><label>Patente</label><input id="ot-nuevo-pat" placeholder="AB123CD"></div></div>
+  </div>
+  <hr class="divider">
   <div class="fg2"><div class="fr"><label>Asignado a</label><select id="ot-resp"><option>Martín (mecánica)</option><option>Theo (detailing/PPF)</option><option>Ambos</option></select></div><div class="fr"><label>Estado</label><select id="ot-est"><option>Ingresado</option><option>En proceso</option><option>Listo</option><option>Entregado</option></select></div></div>
   <div class="fg2"><div class="fr"><label>Fecha de ingreso</label><input id="ot-fing" type="date"></div><div class="fr"><label>Fecha de entrega</label><input id="ot-fent" type="date"></div></div>
   <div class="sub-label">Servicios</div>
@@ -532,6 +548,13 @@ tr:hover td{background:var(--s2)}
   <div class="fr" id="ot-pago-row"><label>¿Pagó?</label><select id="ot-pagado"><option value="false">No</option><option value="true">Sí</option></select></div>
   <div class="fr"><label>Descripción</label><textarea id="ot-desc"></textarea></div>
   <div class="ma"><button class="btn" onclick="closeM('m-ot')">Cancelar</button><button class="btn btn-p" onclick="guardarOT()">Guardar</button></div>
+</div></div>
+
+<!-- DETALLE ORDEN DE TRABAJO -->
+<div class="mo" id="m-ot-detalle"><div class="modal">
+  <div class="mt" id="otd-titulo">Orden de trabajo</div>
+  <div id="otd-content"></div>
+  <div class="ma"><button class="btn" onclick="closeM('m-ot-detalle')">Cerrar</button></div>
 </div></div>
 
 <div class="mo" id="m-cajat"><div class="modal">
@@ -723,7 +746,7 @@ async function navTo(pg,el){
   document.getElementById('topbar-title').textContent=titles[pg]||pg;
   document.getElementById('topbar-actions').innerHTML=getActions(pg);
   closeDetail();
-  const r={dashboard:loadDash,'leads-autos':()=>loadLeadsA().then(()=>renderKanban('autos')),'contactos-autos':()=>loadLeadsA().then(renderContactosAutos),'leads-taller':()=>loadLeadsT().then(()=>renderKanban('taller')),'clientes-taller':()=>loadCLT().then(renderClientesTaller),inventario:()=>loadVeh().then(renderInv),ventas:()=>loadVentas().then(renderVentas),gestoria:()=>Promise.all([loadGestoria(),loadVeh()]).then(renderGestoria),'caja-vehiculos':loadCajaVehiculos,ordenes:()=>loadOT().then(renderOT),'caja-taller':loadCajaTaller,'costos-fijos':()=>loadCF().then(renderCF),recordatorios:()=>loadRecs().then(renderRecs)};
+  const r={dashboard:loadDash,'leads-autos':()=>loadLeadsA().then(()=>renderKanban('autos')),'contactos-autos':()=>loadLeadsA().then(renderContactosAutos),'leads-taller':()=>loadLeadsT().then(()=>renderKanban('taller')),'clientes-taller':()=>loadCLT().then(renderClientesTaller),inventario:()=>loadVeh().then(renderInv),ventas:()=>loadVentas().then(renderVentas),gestoria:()=>Promise.all([loadGestoria(),loadVeh()]).then(renderGestoria),'caja-vehiculos':loadCajaVehiculos,ordenes:()=>Promise.all([loadOT(),loadCLT()]).then(()=>renderOT()),'caja-taller':loadCajaTaller,'costos-fijos':()=>loadCF().then(renderCF),recordatorios:()=>loadRecs().then(renderRecs)};
   if(r[pg])await r[pg]();
 }
 
@@ -1130,15 +1153,90 @@ function renderInv(){const tb=document.getElementById('tb-inv');const bm={'dispo
 async function elimVeh(id){if(!confirm('¿Eliminar vehículo?'))return;setSyncStatus('syncing');await db.from('vehiculos').delete().eq('id',id);setSyncStatus('ok');await loadVeh();renderInv();}
 
 // OT
-function abrirOT(){document.getElementById('ot-fing').value=hoyD();openM('m-ot');}
-async function guardarOT(){const cliente=document.getElementById('ot-cl').value;if(!cliente)return alert('Completá el cliente');const svcs=svcsGet('os-');const ins=parseFloat(document.getElementById('ot-ins').value)||0,mo=parseFloat(document.getElementById('ot-mo').value)||0,pr=parseFloat(document.getElementById('ot-pr').value)||0;setSyncStatus('syncing');await db.from('ordenes_trabajo').insert({cliente,responsable:document.getElementById('ot-resp').value,estado:document.getElementById('ot-est').value,servicios:svcs.length?svcs:['General'],insumos:ins,mano_obra:mo,precio_cobrado:pr,descripcion:document.getElementById('ot-desc').value,fecha_ingreso:document.getElementById('ot-fing').value||hoyD(),fecha_entrega:document.getElementById('ot-fent').value||null,pagado:document.getElementById('ot-pagado').value==='true'});setSyncStatus('ok');closeM('m-ot');['ot-cl','ot-ins','ot-mo','ot-pr','ot-desc','ot-fing','ot-fent'].forEach(id=>document.getElementById(id).value='');document.getElementById('ot-pagado').value='false';svcsReset('os-');await loadOT();renderOT();}
+function abrirOT(){
+  document.getElementById('ot-fing').value=hoyD();
+  const sel=document.getElementById('ot-cliente-sel');
+  sel.innerHTML='<option value="">— elegir cliente —</option>'+C.clt.map(c=>`<option value="${c.id}">${c.nombre}${c.vehiculo?' — '+c.vehiculo:''}</option>`).join('');
+  otTabCliente('existente');
+  document.getElementById('ot-cliente-info').style.display='none';
+  openM('m-ot');
+}
+function otTabCliente(tipo){
+  document.getElementById('ot-tab-existente').classList.toggle('active',tipo==='existente');
+  document.getElementById('ot-tab-nuevo').classList.toggle('active',tipo==='nuevo');
+  document.getElementById('ot-bloque-existente').style.display=tipo==='existente'?'block':'none';
+  document.getElementById('ot-bloque-nuevo').style.display=tipo==='nuevo'?'block':'none';
+}
+function otSeleccionarCliente(){
+  const id=document.getElementById('ot-cliente-sel').value;
+  const info=document.getElementById('ot-cliente-info');
+  if(!id){info.style.display='none';return;}
+  const c=C.clt.find(x=>String(x.id)===id);
+  if(!c){info.style.display='none';return;}
+  info.style.display='block';
+  document.getElementById('ot-info-tel').textContent=c.telefono||'—';
+  document.getElementById('ot-info-veh').textContent=c.vehiculo||'—';
+  document.getElementById('ot-info-pat').textContent=c.patente||'—';
+}
+async function guardarOT(){
+  const esNuevo=document.getElementById('ot-tab-nuevo').classList.contains('active');
+  let clienteId=null,nombreCliente='',vehiculoCliente='';
+  if(esNuevo){
+    const nombre=document.getElementById('ot-nuevo-nombre').value;
+    if(!nombre)return alert('Completá el nombre del cliente');
+    setSyncStatus('syncing');
+    const{data:nuevoCli}=await db.from('clientes_taller').insert({nombre,telefono:document.getElementById('ot-nuevo-tel').value,vehiculo:document.getElementById('ot-nuevo-veh').value,patente:document.getElementById('ot-nuevo-pat').value,historial:[],seguimiento:[]}).select().single();
+    clienteId=nuevoCli?.id||null;
+    nombreCliente=nombre;
+    vehiculoCliente=document.getElementById('ot-nuevo-veh').value;
+    await loadCLT();
+  } else {
+    const selId=document.getElementById('ot-cliente-sel').value;
+    if(!selId)return alert('Elegí un cliente o cargá uno nuevo');
+    const c=C.clt.find(x=>String(x.id)===selId);
+    clienteId=c?.id||null;
+    nombreCliente=c?.nombre||'';
+    vehiculoCliente=c?.vehiculo||'';
+  }
+  const svcs=svcsGet('os-');
+  const ins=parseFloat(document.getElementById('ot-ins').value)||0,mo=parseFloat(document.getElementById('ot-mo').value)||0,pr=parseFloat(document.getElementById('ot-pr').value)||0;
+  setSyncStatus('syncing');
+  await db.from('ordenes_trabajo').insert({cliente:`${nombreCliente}${vehiculoCliente?' — '+vehiculoCliente:''}`,cliente_id:clienteId,responsable:document.getElementById('ot-resp').value,estado:document.getElementById('ot-est').value,servicios:svcs.length?svcs:['General'],insumos:ins,mano_obra:mo,precio_cobrado:pr,descripcion:document.getElementById('ot-desc').value,fecha_ingreso:document.getElementById('ot-fing').value||hoyD(),fecha_entrega:document.getElementById('ot-fent').value||null,pagado:document.getElementById('ot-pagado').value==='true'});
+  setSyncStatus('ok');closeM('m-ot');
+  ['ot-ins','ot-mo','ot-pr','ot-desc','ot-fing','ot-fent','ot-nuevo-nombre','ot-nuevo-tel','ot-nuevo-veh','ot-nuevo-pat'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('ot-pagado').value='false';
+  svcsReset('os-');await loadOT();renderOT();
+}
+function verDetalleOT(id){
+  const o=C.ots.find(x=>x.id===id);if(!o)return;
+  const c=o.cliente_id?C.clt.find(x=>x.id===o.cliente_id):null;
+  document.getElementById('otd-titulo').textContent=`Orden #${o.id} — ${o.cliente}`;
+  const esAdmin=SESSION.rol==='admin';
+  document.getElementById('otd-content').innerHTML=`
+    <div class="dpf"><span class="dpfl">Cliente</span><span class="dpfv">${o.cliente}</span></div>
+    <div class="dpf"><span class="dpfl">Teléfono</span><span class="dpfv">${c?.telefono||'—'}</span></div>
+    <div class="dpf"><span class="dpfl">Vehículo</span><span class="dpfv">${c?.vehiculo||'—'}</span></div>
+    <div class="dpf"><span class="dpfl">Patente</span><span class="dpfv">${c?.patente||'—'}</span></div>
+    <div class="dpf"><span class="dpfl">Asignado a</span><span class="dpfv">${o.responsable||'—'}</span></div>
+    <div class="dpf"><span class="dpfl">Servicios</span><span class="dpfv">${(o.servicios||[]).join(', ')}</span></div>
+    <div class="dpf"><span class="dpfl">Fecha ingreso</span><span class="dpfv">${o.fecha_ingreso||'—'}</span></div>
+    <div class="dpf"><span class="dpfl">Fecha entrega</span><span class="dpfv">${o.fecha_entrega||'—'}</span></div>
+    ${esAdmin?`<div class="dpf"><span class="dpfl">Insumos</span><span class="dpfv">${fmt(o.insumos)}</span></div>
+    <div class="dpf"><span class="dpfl">Mano de obra</span><span class="dpfv">${fmt(o.mano_obra)}</span></div>
+    <div class="dpf"><span class="dpfl">Precio del servicio</span><span class="dpfv">${fmt(o.precio_cobrado)}</span></div>`:''}
+    <div class="dpf"><span class="dpfl">¿Pagó?</span><span class="dpfv">${o.pagado?'Sí':'No'}</span></div>
+    <div class="dpf"><span class="dpfl">Estado</span><span class="dpfv">${o.estado}</span></div>
+    ${o.descripcion?`<div class="dpf"><span class="dpfl">Descripción</span><span class="dpfv">${o.descripcion}</span></div>`:''}
+  `;
+  openM('m-ot-detalle');
+}
 function renderOT(){
   const esAdmin=SESSION.rol==='admin';
   const tb=document.getElementById('tb-ot');
   const bm={'Ingresado':'bgr','En proceso':'bb','Listo':'bg','Entregado':'bgr'};
   tb.innerHTML=C.ots.length?C.ots.map(o=>{
     const margen=(o.precio_cobrado||0)-(o.insumos||0)-(o.mano_obra||0);
-    return`<tr><td style="color:var(--tx3);font-size:10px">#${o.id}</td><td><strong>${o.cliente}</strong></td><td>${(o.servicios||[]).map(s=>b('bgr',s)).join(' ')}</td><td style="font-size:10px">${o.responsable||'—'}</td><td style="font-size:10px;color:var(--tx3)">${o.fecha_ingreso||'—'}</td><td style="font-size:10px;color:var(--tx3)">${o.fecha_entrega||'—'}</td>${esAdmin?`<td class="eg">${fmt((o.insumos||0)+(o.mano_obra||0))}</td><td class="ing">${fmt(o.precio_cobrado)}</td><td class="${margen>=0?'ing':'eg'}">${fmt(margen)}</td>`:''}<td>${o.pagado?b('bg','Sí'):b('br','No')}</td><td>${b(bm[o.estado]||'bgr',o.estado)}</td><td><button class="icon-btn" onclick="elimOT(${o.id})"><i class="ti ti-trash"></i></button></td></tr>`;
+    return`<tr style="cursor:pointer" onclick="verDetalleOT(${o.id})"><td style="color:var(--tx3);font-size:10px">#${o.id}</td><td><strong>${o.cliente}</strong></td><td>${(o.servicios||[]).map(s=>b('bgr',s)).join(' ')}</td><td style="font-size:10px">${o.responsable||'—'}</td><td style="font-size:10px;color:var(--tx3)">${o.fecha_ingreso||'—'}</td><td style="font-size:10px;color:var(--tx3)">${o.fecha_entrega||'—'}</td>${esAdmin?`<td class="eg">${fmt((o.insumos||0)+(o.mano_obra||0))}</td><td class="ing">${fmt(o.precio_cobrado)}</td><td class="${margen>=0?'ing':'eg'}">${fmt(margen)}</td>`:''}<td>${o.pagado?b('bg','Sí'):b('br','No')}</td><td>${b(bm[o.estado]||'bgr',o.estado)}</td><td onclick="event.stopPropagation()"><button class="icon-btn" onclick="elimOT(${o.id})"><i class="ti ti-trash"></i></button></td></tr>`;
   }).join(''):'<tr><td colspan="11"><div class="empty"><i class="ti ti-tool"></i>Sin órdenes.</div></td></tr>';
 }
 async function elimOT(id){if(!confirm('¿Eliminar orden?'))return;setSyncStatus('syncing');await db.from('ordenes_trabajo').delete().eq('id',id);setSyncStatus('ok');await loadOT();renderOT();}

@@ -886,8 +886,8 @@ const loadLeadsT=async()=>{const{data}=await db.from('leads_taller').select('*')
 const loadCLT=async()=>{const{data}=await db.from('clientes_taller').select('*').order('created_at',{ascending:false});C.clt=data||[];};
 const loadVeh=async()=>{const{data}=await db.from('vehiculos').select('*').order('created_at',{ascending:false});C.veh=data||[];};
 const loadOT=async()=>{const{data}=await db.from('ordenes_trabajo').select('*').order('created_at',{ascending:false});C.ots=data||[];};
-const loadCajaV=async()=>{const{data}=await db.from('caja_vehiculos').select('*').order('fecha',{ascending:false});C.cajav=data||[];};
-const loadCajaT=async()=>{const{data}=await db.from('caja_taller').select('*').order('fecha',{ascending:false});C.cajat=data||[];};
+const loadCajaV=async()=>{const{data}=await db.from('caja_vehiculos').select('*').order('created_at',{ascending:true});C.cajav=data||[];};
+const loadCajaT=async()=>{const{data}=await db.from('caja_taller').select('*').order('created_at',{ascending:true});C.cajat=data||[];};
 const loadCF=async()=>{const{data}=await db.from('costos_fijos').select('*').order('created_at',{ascending:false});C.cf=data||[];};
 const loadVentas=async()=>{const{data}=await db.from('ventas').select('*').order('created_at',{ascending:false});C.ventas=data||[];};
 const loadRecs=async()=>{const{data}=await db.from('recordatorios').select('*').eq('completado',false).order('fecha',{ascending:true});C.recs=data||[];};

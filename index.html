@@ -477,26 +477,29 @@ tr:hover td{background:var(--s2)}
 
       <!-- VISTA SUELDOS -->
       <div id="caja-vista-sueldos" style="display:none">
-        <div class="mes-nav">
-          <button class="btn" onclick="cambiarMesSueldos(-1)"><i class="ti ti-chevron-left"></i></button>
-          <div class="mes-label" id="sue-titulo">—</div>
-          <button class="btn" onclick="cambiarMesSueldos(1)"><i class="ti ti-chevron-right"></i></button>
+        <div class="tab-bar" id="sue-tabs" style="margin-bottom:14px">
+          <div class="tab active" onclick="sueldosTab('dia',this)">Día</div>
+          <div class="tab" onclick="sueldosTab('semana',this)">Semana</div>
+          <div class="tab" onclick="sueldosTab('mes',this)">Mes</div>
         </div>
-        <!-- RESUMEN MES -->
+        <div class="mes-nav">
+          <button class="btn" onclick="navSueldos(-1)"><i class="ti ti-chevron-left"></i></button>
+          <div class="mes-label" id="sue-titulo">—</div>
+          <button class="btn" onclick="navSueldos(1)"><i class="ti ti-chevron-right"></i></button>
+          <button class="btn" onclick="irHoySueldos()"><i class="ti ti-home"></i> Hoy</button>
+        </div>
         <div class="cierre-box" style="background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.2)">
-          <div class="cierre-title" style="color:var(--wa)">Sueldos del mes</div>
+          <div class="cierre-title" style="color:var(--wa)" id="sue-periodo-label">Sueldos</div>
           <div class="cierre-grid">
             <div class="cierre-item"><div class="cierre-item-label">Total sueldos</div><div class="cierre-item-val wa-txt" id="sue-total">$0</div></div>
-            <div class="cierre-item"><div class="cierre-item-label">Total gastos fijos</div><div class="cierre-item-val eg" id="sue-gastos">$0</div></div>
-            <div class="cierre-item"><div class="cierre-item-label">Pagos realizados</div><div class="cierre-item-val" id="sue-cant">0</div></div>
+            <div class="cierre-item"><div class="cierre-item-label">Gastos fijos</div><div class="cierre-item-val eg" id="sue-gastos">$0</div></div>
+            <div class="cierre-item"><div class="cierre-item-label">Pagos</div><div class="cierre-item-val" id="sue-cant">0</div></div>
             <div class="cierre-item"><div class="cierre-item-label">Total egresado</div><div class="cierre-item-val eg" id="sue-egreso">$0</div></div>
           </div>
         </div>
-        <!-- DETALLE POR PERSONA -->
-        <div style="margin-bottom:8px;font-size:11px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em">Detalle por persona</div>
+        <div style="margin-bottom:8px;font-size:11px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em">Por persona</div>
         <div class="sg g4" id="sue-personas" style="margin-bottom:20px"></div>
-        <!-- LISTADO COMPLETO -->
-        <div style="margin-bottom:8px;font-size:11px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em">Todos los pagos del mes</div>
+        <div style="margin-bottom:8px;font-size:11px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em">Detalle de pagos</div>
         <div class="tw"><table><thead><tr><th>Fecha</th><th>Descripción</th><th>Tipo</th><th>Caja</th><th>Monto</th></tr></thead><tbody id="sue-lista"></tbody></table></div>
       </div>
     </div>
@@ -1168,43 +1171,66 @@ function cajaTab(vista,el){
   else if(vista==='mes')renderMes();
   else renderSueldos();
 }
-function cambiarMesSueldos(delta){
-  C.mesSueldos=C.mesSueldos||{y:new Date().getFullYear(),m:new Date().getMonth()};
-  C.mesSueldos.m+=delta;
-  if(C.mesSueldos.m>11){C.mesSueldos.m=0;C.mesSueldos.y++;}
-  if(C.mesSueldos.m<0){C.mesSueldos.m=11;C.mesSueldos.y--;}
+// ---- SUELDOS ----
+function sueldosTab(periodo,el){
+  C.suePeriodo=periodo;
+  C.sueRef=hoyD();
+  document.querySelectorAll('#sue-tabs .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
   renderSueldos();
 }
+function navSueldos(delta){
+  const ref=new Date((C.sueRef||hoyD())+'T12:00:00');
+  const p=C.suePeriodo||'mes';
+  if(p==='dia')ref.setDate(ref.getDate()+delta);
+  else if(p==='semana')ref.setDate(ref.getDate()+delta*7);
+  else ref.setMonth(ref.getMonth()+delta);
+  C.sueRef=ref.toISOString().split('T')[0];
+  renderSueldos();
+}
+function irHoySueldos(){C.sueRef=hoyD();renderSueldos();}
 function renderSueldos(){
-  if(!C.mesSueldos)C.mesSueldos={y:new Date().getFullYear(),m:new Date().getMonth()};
-  const{y,m}=C.mesSueldos;
-  document.getElementById('sue-titulo').textContent=`${MESES[m]} ${y}`;
-  const prefijo=`${y}-${String(m+1).padStart(2,'0')}`;
-  const movsMes=C.cajat.filter(x=>x.fecha&&x.fecha.startsWith(prefijo)&&(x.tipo_mov==='sueldo'||x.tipo_mov==='gasto_fijo'));
-  const sueldos=movsMes.filter(x=>x.tipo_mov==='sueldo');
-  const gastos=movsMes.filter(x=>x.tipo_mov==='gasto_fijo');
+  if(!C.sueRef)C.sueRef=hoyD();
+  if(!C.suePeriodo)C.suePeriodo='mes';
+  const p=C.suePeriodo;
+  const ref=new Date(C.sueRef+'T12:00:00');
+  let desde,hasta,titulo;
+  if(p==='dia'){
+    desde=C.sueRef;hasta=C.sueRef;
+    const ds=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    titulo=`${ds[ref.getDay()]} ${ref.getDate()} de ${MESES[ref.getMonth()]} ${ref.getFullYear()}`;
+  } else if(p==='semana'){
+    const dow=ref.getDay();
+    const lun=new Date(ref);lun.setDate(ref.getDate()-((dow+6)%7));
+    const dom=new Date(lun);dom.setDate(lun.getDate()+6);
+    desde=lun.toISOString().split('T')[0];hasta=dom.toISOString().split('T')[0];
+    titulo=`Semana del ${lun.getDate()} al ${dom.getDate()} de ${MESES[lun.getMonth()]}`;
+  } else {
+    const y=ref.getFullYear(),m=ref.getMonth();
+    desde=`${y}-${String(m+1).padStart(2,'0')}-01`;
+    const ult=new Date(y,m+1,0);hasta=ult.toISOString().split('T')[0];
+    titulo=`${MESES[m]} ${y}`;
+  }
+  document.getElementById('sue-titulo').textContent=titulo;
+  document.getElementById('sue-periodo-label').textContent=`Sueldos — ${titulo}`;
+  const movs=C.cajat.filter(x=>x.fecha&&x.fecha>=desde&&x.fecha<=hasta&&(x.tipo_mov==='sueldo'||x.tipo_mov==='gasto_fijo'));
+  const sueldos=movs.filter(x=>x.tipo_mov==='sueldo');
+  const gastos=movs.filter(x=>x.tipo_mov==='gasto_fijo');
   const totalSueldos=sueldos.reduce((a,x)=>a+(parseFloat(x.pagado)||0),0);
   const totalGastos=gastos.reduce((a,x)=>a+(parseFloat(x.pagado)||0),0);
-  const set=(id,v,col)=>{const el=document.getElementById(id);if(el){el.textContent=v;if(col)el.style.color=col;}};
-  set('sue-total',fmt(totalSueldos));
-  set('sue-gastos',fmt(totalGastos));
-  set('sue-cant',movsMes.length);
-  set('sue-egreso',fmt(totalSueldos+totalGastos));
-  // agrupar por persona (detalle del texto antes del " — ")
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set('sue-total',fmt(totalSueldos));set('sue-gastos',fmt(totalGastos));
+  set('sue-cant',movs.length);set('sue-egreso',fmt(totalSueldos+totalGastos));
   const personas={};
   sueldos.forEach(x=>{
-    const nombre=x.detalle.split('—')[0].replace(/sueldo/i,'').trim()||x.detalle;
+    const nombre=x.detalle.replace(/sueldo\s*/i,'').split('—')[0].trim()||x.detalle;
     if(!personas[nombre])personas[nombre]=0;
     personas[nombre]+=(parseFloat(x.pagado)||0);
   });
   const personasEl=document.getElementById('sue-personas');
-  personasEl.innerHTML=Object.keys(personas).length?Object.entries(personas).map(([nombre,total])=>`<div class="sc"><div class="sl">${nombre}</div><div class="sv wa-txt" style="font-size:16px">${fmt(total)}</div><div class="ss">del mes</div></div>`).join(''):'<div style="color:var(--tx3);font-size:11px">Sin sueldos registrados este mes.</div>';
-  // listado completo
+  personasEl.innerHTML=Object.keys(personas).length?Object.entries(personas).map(([nombre,total])=>`<div class="sc"><div class="sl">${nombre}</div><div class="sv wa-txt" style="font-size:16px">${fmt(total)}</div></div>`).join(''):'<div style="color:var(--tx3);font-size:11px;padding:8px 0">Sin sueldos en este período.</div>';
   const tb=document.getElementById('sue-lista');
-  tb.innerHTML=movsMes.length?movsMes.map(x=>{
-    const caja=CAJAS.find(c=>c.n===x.subcuenta);
-    return`<tr><td style="font-size:10px;color:var(--tx3)">${x.fecha||'—'}</td><td><strong>${x.detalle}</strong></td><td>${b(x.tipo_mov==='sueldo'?'ba':'bgr',x.tipo_mov==='sueldo'?'Sueldo':'Gasto fijo')}</td><td style="font-size:10px">${caja?.nombre||'—'}</td><td class="wa-txt">${fmt(x.pagado)}</td></tr>`;
-  }).join(''):'<tr><td colspan="5"><div class="empty"><i class="ti ti-users"></i>Sin sueldos ni gastos este mes.</div></td></tr>';
+  tb.innerHTML=movs.length?movs.map(x=>{const caja=CAJAS.find(c=>c.n===x.subcuenta);return`<tr><td style="font-size:10px;color:var(--tx3)">${x.fecha||'—'}</td><td><strong>${x.detalle}</strong></td><td>${b(x.tipo_mov==='sueldo'?'ba':'bgr',x.tipo_mov==='sueldo'?'Sueldo':'Gasto fijo')}</td><td style="font-size:10px">${caja?.nombre||'—'}</td><td class="wa-txt">${fmt(x.pagado)}</td></tr>`;}).join(''):'<tr><td colspan="5"><div class="empty"><i class="ti ti-users"></i>Sin registros en este período.</div></td></tr>';
 }
 function cambiarDia(delta){const d=new Date(C.diaActual);d.setDate(d.getDate()+delta);C.diaActual=d.toISOString().split('T')[0];renderDia();}
 function irHoy(){C.diaActual=hoyD();renderDia();}

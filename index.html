@@ -500,7 +500,7 @@ tr:hover td{background:var(--s2)}
         <div style="margin-bottom:8px;font-size:11px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em">Por persona</div>
         <div class="sg g4" id="sue-personas" style="margin-bottom:20px"></div>
         <div style="margin-bottom:8px;font-size:11px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em">Detalle de pagos</div>
-        <div class="tw"><table><thead><tr><th>Fecha</th><th>Descripción</th><th>Tipo</th><th>Caja</th><th>Monto</th></tr></thead><tbody id="sue-lista"></tbody></table></div>
+        <div class="tw"><table><thead><tr><th>Fecha</th><th>Persona</th><th>Descripción</th><th>Tipo</th><th>Caja</th><th>Monto</th></tr></thead><tbody id="sue-lista"></tbody></table></div>
       </div>
     </div>
 
@@ -637,9 +637,25 @@ tr:hover td{background:var(--s2)}
 
 <div class="mo" id="m-sueldo"><div class="modal">
   <div class="mt">Registrar sueldo / gasto</div>
-  <div class="fr"><label>Descripción</label><input id="su-det" placeholder="Sueldo Martín / Sueldo Theo..."></div>
-  <div class="fg2"><div class="fr"><label>Caja</label><select id="su-caja"><option value="1">1 — Efectivo</option><option value="2">2 — Banco</option><option value="3">3 — Jorge</option><option value="4">4 — Cheque</option><option value="5">5 — Mariana</option><option value="6">6 — Martín</option><option value="7">7 — Lucho</option><option value="8">8 — USD</option></select></div><div class="fr"><label>Tipo</label><select id="su-tipo"><option value="sueldo">Sueldo</option><option value="gasto_fijo">Gasto fijo</option></select></div></div>
-  <div class="fr"><label>Monto pagado ($)</label><input id="su-monto" type="number" placeholder="0"></div>
+  <div class="fg2">
+    <div class="fr"><label>Persona</label>
+      <select id="su-persona">
+        <option value="">— elegir persona —</option>
+        <option>Martín</option>
+        <option>Theo</option>
+        <option>Lucho</option>
+        <option>Lucas</option>
+        <option>Elías</option>
+        <option>Georgi</option>
+        <option>Jorge</option>
+        <option>Juan</option>
+        <option>Otro</option>
+      </select>
+    </div>
+    <div class="fr"><label>Tipo</label><select id="su-tipo"><option value="sueldo">Sueldo</option><option value="gasto_fijo">Gasto fijo</option></select></div>
+  </div>
+  <div class="fr"><label>Descripción (opcional)</label><input id="su-det" placeholder="Adelanto, quincena, premio..."></div>
+  <div class="fg2"><div class="fr"><label>Caja</label><select id="su-caja"><option value="1">1 — Efectivo</option><option value="2">2 — Banco</option><option value="3">3 — Jorge</option><option value="4">4 — Cheque</option><option value="5">5 — Mariana</option><option value="6">6 — Martín</option><option value="7">7 — Lucho</option><option value="8">8 — USD</option></select></div><div class="fr"><label>Monto pagado ($)</label><input id="su-monto" type="number" placeholder="0"></div></div>
   <div class="fr"><label>Fecha</label><input id="su-fecha" type="date"></div>
   <div class="ma"><button class="btn" onclick="closeM('m-sueldo')">Cancelar</button><button class="btn btn-wa" onclick="guardarSueldo()"><i class="ti ti-users"></i> Guardar</button></div>
 </div></div>
@@ -1223,14 +1239,14 @@ function renderSueldos(){
   set('sue-cant',movs.length);set('sue-egreso',fmt(totalSueldos+totalGastos));
   const personas={};
   sueldos.forEach(x=>{
-    const nombre=x.detalle.replace(/sueldo\s*/i,'').split('—')[0].trim()||x.detalle;
+    const nombre=x.persona||x.detalle.replace(/sueldo\s*/i,'').split('—')[0].trim()||x.detalle;
     if(!personas[nombre])personas[nombre]=0;
     personas[nombre]+=(parseFloat(x.pagado)||0);
   });
   const personasEl=document.getElementById('sue-personas');
   personasEl.innerHTML=Object.keys(personas).length?Object.entries(personas).map(([nombre,total])=>`<div class="sc"><div class="sl">${nombre}</div><div class="sv wa-txt" style="font-size:16px">${fmt(total)}</div></div>`).join(''):'<div style="color:var(--tx3);font-size:11px;padding:8px 0">Sin sueldos en este período.</div>';
   const tb=document.getElementById('sue-lista');
-  tb.innerHTML=movs.length?movs.map(x=>{const caja=CAJAS.find(c=>c.n===x.subcuenta);return`<tr><td style="font-size:10px;color:var(--tx3)">${x.fecha||'—'}</td><td><strong>${x.detalle}</strong></td><td>${b(x.tipo_mov==='sueldo'?'ba':'bgr',x.tipo_mov==='sueldo'?'Sueldo':'Gasto fijo')}</td><td style="font-size:10px">${caja?.nombre||'—'}</td><td class="wa-txt">${fmt(x.pagado)}</td></tr>`;}).join(''):'<tr><td colspan="5"><div class="empty"><i class="ti ti-users"></i>Sin registros en este período.</div></td></tr>';
+  tb.innerHTML=movs.length?movs.map(x=>{const caja=CAJAS.find(c=>c.n===x.subcuenta);return`<tr><td style="font-size:10px;color:var(--tx3)">${x.fecha||'—'}</td><td><strong>${x.persona||'—'}</strong></td><td>${x.detalle}</td><td>${b(x.tipo_mov==='sueldo'?'ba':'bgr',x.tipo_mov==='sueldo'?'Sueldo':'Gasto fijo')}</td><td style="font-size:10px">${caja?.nombre||'—'}</td><td class="wa-txt">${fmt(x.pagado)}</td></tr>`;}).join(''):'<tr><td colspan="6"><div class="empty"><i class="ti ti-users"></i>Sin registros en este período.</div></td></tr>';
 }
 function cambiarDia(delta){const d=new Date(C.diaActual);d.setDate(d.getDate()+delta);C.diaActual=d.toISOString().split('T')[0];renderDia();}
 function irHoy(){C.diaActual=hoyD();renderDia();}
@@ -1351,12 +1367,16 @@ async function guardarCajaT(){
   await loadCajaT();renderDia();
 }
 async function guardarSueldo(){
-  const det=document.getElementById('su-det').value;if(!det)return alert('Completá la descripción');
+  const persona=document.getElementById('su-persona').value;
+  if(!persona)return alert('Elegí la persona');
   const monto=parseFloat(document.getElementById('su-monto').value)||0;if(!monto)return alert('Ingresá el monto');
+  const tipo=document.getElementById('su-tipo').value;
+  const detExtra=document.getElementById('su-det').value;
+  const detalle=detExtra?`${persona} — ${detExtra}`:persona;
   setSyncStatus('syncing');
-  await db.from('caja_taller').insert({detalle:det,subcuenta:parseInt(document.getElementById('su-caja').value),categoria:document.getElementById('su-tipo').value,cobrado:0,pagado:monto,fecha:document.getElementById('su-fecha').value,tipo_mov:document.getElementById('su-tipo').value});
+  await db.from('caja_taller').insert({detalle,persona,subcuenta:parseInt(document.getElementById('su-caja').value),categoria:tipo,cobrado:0,pagado:monto,fecha:document.getElementById('su-fecha').value,tipo_mov:tipo});
   setSyncStatus('ok');closeM('m-sueldo');
-  ['su-det','su-monto'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('su-det').value='';document.getElementById('su-monto').value='';document.getElementById('su-persona').value='';
   await loadCajaT();renderDia();if(C.cajaVistaActual==='mes')renderMes();
 }
 async function elimMovDia(id){if(!confirm('¿Eliminar este movimiento?'))return;setSyncStatus('syncing');await db.from('caja_taller').delete().eq('id',id);setSyncStatus('ok');await loadCajaT();if(C.cajaVistaActual==='dia')renderDia();else renderMes();}

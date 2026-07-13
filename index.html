@@ -593,9 +593,9 @@ tr:hover td{background:var(--s2)}
   <div class="fg2"><div class="fr"><label>Marca</label><input id="v-marca"></div><div class="fr"><label>Modelo</label><input id="v-modelo"></div></div>
   <div class="fg3"><div class="fr"><label>Año</label><input id="v-anio" type="number"></div><div class="fr"><label>Km</label><input id="v-km" type="number"></div><div class="fr"><label>Color</label><input id="v-color"></div></div>
   <hr class="divider">
-  <div class="fg2"><div class="fr"><label>Precio compra ($)</label><input id="v-costo" type="number" placeholder="0"></div><div class="fr"><label>Fuente de fondos</label><select id="v-fuente"><option>Caja propia</option><option>Financiamiento</option><option>Consignación</option><option>Socio / inversor</option><option>Otro</option></select></div></div>
-  <div class="fg3"><div class="fr"><label>Preparación ($)</label><input id="v-prep" type="number" placeholder="0"></div><div class="fr"><label>Gestoría ($)</label><input id="v-gest" type="number" placeholder="0"></div><div class="fr"><label>Otros ($)</label><input id="v-otros" type="number" placeholder="0"></div></div>
-  <div class="fg2"><div class="fr"><label>Precio venta ($)</label><input id="v-precio" type="number" placeholder="0"></div><div class="fr"><label>Estado</label><select id="v-estado"><option value="disponible">Disponible</option><option value="preparacion">En preparación</option><option value="reservado">Reservado</option></select></div></div>
+  <div class="fg2"><div class="fr"><label>Precio compra ($)</label><input id="v-costo" type="text" inputmode="numeric" placeholder="0"></div><div class="fr"><label>Fuente de fondos</label><select id="v-fuente"><option>Caja propia</option><option>Financiamiento</option><option>Consignación</option><option>Socio / inversor</option><option>Otro</option></select></div></div>
+  <div class="fg3"><div class="fr"><label>Preparación ($)</label><input id="v-prep" type="text" inputmode="numeric" placeholder="0"></div><div class="fr"><label>Gestoría ($)</label><input id="v-gest" type="text" inputmode="numeric" placeholder="0"></div><div class="fr"><label>Otros ($)</label><input id="v-otros" type="text" inputmode="numeric" placeholder="0"></div></div>
+  <div class="fg2"><div class="fr"><label>Precio venta ($)</label><input id="v-precio" type="text" inputmode="numeric" placeholder="0"></div><div class="fr"><label>Estado</label><select id="v-estado"><option value="disponible">Disponible</option><option value="preparacion">En preparación</option><option value="reservado">Reservado</option></select></div></div>
   <div class="fr"><label>Notas</label><textarea id="v-notas"></textarea></div>
   <div class="ma"><button class="btn" onclick="closeM('m-veh')">Cancelar</button><button class="btn btn-p" onclick="guardarVeh()">Guardar</button></div>
 </div></div>
@@ -624,7 +624,7 @@ tr:hover td{background:var(--s2)}
   <div class="sub-label">Servicios</div>
   <div class="chk-group"><label class="chk-label"><input type="checkbox" id="os-mec"> Mecánica</label><label class="chk-label"><input type="checkbox" id="os-det"> Detailing</label><label class="chk-label"><input type="checkbox" id="os-ppf"> PPF</label><label class="chk-label"><input type="checkbox" id="os-lav"> Lavado</label><label class="chk-label"><input type="checkbox" id="os-otro"> Otro</label></div>
   <hr class="divider">
-  <div class="fg3" id="ot-costos-row"><div class="fr"><label>Insumos ($)</label><input id="ot-ins" type="number" placeholder="0"></div><div class="fr"><label>Mano de obra ($)</label><input id="ot-mo" type="number" placeholder="0"></div><div class="fr"><label>Precio del servicio ($)</label><input id="ot-pr" type="number" placeholder="0"></div></div>
+  <div class="fg3" id="ot-costos-row"><div class="fr"><label>Insumos ($)</label><input id="ot-ins" type="text" inputmode="numeric" placeholder="0"></div><div class="fr"><label>Mano de obra ($)</label><input id="ot-mo" type="text" inputmode="numeric" placeholder="0"></div><div class="fr"><label>Precio del servicio ($)</label><input id="ot-pr" type="text" inputmode="numeric" placeholder="0"></div></div>
   <div class="fr" id="ot-pago-row"><label>¿Pagó?</label><select id="ot-pagado"><option value="false">No</option><option value="true">Sí</option></select></div>
   <div class="fr"><label>Descripción</label><textarea id="ot-desc"></textarea></div>
   <div class="ma"><button class="btn" onclick="closeM('m-ot')">Cancelar</button><button class="btn btn-p" onclick="guardarOT()">Guardar</button></div>
@@ -641,7 +641,7 @@ tr:hover td{background:var(--s2)}
   <div class="mt" id="cajat-title">Nuevo movimiento — caja taller</div>
   <div class="fr"><label>Detalle</label><input id="ct-det" placeholder="Cobro PPF / Insumos..."></div>
   <div class="fg2"><div class="fr"><label>Caja</label><select id="ct-caja"><option value="1">1 — Efectivo</option><option value="2">2 — Banco</option><option value="3">3 — Jorge</option><option value="4">4 — Cheque</option><option value="5">5 — Mariana</option><option value="6">6 — Martín</option><option value="7">7 — Lucho</option><option value="8">8 — USD</option></select></div><div class="fr"><label>Categoría</label><select id="ct-cat"><option>Cobro trabajo</option><option>Insumos</option><option>Herramientas</option><option>Lavado</option><option>Otro</option></select></div></div>
-  <div class="fg2"><div class="fr"><label>Cobrado ($)</label><input id="ct-cobrado" type="number" placeholder="0"></div><div class="fr"><label>Pagado ($)</label><input id="ct-pagado" type="number" placeholder="0"></div></div>
+  <div class="fg2"><div class="fr"><label>Cobrado ($)</label><input id="ct-cobrado" type="text" inputmode="numeric" placeholder="0"></div><div class="fr"><label>Pagado ($)</label><input id="ct-pagado" type="text" inputmode="numeric" placeholder="0"></div></div>
   <div class="fr"><label>Fecha</label><input id="ct-fecha" type="date"></div>
   <input type="hidden" id="ct-tipo-mov" value="movimiento">
   <div class="ma"><button class="btn" onclick="closeM('m-cajat')">Cancelar</button><button class="btn btn-p" onclick="guardarCajaT()">Guardar</button></div>
@@ -667,7 +667,7 @@ tr:hover td{background:var(--s2)}
     <div class="fr"><label>Tipo</label><select id="su-tipo"><option value="sueldo">Sueldo</option><option value="gasto_fijo">Gasto fijo</option></select></div>
   </div>
   <div class="fr"><label>Descripción (opcional)</label><input id="su-det" placeholder="Adelanto, quincena, premio..."></div>
-  <div class="fg2"><div class="fr"><label>Caja</label><select id="su-caja"><option value="1">1 — Efectivo</option><option value="2">2 — Banco</option><option value="3">3 — Jorge</option><option value="4">4 — Cheque</option><option value="5">5 — Mariana</option><option value="6">6 — Martín</option><option value="7">7 — Lucho</option><option value="8">8 — USD</option></select></div><div class="fr"><label>Monto pagado ($)</label><input id="su-monto" type="number" placeholder="0"></div></div>
+  <div class="fg2"><div class="fr"><label>Caja</label><select id="su-caja"><option value="1">1 — Efectivo</option><option value="2">2 — Banco</option><option value="3">3 — Jorge</option><option value="4">4 — Cheque</option><option value="5">5 — Mariana</option><option value="6">6 — Martín</option><option value="7">7 — Lucho</option><option value="8">8 — USD</option></select></div><div class="fr"><label>Monto pagado ($)</label><input id="su-monto" type="text" inputmode="numeric" placeholder="0"></div></div>
   <div class="fr"><label>Fecha</label><input id="su-fecha" type="date"></div>
   <div class="ma"><button class="btn" onclick="closeM('m-sueldo')">Cancelar</button><button class="btn btn-wa" onclick="guardarSueldo()"><i class="ti ti-users"></i> Guardar</button></div>
 </div></div>
@@ -676,7 +676,7 @@ tr:hover td{background:var(--s2)}
   <div class="mt" id="cajav-title">Nuevo movimiento — caja vehículos</div>
   <div class="fr"><label>Detalle</label><input id="cv-det" placeholder="Venta Hilux / Compra Ranger..."></div>
   <div class="fg2"><div class="fr"><label>Caja</label><select id="cv-caja"><option value="1">1 — Efectivo</option><option value="2">2 — Banco</option><option value="3">3 — Jorge</option><option value="4">4 — Cheque</option><option value="5">5 — Mariana</option><option value="6">6 — Martín</option><option value="7">7 — Lucho</option><option value="8">8 — USD</option></select></div><div class="fr"><label>Categoría</label><select id="cv-cat"><option>Venta vehículo</option><option>Compra vehículo</option><option>Preparación</option><option>Gestoría</option><option>Comisión</option><option>Otro</option></select></div></div>
-  <div class="fg2"><div class="fr"><label>Cobrado ($)</label><input id="cv-cobrado" type="number" placeholder="0"></div><div class="fr"><label>Pagado ($)</label><input id="cv-pagado" type="number" placeholder="0"></div></div>
+  <div class="fg2"><div class="fr"><label>Cobrado ($)</label><input id="cv-cobrado" type="text" inputmode="numeric" placeholder="0"></div><div class="fr"><label>Pagado ($)</label><input id="cv-pagado" type="text" inputmode="numeric" placeholder="0"></div></div>
   <div class="fr"><label>Vehículo</label><input id="cv-veh"></div>
   <div class="fr"><label>Fecha</label><input id="cv-fecha" type="date"></div>
   <input type="hidden" id="cv-tipo-mov" value="movimiento">
@@ -687,7 +687,7 @@ tr:hover td{background:var(--s2)}
   <div class="mt">Registrar sueldo / gasto — vehículos</div>
   <div class="fr"><label>Descripción</label><input id="suv-det" placeholder="Comisión vendedor / Gasto..."></div>
   <div class="fg2"><div class="fr"><label>Caja</label><select id="suv-caja"><option value="1">1 — Efectivo</option><option value="2">2 — Banco</option><option value="3">3 — Jorge</option><option value="4">4 — Cheque</option><option value="5">5 — Mariana</option><option value="6">6 — Martín</option><option value="7">7 — Lucho</option><option value="8">8 — USD</option></select></div><div class="fr"><label>Tipo</label><select id="suv-tipo"><option value="sueldo">Sueldo / Comisión</option><option value="gasto_fijo">Gasto fijo</option></select></div></div>
-  <div class="fr"><label>Monto pagado ($)</label><input id="suv-monto" type="number" placeholder="0"></div>
+  <div class="fr"><label>Monto pagado ($)</label><input id="suv-monto" type="text" inputmode="numeric" placeholder="0"></div>
   <div class="fr"><label>Fecha</label><input id="suv-fecha" type="date"></div>
   <div class="ma"><button class="btn" onclick="closeM('m-sueldov')">Cancelar</button><button class="btn btn-wa" onclick="guardarSueldoV()"><i class="ti ti-users"></i> Guardar</button></div>
 </div></div>
@@ -695,7 +695,7 @@ tr:hover td{background:var(--s2)}
 <div class="mo" id="m-cf"><div class="modal">
   <div class="mt">Agregar costo fijo</div>
   <div class="fr"><label>Nombre</label><input id="cf-n"></div>
-  <div class="fg2"><div class="fr"><label>Categoría</label><select id="cf-cat"><option value="alquiler">Alquiler</option><option value="proveedor">Proveedor</option><option value="servicio">Servicio</option><option value="otro">Otro</option></select></div><div class="fr"><label>Monto/mes ($)</label><input id="cf-m" type="number" placeholder="0"></div></div>
+  <div class="fg2"><div class="fr"><label>Categoría</label><select id="cf-cat"><option value="alquiler">Alquiler</option><option value="proveedor">Proveedor</option><option value="servicio">Servicio</option><option value="otro">Otro</option></select></div><div class="fr"><label>Monto/mes ($)</label><input id="cf-m" type="text" inputmode="numeric" placeholder="0"></div></div>
   <div class="fg2"><div class="fr"><label>Día vencimiento</label><input id="cf-dia" type="number" placeholder="5"></div><div class="fr"><label>Estado</label><select id="cf-est"><option value="activo">Activo</option><option value="pausado">Pausado</option></select></div></div>
   <div class="fr"><label>Notas</label><input id="cf-notas"></div>
   <div class="ma"><button class="btn" onclick="closeM('m-cf')">Cancelar</button><button class="btn btn-p" onclick="guardarCF()">Guardar</button></div>
@@ -707,7 +707,7 @@ tr:hover td{background:var(--s2)}
   <input type="hidden" id="cfp-id">
   <div class="fg2">
     <div class="fr"><label>Fecha de pago</label><input id="cfp-fecha" type="date"></div>
-    <div class="fr"><label>Monto ($)</label><input id="cfp-monto" type="number" placeholder="0"></div>
+    <div class="fr"><label>Monto ($)</label><input id="cfp-monto" type="text" inputmode="numeric" placeholder="0"></div>
   </div>
   <div class="fr"><label>Caja</label>
     <select id="cfp-caja">
@@ -754,7 +754,7 @@ tr:hover td{background:var(--s2)}
   <div class="fg4" style="margin-bottom:14px">
     <div class="fr" style="margin-bottom:0"><input id="provd-item-fecha" type="date"></div>
     <div class="fr" style="margin-bottom:0"><input id="provd-item-desc" placeholder="Descripción del ítem"></div>
-    <div class="fr" style="margin-bottom:0"><input id="provd-item-valor" type="number" placeholder="Valor $"></div>
+    <div class="fr" style="margin-bottom:0"><input id="provd-item-valor" type="text" inputmode="numeric" placeholder="Valor $"></div>
     <button class="btn btn-p" onclick="agregarItemProv()" style="height:34px"><i class="ti ti-plus"></i> Agregar</button>
   </div>
   <hr class="divider">
@@ -763,7 +763,7 @@ tr:hover td{background:var(--s2)}
     <table><thead><tr><th>Fecha</th><th>Caja</th><th>Monto</th><th>Nota</th><th></th></tr></thead><tbody id="provd-pagos"></tbody></table>
   </div>
   <div class="fg3">
-    <div class="fr" style="margin-bottom:0"><input id="provd-pago-monto" type="number" placeholder="Monto $"></div>
+    <div class="fr" style="margin-bottom:0"><input id="provd-pago-monto" type="text" inputmode="numeric" placeholder="Monto $"></div>
     <div class="fr" style="margin-bottom:0">
       <select id="provd-pago-caja">
         <option value="1">1 — Efectivo</option><option value="2">2 — Banco</option><option value="3">3 — Jorge</option>
@@ -781,7 +781,7 @@ tr:hover td{background:var(--s2)}
   <div class="mt">Registrar venta</div>
   <div class="fr"><label>Vehículo</label><select id="vt-v" style="width:100%;padding:8px 10px;border-radius:var(--r);border:1px solid var(--bd2);background:var(--s2);color:var(--tx);font-size:12px"></select></div>
   <div class="fr"><label>Comprador</label><input id="vt-c"></div>
-  <div class="fg2"><div class="fr"><label>Precio ($)</label><input id="vt-p" type="number" placeholder="0"></div><div class="fr"><label>Estado</label><select id="vt-e"><option>Seña</option><option>Cerrado</option><option>Entregado</option></select></div></div>
+  <div class="fg2"><div class="fr"><label>Precio ($)</label><input id="vt-p" type="text" inputmode="numeric" placeholder="0"></div><div class="fr"><label>Estado</label><select id="vt-e"><option>Seña</option><option>Cerrado</option><option>Entregado</option></select></div></div>
   <div class="ma"><button class="btn" onclick="closeM('m-venta')">Cancelar</button><button class="btn btn-p" onclick="guardarVenta()">Guardar</button></div>
 </div></div>
 
@@ -879,7 +879,7 @@ tr:hover td{background:var(--s2)}
   <div class="fg4" style="margin-bottom:14px">
     <div class="fr" style="margin-bottom:0"><input id="ccd-item-fecha" type="date"></div>
     <div class="fr" style="margin-bottom:0"><input id="ccd-item-desc" placeholder="Descripción del ítem"></div>
-    <div class="fr" style="margin-bottom:0"><input id="ccd-item-valor" type="number" placeholder="Valor $"></div>
+    <div class="fr" style="margin-bottom:0"><input id="ccd-item-valor" type="text" inputmode="numeric" placeholder="Valor $"></div>
     <button class="btn btn-p" onclick="agregarItemCC()" style="height:34px"><i class="ti ti-plus"></i> Agregar</button>
   </div>
   <hr class="divider">
@@ -888,7 +888,7 @@ tr:hover td{background:var(--s2)}
     <table><thead><tr><th>Fecha</th><th>Caja</th><th>Monto</th><th>Nota</th><th></th></tr></thead><tbody id="ccd-pagos"></tbody></table>
   </div>
   <div class="fg3">
-    <div class="fr" style="margin-bottom:0"><input id="ccd-pago-monto" type="number" placeholder="Monto $"></div>
+    <div class="fr" style="margin-bottom:0"><input id="ccd-pago-monto" type="text" inputmode="numeric" placeholder="Monto $"></div>
     <div class="fr" style="margin-bottom:0">
       <select id="ccd-pago-caja">
         <option value="1">1 — Efectivo</option><option value="2">2 — Banco</option><option value="3">3 — Jorge</option>
@@ -914,8 +914,33 @@ const MESES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','
 let SESSION=null;
 let C={leadsA:[],leadsT:[],clt:[],veh:[],ots:[],cajav:[],cajat:[],cf:[],cfPagos:[],ventas:[],recs:[],gestoria:[],cct:[],ccv:[],prov:[],activeId:null,activeType:null,recFiltro:'todos',diaActual:new Date().toISOString().split('T')[0],mesActual:{y:new Date().getFullYear(),m:new Date().getMonth()},diaVActual:new Date().toISOString().split('T')[0],mesVActual:{y:new Date().getFullYear(),m:new Date().getMonth()},cajaVistaActual:'dia',cajaVVistaActual:'dia'};
 
-const fmt=n=>'$'+Number(n||0).toLocaleString('es-AR');
+const fmt=n=>{const num=Math.round(Number(n||0));return'$'+num.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.')};
 const hoy=()=>new Date().toLocaleDateString('es-AR');
+
+// Máscara de input para campos de plata
+function maskMoney(el){
+  el.addEventListener('input',function(){
+    let v=this.value.replace(/\./g,'').replace(/[^\d]/g,'');
+    if(v==='')return;
+    this.value=Number(v).toLocaleString('de-DE');
+  });
+  el.addEventListener('focus',function(){
+    this.value=this.value.replace(/\./g,'');
+  });
+  el.addEventListener('blur',function(){
+    let v=this.value.replace(/\./g,'').replace(/[^\d]/g,'');
+    if(v)this.value=Number(v).toLocaleString('de-DE');
+  });
+}
+function getMaskValue(id){
+  const v=document.getElementById(id)?.value.replace(/\./g,'')||'0';
+  return parseFloat(v)||0;
+}
+function setMaskValue(id,n){
+  const el=document.getElementById(id);if(!el)return;
+  if(n)el.value=Number(n).toLocaleString('de-DE');else el.value='';
+}
+function clearMask(id){const el=document.getElementById(id);if(el)el.value='';}
 function freqLabel(dias){
   const map={4:'Cada 4 días',7:'Cada 1 semana',14:'Cada 2 semanas',21:'Cada 3 semanas',30:'Cada 1 mes',60:'Cada 2 meses',90:'Cada 3 meses',120:'Cada 4 meses',180:'Cada 6 meses',365:'Cada 12 meses'};
   return map[dias]||`Cada ${dias} días`;
@@ -974,6 +999,12 @@ function iniciarApp(){
 window.addEventListener('DOMContentLoaded',()=>{
   const saved=localStorage.getItem('gyfut_session');
   if(saved){SESSION=JSON.parse(saved);iniciarApp();}
+  // aplicar máscara a todos los campos de plata
+  ['ct-cobrado','ct-pagado','su-monto','cv-cobrado','cv-pagado','suv-monto',
+   'ot-ins','ot-mo','ot-pr','ccd-item-valor','ccd-pago-monto',
+   'provd-item-valor','provd-pago-monto','cfp-monto','cf-m',
+   'v-costo','v-prep','v-gest','v-otros','v-precio','vt-p'
+  ].forEach(id=>{const el=document.getElementById(id);if(el)maskMoney(el);});
 });
 
 function setSyncStatus(s){const d=document.getElementById('sdot'),t=document.getElementById('stxt');if(s==='ok'){d.className='sdot';t.textContent='Conectado';}else if(s==='syncing'){d.className='sdot spin';t.textContent='Guardando...';}else{d.className='sdot err';t.textContent='Error';}}
@@ -1190,7 +1221,7 @@ function renderDetalleCC(){
 }
 async function agregarItemCC(){
   const desc=document.getElementById('ccd-item-desc').value;
-  const valor=parseFloat(document.getElementById('ccd-item-valor').value)||0;
+  const valor=getMaskValue('ccd-item-valor');
   const fecha=document.getElementById('ccd-item-fecha').value||hoyD();
   if(!desc||!valor)return alert('Completá descripción y valor');
   const id=parseInt(document.getElementById('ccd-id').value);
@@ -1219,7 +1250,7 @@ async function elimItemCC(idx){
   renderDetalleCC();
 }
 async function agregarPagoCC(){
-  const monto=parseFloat(document.getElementById('ccd-pago-monto').value)||0;
+  const monto=getMaskValue('ccd-pago-monto');
   if(!monto)return alert('Ingresá el monto del pago');
   const subcuenta=parseInt(document.getElementById('ccd-pago-caja').value);
   const nota=document.getElementById('ccd-pago-nota').value;
@@ -1446,8 +1477,8 @@ function abrirSueldo(){document.getElementById('su-fecha').value=C.diaActual;ope
 
 async function guardarCajaT(){
   const det=document.getElementById('ct-det').value;if(!det)return alert('Completá el detalle');
-  const cobrado=parseFloat(document.getElementById('ct-cobrado').value)||0;
-  const pagado=parseFloat(document.getElementById('ct-pagado').value)||0;
+  const cobrado=getMaskValue('ct-cobrado');
+  const pagado=getMaskValue('ct-pagado');
   if(!cobrado&&!pagado)return alert('Ingresá cobrado o pagado');
   setSyncStatus('syncing');
   await db.from('caja_taller').insert({detalle:det,subcuenta:parseInt(document.getElementById('ct-caja').value),categoria:document.getElementById('ct-cat').value,cobrado,pagado,fecha:document.getElementById('ct-fecha').value,tipo_mov:'movimiento'});
@@ -1458,7 +1489,7 @@ async function guardarCajaT(){
 async function guardarSueldo(){
   const persona=document.getElementById('su-persona').value;
   if(!persona)return alert('Elegí la persona');
-  const monto=parseFloat(document.getElementById('su-monto').value)||0;if(!monto)return alert('Ingresá el monto');
+  const monto=getMaskValue('su-monto');if(!monto)return alert('Ingresá el monto');
   const tipo=document.getElementById('su-tipo').value;
   const detExtra=document.getElementById('su-det').value;
   const detalle=detExtra?`${persona} — ${detExtra}`:persona;
@@ -1575,8 +1606,8 @@ function abrirMovDiaV(){document.getElementById('cv-fecha').value=C.diaVActual;d
 function abrirSueldoV(){document.getElementById('suv-fecha').value=C.diaVActual;openM('m-sueldov');}
 async function guardarCajaV(){
   const det=document.getElementById('cv-det').value;if(!det)return alert('Completá el detalle');
-  const cobrado=parseFloat(document.getElementById('cv-cobrado').value)||0;
-  const pagado=parseFloat(document.getElementById('cv-pagado').value)||0;
+  const cobrado=getMaskValue('cv-cobrado');
+  const pagado=getMaskValue('cv-pagado');
   if(!cobrado&&!pagado)return alert('Ingresá cobrado o pagado');
   setSyncStatus('syncing');
   await db.from('caja_vehiculos').insert({detalle:det,subcuenta:parseInt(document.getElementById('cv-caja').value),categoria:document.getElementById('cv-cat').value,cobrado,pagado,vehiculo:document.getElementById('cv-veh').value,fecha:document.getElementById('cv-fecha').value,tipo_mov:'movimiento'});
@@ -1586,7 +1617,7 @@ async function guardarCajaV(){
 }
 async function guardarSueldoV(){
   const det=document.getElementById('suv-det').value;if(!det)return alert('Completá la descripción');
-  const monto=parseFloat(document.getElementById('suv-monto').value)||0;if(!monto)return alert('Ingresá el monto');
+  const monto=getMaskValue('suv-monto');if(!monto)return alert('Ingresá el monto');
   setSyncStatus('syncing');
   await db.from('caja_vehiculos').insert({detalle:det,subcuenta:parseInt(document.getElementById('suv-caja').value),categoria:document.getElementById('suv-tipo').value,cobrado:0,pagado:monto,fecha:document.getElementById('suv-fecha').value,tipo_mov:document.getElementById('suv-tipo').value});
   setSyncStatus('ok');closeM('m-sueldov');
@@ -1698,7 +1729,7 @@ async function elimCLT(id){
 
 // VEHÍCULOS
 const costoTotal=v=>(parseFloat(v.costo)||0)+(parseFloat(v.prep)||0)+(parseFloat(v.gestoria)||0)+(parseFloat(v.otros_costos)||0);
-async function guardarVeh(){const marca=document.getElementById('v-marca').value,modelo=document.getElementById('v-modelo').value;if(!marca||!modelo)return alert('Completá marca y modelo');setSyncStatus('syncing');await db.from('vehiculos').insert({marca,modelo,anio:parseInt(document.getElementById('v-anio').value)||null,km:parseInt(document.getElementById('v-km').value)||null,color:document.getElementById('v-color').value,costo:parseFloat(document.getElementById('v-costo').value)||0,fuente:document.getElementById('v-fuente').value,prep:parseFloat(document.getElementById('v-prep').value)||0,gestoria:parseFloat(document.getElementById('v-gest').value)||0,otros_costos:parseFloat(document.getElementById('v-otros').value)||0,precio_venta:parseFloat(document.getElementById('v-precio').value)||0,estado:document.getElementById('v-estado').value,notas:document.getElementById('v-notas').value});setSyncStatus('ok');closeM('m-veh');['v-marca','v-modelo','v-anio','v-km','v-color','v-costo','v-prep','v-gest','v-otros','v-precio','v-notas'].forEach(id=>document.getElementById(id).value='');await loadVeh();renderInv();}
+async function guardarVeh(){const marca=document.getElementById('v-marca').value,modelo=document.getElementById('v-modelo').value;if(!marca||!modelo)return alert('Completá marca y modelo');setSyncStatus('syncing');await db.from('vehiculos').insert({marca,modelo,anio:parseInt(document.getElementById('v-anio').value)||null,km:parseInt(document.getElementById('v-km').value)||null,color:document.getElementById('v-color').value,costo:getMaskValue('v-costo'),fuente:document.getElementById('v-fuente').value,prep:getMaskValue('v-prep'),gestoria:getMaskValue('v-gest'),otros_costos:getMaskValue('v-otros'),precio_venta:getMaskValue('v-precio'),estado:document.getElementById('v-estado').value,notas:document.getElementById('v-notas').value});setSyncStatus('ok');closeM('m-veh');['v-marca','v-modelo','v-anio','v-km','v-color','v-costo','v-prep','v-gest','v-otros','v-precio','v-notas'].forEach(id=>document.getElementById(id).value='');await loadVeh();renderInv();}
 function renderInv(){const tb=document.getElementById('tb-inv');const bm={'disponible':['bg','Disponible'],'reservado':['ba','Reservado'],'preparacion':['bb','En preparación'],'vendido':['bgr','Vendido']};tb.innerHTML=C.veh.length?C.veh.map(v=>{const ct=costoTotal(v);const mg=(parseFloat(v.precio_venta)||0)-ct;const[bc,bt]=bm[v.estado]||['bgr',v.estado];return`<tr><td><strong>${v.marca} ${v.modelo}</strong>${v.color?` <span style="font-size:9px;color:var(--tx3)">${v.color}</span>`:''}</td><td>${v.anio||'—'}</td><td>${v.km?Number(v.km).toLocaleString('es-AR')+' km':'—'}</td><td>${fmt(ct)}</td><td>${fmt(v.precio_venta)}</td><td class="${mg>=0?'ing':'eg'}">${fmt(mg)}</td><td><span class="badge bgr" style="font-size:9px">${v.fuente||'—'}</span></td><td>${b(bc,bt)}</td><td><button class="icon-btn" onclick="elimVeh(${v.id})"><i class="ti ti-trash"></i></button></td></tr>`}).join(''):'<tr><td colspan="9"><div class="empty"><i class="ti ti-car"></i>Sin vehículos.</div></td></tr>';}
 async function elimVeh(id){if(!confirm('¿Eliminar vehículo?'))return;setSyncStatus('syncing');await db.from('vehiculos').delete().eq('id',id);setSyncStatus('ok');await loadVeh();renderInv();}
 
@@ -1763,7 +1794,7 @@ async function guardarOT(){
     vehiculoCliente=c?.vehiculo||'';
   }
   const svcs=svcsGet('os-');
-  const ins=parseFloat(document.getElementById('ot-ins').value)||0,mo=parseFloat(document.getElementById('ot-mo').value)||0,pr=parseFloat(document.getElementById('ot-pr').value)||0;
+  const ins=getMaskValue('ot-ins'),mo=getMaskValue('ot-mo'),pr=getMaskValue('ot-pr');
   setSyncStatus('syncing');
   await db.from('ordenes_trabajo').insert({cliente:`${nombreCliente}${vehiculoCliente?' — '+vehiculoCliente:''}`,cliente_id:clienteId,responsable:document.getElementById('ot-resp').value,estado:document.getElementById('ot-est').value,servicios:svcs.length?svcs:['General'],insumos:ins,mano_obra:mo,precio_cobrado:pr,descripcion:document.getElementById('ot-desc').value,fecha_ingreso:document.getElementById('ot-fing').value||hoyD(),fecha_entrega:document.getElementById('ot-fent').value||null,pagado:document.getElementById('ot-pagado').value==='true'});
   setSyncStatus('ok');closeM('m-ot');
@@ -1837,7 +1868,7 @@ function renderOT(){
 async function elimOT(id){if(!confirm('¿Eliminar orden?'))return;setSyncStatus('syncing');await db.from('ordenes_trabajo').delete().eq('id',id);setSyncStatus('ok');await loadOT();renderOT();}
 
 // CF
-async function guardarCF(){const nombre=document.getElementById('cf-n').value,monto=parseFloat(document.getElementById('cf-m').value)||0;if(!nombre||!monto)return alert('Completá nombre y monto');setSyncStatus('syncing');await db.from('costos_fijos').insert({nombre,categoria:document.getElementById('cf-cat').value,monto,dia_vencimiento:parseInt(document.getElementById('cf-dia').value)||null,estado:document.getElementById('cf-est').value,notas:document.getElementById('cf-notas').value});setSyncStatus('ok');closeM('m-cf');['cf-n','cf-m','cf-dia','cf-notas'].forEach(id=>document.getElementById(id).value='');await loadCF();renderCF();}
+async function guardarCF(){const nombre=document.getElementById('cf-n').value,monto=getMaskValue('cf-m');if(!nombre||!monto)return alert('Completá nombre y monto');setSyncStatus('syncing');await db.from('costos_fijos').insert({nombre,categoria:document.getElementById('cf-cat').value,monto,dia_vencimiento:parseInt(document.getElementById('cf-dia').value)||null,estado:document.getElementById('cf-est').value,notas:document.getElementById('cf-notas').value});setSyncStatus('ok');closeM('m-cf');['cf-n','cf-m','cf-dia','cf-notas'].forEach(id=>document.getElementById(id).value='');await loadCF();renderCF();}
 function renderCF(){
   const mes=mesActualStr();
   const activos=C.cf.filter(c=>c.estado==='activo');
@@ -1860,7 +1891,7 @@ async function elimCF(id){setSyncStatus('syncing');await db.from('costos_fijos')
 
 // VENTAS
 function abrirVenta(){const d=C.veh.filter(v=>v.estado!=='vendido');if(!d.length)return alert('Sin vehículos disponibles');document.getElementById('vt-v').innerHTML=d.map(v=>`<option value="${v.id}">${v.marca} ${v.modelo} ${v.anio}</option>`).join('');openM('m-venta');}
-async function guardarVenta(){const vid=parseInt(document.getElementById('vt-v').value),veh=C.veh.find(v=>v.id===vid),pr=parseFloat(document.getElementById('vt-p').value)||0;const comp=document.getElementById('vt-c').value;if(!comp)return alert('Completá el comprador');setSyncStatus('syncing');await db.from('ventas').insert({vehiculo_id:vid,vehiculo_texto:veh?`${veh.marca} ${veh.modelo} ${veh.anio}`:'—',comprador:comp,precio:pr,costo:veh?costoTotal(veh):0,estado:document.getElementById('vt-e').value});await db.from('vehiculos').update({estado:'vendido'}).eq('id',vid);setSyncStatus('ok');closeM('m-venta');document.getElementById('vt-c').value='';document.getElementById('vt-p').value='';await loadVentas();await loadVeh();renderVentas();renderInv();}
+async function guardarVenta(){const vid=parseInt(document.getElementById('vt-v').value),veh=C.veh.find(v=>v.id===vid),pr=getMaskValue('vt-p');const comp=document.getElementById('vt-c').value;if(!comp)return alert('Completá el comprador');setSyncStatus('syncing');await db.from('ventas').insert({vehiculo_id:vid,vehiculo_texto:veh?`${veh.marca} ${veh.modelo} ${veh.anio}`:'—',comprador:comp,precio:pr,costo:veh?costoTotal(veh):0,estado:document.getElementById('vt-e').value});await db.from('vehiculos').update({estado:'vendido'}).eq('id',vid);setSyncStatus('ok');closeM('m-venta');document.getElementById('vt-c').value='';document.getElementById('vt-p').value='';await loadVentas();await loadVeh();renderVentas();renderInv();}
 function renderVentas(){const bm={'Seña':'ba','Cerrado':'bg','Entregado':'bgr'};const tb=document.getElementById('tb-ventas');tb.innerHTML=C.ventas.length?C.ventas.map(v=>{const g=(v.precio||0)-(v.costo||0);return`<tr><td><strong>${v.vehiculo_texto||'—'}</strong></td><td>${v.comprador}</td><td class="ing">${fmt(v.precio)}</td><td class="eg">${fmt(v.costo)}</td><td class="${g>=0?'ing':'eg'}">${fmt(g)}</td><td style="color:var(--tx3);font-size:10px">${v.created_at?.slice(0,10)||'—'}</td><td>${b(bm[v.estado]||'bgr',v.estado)}</td></tr>`}).join(''):'<tr><td colspan="7"><div class="empty"><i class="ti ti-transfer"></i>Sin ventas.</div></td></tr>';}
 
 // PANEL DETALLE
@@ -1921,7 +1952,7 @@ function renderDetalleProv(){
 }
 async function agregarItemProv(){
   const desc=document.getElementById('provd-item-desc').value;
-  const valor=parseFloat(document.getElementById('provd-item-valor').value)||0;
+  const valor=getMaskValue('provd-item-valor');
   const fecha=document.getElementById('provd-item-fecha').value||hoyD();
   if(!desc||!valor)return alert('Completá descripción y valor');
   const id=parseInt(document.getElementById('provd-id').value);
@@ -1939,7 +1970,7 @@ async function elimItemProv(idx){
   renderDetalleProv();
 }
 async function agregarPagoProv(){
-  const monto=parseFloat(document.getElementById('provd-pago-monto').value)||0;if(!monto)return alert('Ingresá el monto');
+  const monto=getMaskValue('provd-pago-monto');if(!monto)return alert('Ingresá el monto');
   const subcuenta=parseInt(document.getElementById('provd-pago-caja').value);
   const nota=document.getElementById('provd-pago-nota').value;
   const id=parseInt(document.getElementById('provd-id').value);
@@ -1977,7 +2008,7 @@ function abrirPagoCF(id){
 async function guardarPagoCF(){
   const id=parseInt(document.getElementById('cfp-id').value);
   const cf=C.cf.find(x=>x.id===id);if(!cf)return;
-  const monto=parseFloat(document.getElementById('cfp-monto').value)||0;if(!monto)return alert('Ingresá el monto');
+  const monto=getMaskValue('cfp-monto');if(!monto)return alert('Ingresá el monto');
   const fecha=document.getElementById('cfp-fecha').value;
   const subcuenta=parseInt(document.getElementById('cfp-caja').value);
   const nota=document.getElementById('cfp-nota').value;

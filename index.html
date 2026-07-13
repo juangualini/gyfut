@@ -1381,8 +1381,8 @@ function renderMovList(containerId,movs,esSueldo,esAdmin){
       <div class="mov-cell"><span class="num-caja ${esSueldo?'sueldo':''}">${m.subcuenta}</span></div>
       <div class="mov-cell"><strong>${m.detalle}</strong><br><span style="font-size:9px;color:var(--tx3)">${caja?.nombre||'—'}</span></div>
       <div class="mov-cell muted">${tipoBadge}</div>
-      <div class="mov-cell cobrado">${esAdmin?((m.cobrado&&m.cobrado>0)?fmt(m.cobrado):'—'):'—'}</div>
-      <div class="mov-cell pagado">${esAdmin?((m.pagado&&m.pagado>0)?fmt(m.pagado):'—'):'—'}</div>
+      <div class="mov-cell cobrado">${(m.cobrado&&m.cobrado>0)?fmt(m.cobrado):'—'}</div>
+      <div class="mov-cell pagado">${(m.pagado&&m.pagado>0)?fmt(m.pagado):'—'}</div>
       <div class="mov-cell"><button class="icon-btn" onclick="elimMovDia(${m.id})"><i class="ti ti-trash"></i></button></div>
     </div>`;
   }).join('');

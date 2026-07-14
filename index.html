@@ -640,8 +640,34 @@ tr:hover td{background:var(--s2)}
   <div class="sub-label">Servicios</div>
   <div class="chk-group"><label class="chk-label"><input type="checkbox" id="os-mec"> Mecánica</label><label class="chk-label"><input type="checkbox" id="os-det"> Detailing</label><label class="chk-label"><input type="checkbox" id="os-ppf"> PPF</label><label class="chk-label"><input type="checkbox" id="os-lav"> Lavado</label><label class="chk-label"><input type="checkbox" id="os-otro"> Otro</label></div>
   <hr class="divider">
-  <div class="fg3" id="ot-costos-row"><div class="fr"><label>Insumos ($)</label><input id="ot-ins" type="text" inputmode="numeric" placeholder="0"></div><div class="fr"><label>Mano de obra ($)</label><input id="ot-mo" type="text" inputmode="numeric" placeholder="0"></div><div class="fr"><label>Precio del servicio ($)</label><input id="ot-pr" type="text" inputmode="numeric" placeholder="0"></div></div>
-  <div class="fr" id="ot-pago-row"><label>¿Pagó?</label><select id="ot-pagado"><option value="false">No</option><option value="true">Sí</option></select></div>
+  <hr class="divider">
+  <!-- INSUMOS -->
+  <div class="sub-label">Insumos</div>
+  <div id="ot-ins-lista" style="margin-bottom:8px"></div>
+  <div class="fg3" style="margin-bottom:10px">
+    <div class="fr" style="margin-bottom:0"><input id="ot-ins-desc" placeholder="Descripción (ej: cubiertas)"></div>
+    <div class="fr" style="margin-bottom:0"><input id="ot-ins-val" type="text" inputmode="numeric" placeholder="Valor $"></div>
+    <button class="btn" onclick="agregarItemOT('ins')" style="height:34px"><i class="ti ti-plus"></i> Agregar</button>
+  </div>
+  <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);margin-bottom:12px">
+    <span>Total insumos:</span><span class="eg" id="ot-ins-total">$0</span>
+  </div>
+  <!-- MANO DE OBRA -->
+  <div class="sub-label">Mano de obra</div>
+  <div id="ot-mo-lista" style="margin-bottom:8px"></div>
+  <div class="fg3" style="margin-bottom:10px">
+    <div class="fr" style="margin-bottom:0"><input id="ot-mo-desc" placeholder="Descripción (ej: alineación)"></div>
+    <div class="fr" style="margin-bottom:0"><input id="ot-mo-val" type="text" inputmode="numeric" placeholder="Valor $"></div>
+    <button class="btn" onclick="agregarItemOT('mo')" style="height:34px"><i class="ti ti-plus"></i> Agregar</button>
+  </div>
+  <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);margin-bottom:12px">
+    <span>Total mano de obra:</span><span class="eg" id="ot-mo-total">$0</span>
+  </div>
+  <hr class="divider">
+  <div class="fg2">
+    <div class="fr"><label>Precio del servicio ($)</label><input id="ot-pr" type="text" inputmode="numeric" placeholder="0"></div>
+    <div class="fr"><label>¿Pagó?</label><select id="ot-pagado"><option value="false">No</option><option value="true">Sí</option></select></div>
+  </div>
   <div class="fr"><label>Descripción</label><textarea id="ot-desc"></textarea></div>
   <div class="ma"><button class="btn" onclick="closeM('m-ot')">Cancelar</button><button class="btn btn-p" onclick="guardarOT()">Guardar</button></div>
 </div></div>
@@ -1768,7 +1794,67 @@ function renderInv(){const tb=document.getElementById('tb-inv');const bm={'dispo
 async function elimVeh(id){if(!confirm('¿Eliminar vehículo?'))return;setSyncStatus('syncing');await db.from('vehiculos').delete().eq('id',id);setSyncStatus('ok');await loadVeh();renderInv();}
 
 // OT
+// Estado temporal de ítems de OT
+let OT_INS=[],OT_MO=[];
+
+function renderItemsOT(tipo,containerId,totalId){
+  const items=tipo==='ins'?OT_INS:OT_MO;
+  const cont=document.getElementById(containerId);if(!cont)return;
+  const total=items.reduce((a,i)=>a+(i.valor||0),0);
+  const tel=document.getElementById(totalId);if(tel)tel.textContent=fmt(total);
+  if(!items.length){cont.innerHTML='';return;}
+  cont.innerHTML=`<div class="tw" style="margin-bottom:6px"><table><thead><tr><th>Descripción</th><th>Valor</th><th></th></tr></thead><tbody>${
+    items.map((it,idx)=>`<tr><td style="font-size:11px">${it.desc}</td><td class="eg" style="font-size:11px">${fmt(it.valor)}</td><td><button class="icon-btn" onclick="elimItemOT('${tipo}',${idx})"><i class="ti ti-trash"></i></button></td></tr>`).join('')
+  }</tbody></table></div>`;
+}
+function agregarItemOT(tipo){
+  const descId=tipo==='ins'?'ot-ins-desc':'ot-mo-desc';
+  const valId=tipo==='ins'?'ot-ins-val':'ot-mo-val';
+  const desc=document.getElementById(descId).value.trim();
+  const valor=getMaskValue(valId);
+  if(!desc||!valor)return alert('Completá descripción y valor');
+  if(tipo==='ins')OT_INS.push({desc,valor});else OT_MO.push({desc,valor});
+  document.getElementById(descId).value='';document.getElementById(valId).value='';
+  renderItemsOT(tipo,tipo==='ins'?'ot-ins-lista':'ot-mo-lista',tipo==='ins'?'ot-ins-total':'ot-mo-total');
+}
+function elimItemOT(tipo,idx){
+  if(tipo==='ins')OT_INS.splice(idx,1);else OT_MO.splice(idx,1);
+  renderItemsOT(tipo,tipo==='ins'?'ot-ins-lista':'ot-mo-lista',tipo==='ins'?'ot-ins-total':'ot-mo-total');
+}
+
+// Estado temporal para edición
+let OTD_INS=[],OTD_MO=[];
+function renderItemsOTD(tipo){
+  const items=tipo==='ins'?OTD_INS:OTD_MO;
+  const containerId=tipo==='ins'?'otd-ins-lista':'otd-mo-lista';
+  const totalId=tipo==='ins'?'otd-ins-total':'otd-mo-total';
+  const cont=document.getElementById(containerId);if(!cont)return;
+  const total=items.reduce((a,i)=>a+(i.valor||0),0);
+  const tel=document.getElementById(totalId);if(tel)tel.textContent=fmt(total);
+  if(!items.length){cont.innerHTML='';return;}
+  cont.innerHTML=`<div class="tw" style="margin-bottom:6px"><table><thead><tr><th>Descripción</th><th>Valor</th><th></th></tr></thead><tbody>${
+    items.map((it,idx)=>`<tr><td style="font-size:11px">${it.desc}</td><td class="eg" style="font-size:11px">${fmt(it.valor)}</td><td><button class="icon-btn" onclick="elimItemOTEdit('${tipo}',${idx})"><i class="ti ti-trash"></i></button></td></tr>`).join('')
+  }</tbody></table></div>`;
+}
+function agregarItemOTEdit(tipo){
+  const descId=tipo==='ins'?'otd-ins-desc':'otd-mo-desc';
+  const valId=tipo==='ins'?'otd-ins-val':'otd-mo-val';
+  const desc=document.getElementById(descId).value.trim();
+  const valor=getMaskValue(valId);
+  if(!desc||!valor)return alert('Completá descripción y valor');
+  if(tipo==='ins')OTD_INS.push({desc,valor});else OTD_MO.push({desc,valor});
+  document.getElementById(descId).value='';document.getElementById(valId).value='';
+  renderItemsOTD(tipo);
+}
+function elimItemOTEdit(tipo,idx){
+  if(tipo==='ins')OTD_INS.splice(idx,1);else OTD_MO.splice(idx,1);
+  renderItemsOTD(tipo);
+}
+
 function abrirOT(){
+  OT_INS=[];OT_MO=[];
+  renderItemsOT('ins','ot-ins-lista','ot-ins-total');
+  renderItemsOT('mo','ot-mo-lista','ot-mo-total');
   document.getElementById('ot-fing').value=hoyD();
   const esAdmin=SESSION.rol==='admin';
   const tabExistente=document.getElementById('ot-tab-existente');
@@ -1834,17 +1920,23 @@ async function guardarOT(){
     vehiculoCliente=c?.vehiculo||'';
   }
   const svcs=svcsGet('os-');
-  const ins=getMaskValue('ot-ins'),mo=getMaskValue('ot-mo'),pr=getMaskValue('ot-pr');
+  const ins=OT_INS.reduce((a,i)=>a+(i.valor||0),0);
+  const mo=OT_MO.reduce((a,i)=>a+(i.valor||0),0);
+  const pr=getMaskValue('ot-pr');
   setSyncStatus('syncing');
-  await db.from('ordenes_trabajo').insert({cliente:`${nombreCliente}${vehiculoCliente?' — '+vehiculoCliente:''}`,cliente_id:clienteId,responsable:document.getElementById('ot-resp').value,estado:document.getElementById('ot-est').value,servicios:svcs.length?svcs:['General'],insumos:ins,mano_obra:mo,precio_cobrado:pr,descripcion:document.getElementById('ot-desc').value,fecha_ingreso:document.getElementById('ot-fing').value||hoyD(),fecha_entrega:document.getElementById('ot-fent').value||null,pagado:document.getElementById('ot-pagado').value==='true'});
+  await db.from('ordenes_trabajo').insert({cliente:`${nombreCliente}${vehiculoCliente?' — '+vehiculoCliente:''}`,cliente_id:clienteId,responsable:document.getElementById('ot-resp').value,estado:document.getElementById('ot-est').value,servicios:svcs.length?svcs:['General'],insumos:ins,mano_obra:mo,insumos_items:OT_INS,mano_obra_items:OT_MO,precio_cobrado:pr,descripcion:document.getElementById('ot-desc').value,fecha_ingreso:document.getElementById('ot-fing').value||hoyD(),fecha_entrega:document.getElementById('ot-fent').value||null,pagado:document.getElementById('ot-pagado').value==='true'});
   setSyncStatus('ok');closeM('m-ot');
-  ['ot-ins','ot-mo','ot-pr','ot-desc','ot-fing','ot-fent','ot-nuevo-nombre','ot-nuevo-tel','ot-nuevo-veh','ot-nuevo-pat'].forEach(id=>document.getElementById(id).value='');
+  ['ot-pr','ot-desc','ot-fing','ot-fent','ot-nuevo-nombre','ot-nuevo-tel','ot-nuevo-veh','ot-nuevo-pat'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('ot-pagado').value='false';
+  OT_INS=[];OT_MO=[];
   svcsReset('os-');await loadOT();renderOT();
 }
 function verDetalleOT(id){
   const o=C.ots.find(x=>x.id===id);if(!o)return;
   const c=o.cliente_id?C.clt.find(x=>x.id===o.cliente_id):null;
+  // cargar items existentes
+  OTD_INS=(o.insumos_items||[]).map(i=>({desc:i.desc,valor:i.valor}));
+  OTD_MO=(o.mano_obra_items||[]).map(i=>({desc:i.desc,valor:i.valor}));
   document.getElementById('otd-titulo').textContent=`Editar orden #${o.id}`;
   const esAdmin=SESSION.rol==='admin';
   const svcMap={Mecánica:'mec',Detailing:'det',PPF:'ppf',Lavado:'lav',Otro:'otro'};
@@ -1864,11 +1956,40 @@ function verDetalleOT(id){
       <label class="chk-label"><input type="checkbox" id="otd-svc-otro" ${svcsActuales.includes('Otro')||svcsActuales.includes('General')?'checked':''}> Otro</label>
     </div>
     <hr class="divider">
-    <div class="fg3"><div class="fr"><label>Insumos ($)</label><input id="otd-ins" type="number" value="${o.insumos||0}"></div><div class="fr"><label>Mano de obra ($)</label><input id="otd-mo" type="number" value="${o.mano_obra||0}"></div><div class="fr"><label>Precio del servicio ($)</label><input id="otd-pr" type="number" value="${o.precio_cobrado||0}"></div></div>
+    <hr class="divider">
+    <div class="sub-label">Insumos</div>
+    <div id="otd-ins-lista" style="margin-bottom:8px"></div>
+    <div class="fg3" style="margin-bottom:10px">
+      <div class="fr" style="margin-bottom:0"><input id="otd-ins-desc" placeholder="Descripción"></div>
+      <div class="fr" style="margin-bottom:0"><input id="otd-ins-val" type="text" inputmode="numeric" placeholder="Valor $"></div>
+      <button class="btn" onclick="agregarItemOTEdit('ins')" style="height:34px"><i class="ti ti-plus"></i> Agregar</button>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);margin-bottom:12px">
+      <span>Total insumos:</span><span class="eg" id="otd-ins-total">$0</span>
+    </div>
+    <div class="sub-label">Mano de obra</div>
+    <div id="otd-mo-lista" style="margin-bottom:8px"></div>
+    <div class="fg3" style="margin-bottom:10px">
+      <div class="fr" style="margin-bottom:0"><input id="otd-mo-desc" placeholder="Descripción"></div>
+      <div class="fr" style="margin-bottom:0"><input id="otd-mo-val" type="text" inputmode="numeric" placeholder="Valor $"></div>
+      <button class="btn" onclick="agregarItemOTEdit('mo')" style="height:34px"><i class="ti ti-plus"></i> Agregar</button>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);margin-bottom:12px">
+      <span>Total mano de obra:</span><span class="eg" id="otd-mo-total">$0</span>
+    </div>
+    <hr class="divider">
+    <div class="fg2">
+      <div class="fr"><label>Precio del servicio ($)</label><input id="otd-pr" type="text" inputmode="numeric" value="${o.precio_cobrado||0}"></div>
+      <div class="fr"><label>¿Pagó?</label><select id="otd-pagado"><option value="false" ${!o.pagado?'selected':''}>No</option><option value="true" ${o.pagado?'selected':''}>Sí</option></select></div>
+    </div>
     <div class="fr"><label>¿Pagó?</label><select id="otd-pagado"><option value="false" ${!o.pagado?'selected':''}>No</option><option value="true" ${o.pagado?'selected':''}>Sí</option></select></div>
     <div class="fr"><label>Descripción</label><textarea id="otd-desc">${o.descripcion||''}</textarea></div>
   `;
   document.querySelector('#m-ot-detalle .ma').innerHTML=`<button class="btn" onclick="closeM('m-ot-detalle')">Cancelar</button><button class="btn btn-p" onclick="guardarEdicionOT()">Guardar cambios</button>`;
+  // aplicar máscara al campo de precio
+  const prEl=document.getElementById('otd-pr');if(prEl){maskMoney(prEl);prEl.value=o.precio_cobrado?Number(o.precio_cobrado).toLocaleString('de-DE'):'';}
+  renderItemsOTD('ins');
+  renderItemsOTD('mo');
   openM('m-ot-detalle');
 }
 async function guardarEdicionOT(){
@@ -1879,6 +2000,8 @@ async function guardarEdicionOT(){
   if(document.getElementById('otd-svc-ppf').checked)svcs.push('PPF');
   if(document.getElementById('otd-svc-lav').checked)svcs.push('Lavado');
   if(document.getElementById('otd-svc-otro').checked)svcs.push('Otro');
+  const ins=OTD_INS.reduce((a,i)=>a+(i.valor||0),0);
+  const mo=OTD_MO.reduce((a,i)=>a+(i.valor||0),0);
   setSyncStatus('syncing');
   await db.from('ordenes_trabajo').update({
     cliente:document.getElementById('otd-cliente').value,
@@ -1887,9 +2010,11 @@ async function guardarEdicionOT(){
     servicios:svcs.length?svcs:['General'],
     fecha_ingreso:document.getElementById('otd-fing').value||null,
     fecha_entrega:document.getElementById('otd-fent').value||null,
-    insumos:parseFloat(document.getElementById('otd-ins').value)||0,
-    mano_obra:parseFloat(document.getElementById('otd-mo').value)||0,
-    precio_cobrado:parseFloat(document.getElementById('otd-pr').value)||0,
+    insumos:ins,
+    mano_obra:mo,
+    insumos_items:OTD_INS,
+    mano_obra_items:OTD_MO,
+    precio_cobrado:getMaskValue('otd-pr'),
     pagado:document.getElementById('otd-pagado').value==='true',
     descripcion:document.getElementById('otd-desc').value
   }).eq('id',id);

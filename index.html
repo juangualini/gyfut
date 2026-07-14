@@ -615,8 +615,9 @@ tr:hover td{background:var(--s2)}
   <div class="ma"><button class="btn" onclick="closeM('m-veh')">Cancelar</button><button class="btn btn-p" onclick="guardarVeh()">Guardar</button></div>
 </div></div>
 
-<div class="mo" id="m-ot"><div class="modal">
+<div class="mo" id="m-ot"><div class="modal" style="width:580px">
   <div class="mt">Nueva orden de trabajo</div>
+  <!-- CLIENTE -->
   <div class="tab-bar" style="margin-bottom:14px">
     <div class="tab active" id="ot-tab-existente" onclick="otTabCliente('existente')">Cliente existente</div>
     <div class="tab" id="ot-tab-nuevo" onclick="otTabCliente('nuevo')">Cliente nuevo</div>
@@ -640,35 +641,73 @@ tr:hover td{background:var(--s2)}
   <div class="sub-label">Servicios</div>
   <div class="chk-group"><label class="chk-label"><input type="checkbox" id="os-mec"> Mecánica</label><label class="chk-label"><input type="checkbox" id="os-det"> Detailing</label><label class="chk-label"><input type="checkbox" id="os-ppf"> PPF</label><label class="chk-label"><input type="checkbox" id="os-lav"> Lavado</label><label class="chk-label"><input type="checkbox" id="os-otro"> Otro</label></div>
   <hr class="divider">
-  <hr class="divider">
-  <!-- INSUMOS -->
-  <div class="sub-label">Insumos</div>
+
+  <!-- LO QUE LE COBRÁS AL CLIENTE -->
+  <div class="sub-label" style="color:var(--ok)">↑ Lo que le cobrás al cliente</div>
+
+  <div class="sub-label">Insumos cobrados</div>
   <div id="ot-ins-lista" style="margin-bottom:8px"></div>
-  <div class="fg3" style="margin-bottom:10px">
-    <div class="fr" style="margin-bottom:0"><input id="ot-ins-desc" placeholder="Descripción (ej: cubiertas)"></div>
+  <div class="fg3" style="margin-bottom:6px">
+    <div class="fr" style="margin-bottom:0"><input id="ot-ins-desc" placeholder="Ej: cubiertas"></div>
     <div class="fr" style="margin-bottom:0"><input id="ot-ins-val" type="text" inputmode="numeric" placeholder="Valor $"></div>
     <button class="btn" onclick="agregarItemOT('ins')" style="height:34px"><i class="ti ti-plus"></i> Agregar</button>
   </div>
-  <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);margin-bottom:12px">
-    <span>Total insumos:</span><span class="eg" id="ot-ins-total">$0</span>
+  <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);margin-bottom:10px">
+    <span>Total insumos:</span><span class="ing" id="ot-ins-total">$0</span>
   </div>
-  <!-- MANO DE OBRA -->
-  <div class="sub-label">Mano de obra</div>
+
+  <div class="sub-label">Mano de obra cobrada</div>
   <div id="ot-mo-lista" style="margin-bottom:8px"></div>
-  <div class="fg3" style="margin-bottom:10px">
-    <div class="fr" style="margin-bottom:0"><input id="ot-mo-desc" placeholder="Descripción (ej: alineación)"></div>
+  <div class="fg3" style="margin-bottom:6px">
+    <div class="fr" style="margin-bottom:0"><input id="ot-mo-desc" placeholder="Ej: alineación"></div>
     <div class="fr" style="margin-bottom:0"><input id="ot-mo-val" type="text" inputmode="numeric" placeholder="Valor $"></div>
     <button class="btn" onclick="agregarItemOT('mo')" style="height:34px"><i class="ti ti-plus"></i> Agregar</button>
   </div>
-  <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);margin-bottom:12px">
-    <span>Total mano de obra:</span><span class="eg" id="ot-mo-total">$0</span>
+  <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);margin-bottom:10px">
+    <span>Total mano de obra:</span><span class="ing" id="ot-mo-total">$0</span>
   </div>
+
+  <!-- TOTAL COBRADO -->
+  <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:var(--r);padding:10px 14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center">
+    <span style="font-size:12px;font-weight:600;color:var(--ok)">Total cobrado al cliente</span>
+    <span style="font-size:18px;font-weight:700;color:var(--ok)" id="ot-total-cobrado">$0</span>
+  </div>
+
   <hr class="divider">
-  <div class="fg2">
-    <div class="fr"><label>Precio del servicio ($)</label><input id="ot-pr" type="text" inputmode="numeric" placeholder="0"></div>
-    <div class="fr"><label>¿Pagó?</label><select id="ot-pagado"><option value="false">No</option><option value="true">Sí</option></select></div>
+
+  <!-- COSTO PROVEEDOR -->
+  <div class="sub-label" style="color:var(--er)">↓ Costo para vos (proveedores)</div>
+  <div id="ot-prov-lista" style="margin-bottom:8px"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;margin-bottom:6px;align-items:end">
+    <div class="fr" style="margin-bottom:0"><input id="ot-prov-desc" placeholder="Ej: cubiertas costo"></div>
+    <div class="fr" style="margin-bottom:0"><input id="ot-prov-val" type="text" inputmode="numeric" placeholder="Costo $"></div>
+    <div class="fr" style="margin-bottom:0"><select id="ot-prov-sel" style="width:100%;padding:8px 10px;border-radius:var(--r);border:1px solid var(--bd2);background:var(--s2);color:var(--tx);font-size:11px"><option value="">Sin proveedor</option></select></div>
+    <button class="btn" onclick="agregarItemProvOT()" style="height:34px"><i class="ti ti-plus"></i></button>
   </div>
-  <div class="fr"><label>Descripción</label><textarea id="ot-desc"></textarea></div>
+  <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);margin-bottom:10px">
+    <span>Total costo proveedor:</span><span class="eg" id="ot-prov-total">$0</span>
+  </div>
+
+  <!-- NETO -->
+  <div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:var(--r);padding:10px 14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center">
+    <span style="font-size:12px;font-weight:600;color:var(--ac)">Neto (cobrado − costo)</span>
+    <span style="font-size:18px;font-weight:700;color:var(--ac)" id="ot-neto">$0</span>
+  </div>
+
+  <hr class="divider">
+
+  <!-- PAGO -->
+  <div class="fg2">
+    <div class="fr"><label>¿Pagó?</label><select id="ot-pagado" onchange="toggleCajaPago()"><option value="false">No</option><option value="true">Sí</option></select></div>
+    <div class="fr" id="ot-caja-pago-row" style="display:none"><label>Caja donde entró</label>
+      <select id="ot-pago-caja">
+        <option value="1">1 — Efectivo</option><option value="2">2 — Banco</option><option value="3">3 — Jorge</option>
+        <option value="4">4 — Cheque</option><option value="5">5 — Mariana</option><option value="6">6 — Martín</option>
+        <option value="7">7 — Lucho</option><option value="8">8 — USD</option>
+      </select>
+    </div>
+  </div>
+  <div class="fr"><label>Descripción / notas</label><textarea id="ot-desc"></textarea></div>
   <div class="ma"><button class="btn" onclick="closeM('m-ot')">Cancelar</button><button class="btn btn-p" onclick="guardarOT()">Guardar</button></div>
 </div></div>
 
@@ -1084,7 +1123,7 @@ async function navTo(pg,el){
   document.getElementById('topbar-title').textContent=titles[pg]||pg;
   document.getElementById('topbar-actions').innerHTML=getActions(pg);
   closeDetail();
-  const r={dashboard:loadDash,'leads-autos':()=>loadLeadsA().then(()=>renderKanban('autos')),'contactos-autos':()=>loadLeadsA().then(renderContactosAutos),'leads-taller':()=>loadLeadsT().then(()=>renderKanban('taller')),'clientes-taller':()=>loadCLT().then(renderClientesTaller),inventario:()=>loadVeh().then(renderInv),ventas:()=>loadVentas().then(renderVentas),gestoria:()=>Promise.all([loadGestoria(),loadVeh()]).then(renderGestoria),'caja-vehiculos':loadCajaVehiculos,ordenes:()=>Promise.all([loadOT(),loadCLT()]).then(()=>renderOT()),'caja-taller':loadCajaTaller,'costos-fijos':()=>loadCF().then(renderCF),recordatorios:()=>loadRecs().then(renderRecs),'cc-taller':()=>{const loads=[loadCCT(),loadOT()];if(SESSION.rol==='admin')loads.push(loadCLT());return Promise.all(loads).then(()=>renderCCT());},'cc-vehiculos':()=>Promise.all([loadCCV(),loadVeh()]).then(()=>renderCCVList()),'costos-fijos':()=>Promise.all([loadCF(),loadCFPagos()]).then(()=>renderCF()),proveedores:()=>loadProv().then(renderProv)};
+  const r={dashboard:loadDash,'leads-autos':()=>loadLeadsA().then(()=>renderKanban('autos')),'contactos-autos':()=>loadLeadsA().then(renderContactosAutos),'leads-taller':()=>loadLeadsT().then(()=>renderKanban('taller')),'clientes-taller':()=>loadCLT().then(renderClientesTaller),inventario:()=>loadVeh().then(renderInv),ventas:()=>loadVentas().then(renderVentas),gestoria:()=>Promise.all([loadGestoria(),loadVeh()]).then(renderGestoria),'caja-vehiculos':loadCajaVehiculos,ordenes:()=>Promise.all([loadOT(),loadCLT(),loadProv()]).then(()=>renderOT()),'caja-taller':loadCajaTaller,'costos-fijos':()=>loadCF().then(renderCF),recordatorios:()=>loadRecs().then(renderRecs),'cc-taller':()=>{const loads=[loadCCT(),loadOT()];if(SESSION.rol==='admin')loads.push(loadCLT());return Promise.all(loads).then(()=>renderCCT());},'cc-vehiculos':()=>Promise.all([loadCCV(),loadVeh()]).then(()=>renderCCVList()),'costos-fijos':()=>Promise.all([loadCF(),loadCFPagos()]).then(()=>renderCF()),proveedores:()=>loadProv().then(renderProv)};
   if(r[pg])await r[pg]();
 }
 
@@ -1796,17 +1835,18 @@ async function elimVeh(id){if(!confirm('¿Eliminar vehículo?'))return;setSyncSt
 
 // OT
 // Estado temporal de ítems de OT
-let OT_INS=[],OT_MO=[];
+let OT_INS=[],OT_MO=[],OT_PROV=[];
 
 function renderItemsOT(tipo,containerId,totalId){
   const items=tipo==='ins'?OT_INS:OT_MO;
   const cont=document.getElementById(containerId);if(!cont)return;
   const total=items.reduce((a,i)=>a+(i.valor||0),0);
   const tel=document.getElementById(totalId);if(tel)tel.textContent=fmt(total);
-  if(!items.length){cont.innerHTML='';return;}
+  if(!items.length){cont.innerHTML='';actualizarTotalesOT();return;}
   cont.innerHTML=`<div class="tw" style="margin-bottom:6px"><table><thead><tr><th>Descripción</th><th>Valor</th><th></th></tr></thead><tbody>${
-    items.map((it,idx)=>`<tr><td style="font-size:11px">${it.desc}</td><td class="eg" style="font-size:11px">${fmt(it.valor)}</td><td><button class="icon-btn" onclick="elimItemOT('${tipo}',${idx})"><i class="ti ti-trash"></i></button></td></tr>`).join('')
+    items.map((it,idx)=>`<tr><td style="font-size:11px">${it.desc}</td><td class="ing" style="font-size:11px">${fmt(it.valor)}</td><td><button class="icon-btn" onclick="elimItemOT('${tipo}',${idx})"><i class="ti ti-trash"></i></button></td></tr>`).join('')
   }</tbody></table></div>`;
+  actualizarTotalesOT();
 }
 function agregarItemOT(tipo){
   const descId=tipo==='ins'?'ot-ins-desc':'ot-mo-desc';
@@ -1821,6 +1861,42 @@ function agregarItemOT(tipo){
 function elimItemOT(tipo,idx){
   if(tipo==='ins')OT_INS.splice(idx,1);else OT_MO.splice(idx,1);
   renderItemsOT(tipo,tipo==='ins'?'ot-ins-lista':'ot-mo-lista',tipo==='ins'?'ot-ins-total':'ot-mo-total');
+  actualizarTotalesOT();
+}
+function actualizarTotalesOT(){
+  const totalIns=OT_INS.reduce((a,i)=>a+(i.valor||0),0);
+  const totalMo=OT_MO.reduce((a,i)=>a+(i.valor||0),0);
+  const totalProv=OT_PROV.reduce((a,i)=>a+(i.valor||0),0);
+  const totalCobrado=totalIns+totalMo;
+  const neto=totalCobrado-totalProv;
+  const set=(id,v,col)=>{const el=document.getElementById(id);if(el){el.textContent=v;if(col)el.style.color=col;}};
+  set('ot-total-cobrado',fmt(totalCobrado));
+  set('ot-prov-total',fmt(totalProv));
+  set('ot-neto',fmt(neto),neto>=0?'var(--ac)':'var(--er)');
+}
+function renderItemsProvOT(){
+  const cont=document.getElementById('ot-prov-lista');if(!cont)return;
+  if(!OT_PROV.length){cont.innerHTML='';actualizarTotalesOT();return;}
+  cont.innerHTML=`<div class="tw" style="margin-bottom:6px"><table><thead><tr><th>Descripción</th><th>Proveedor</th><th>Costo</th><th></th></tr></thead><tbody>${
+    OT_PROV.map((it,idx)=>`<tr><td style="font-size:11px">${it.desc}</td><td style="font-size:10px;color:var(--tx3)">${it.provNombre||'—'}</td><td class="eg" style="font-size:11px">${fmt(it.valor)}</td><td><button class="icon-btn" onclick="elimItemProvOT(${idx})"><i class="ti ti-trash"></i></button></td></tr>`).join('')
+  }</tbody></table></div>`;
+  actualizarTotalesOT();
+}
+function agregarItemProvOT(){
+  const desc=document.getElementById('ot-prov-desc').value.trim();
+  const valor=getMaskValue('ot-prov-val');
+  const sel=document.getElementById('ot-prov-sel');
+  const provId=sel?.value||'';
+  const provNombre=sel?.options[sel.selectedIndex]?.text||'';
+  if(!desc||!valor)return alert('Completá descripción y costo');
+  OT_PROV.push({desc,valor,provId,provNombre});
+  document.getElementById('ot-prov-desc').value='';document.getElementById('ot-prov-val').value='';
+  renderItemsProvOT();
+}
+function elimItemProvOT(idx){OT_PROV.splice(idx,1);renderItemsProvOT();}
+function toggleCajaPago(){
+  const pago=document.getElementById('ot-pagado').value==='true';
+  document.getElementById('ot-caja-pago-row').style.display=pago?'':'none';
 }
 
 // Estado temporal para edición
@@ -1853,10 +1929,17 @@ function elimItemOTEdit(tipo,idx){
 }
 
 function abrirOT(){
-  OT_INS=[];OT_MO=[];
+  OT_INS=[];OT_MO=[];OT_PROV=[];
   renderItemsOT('ins','ot-ins-lista','ot-ins-total');
   renderItemsOT('mo','ot-mo-lista','ot-mo-total');
+  renderItemsProvOT();
+  actualizarTotalesOT();
   document.getElementById('ot-fing').value=hoyD();
+  document.getElementById('ot-pagado').value='false';
+  document.getElementById('ot-caja-pago-row').style.display='none';
+  // poblar selector de proveedores
+  const sel=document.getElementById('ot-prov-sel');
+  if(sel)sel.innerHTML='<option value="">Sin proveedor</option>'+C.prov.map(p=>`<option value="${p.id}">${p.nombre}</option>`).join('');
   const esAdmin=SESSION.rol==='admin';
   const tabExistente=document.getElementById('ot-tab-existente');
   if(esAdmin){
@@ -1925,11 +2008,52 @@ async function guardarOT(){
   const mo=OT_MO.reduce((a,i)=>a+(i.valor||0),0);
   const pr=getMaskValue('ot-pr');
   setSyncStatus('syncing');
-  await db.from('ordenes_trabajo').insert({cliente:`${nombreCliente}${vehiculoCliente?' — '+vehiculoCliente:''}`,cliente_id:clienteId,responsable:document.getElementById('ot-resp').value,estado:document.getElementById('ot-est').value,servicios:svcs.length?svcs:['General'],insumos:ins,mano_obra:mo,insumos_items:OT_INS,mano_obra_items:OT_MO,precio_cobrado:pr,descripcion:document.getElementById('ot-desc').value,fecha_ingreso:document.getElementById('ot-fing').value||hoyD(),fecha_entrega:document.getElementById('ot-fent').value||null,pagado:document.getElementById('ot-pagado').value==='true'});
+  const totalCobrado=ins+mo;
+  const totalProv=OT_PROV.reduce((a,i)=>a+(i.valor||0),0);
+  const pagado=document.getElementById('ot-pagado').value==='true';
+  const cajaPago=parseInt(document.getElementById('ot-pago-caja')?.value||'1');
+  await db.from('ordenes_trabajo').insert({
+    cliente:`${nombreCliente}${vehiculoCliente?' — '+vehiculoCliente:''}`,
+    cliente_id:clienteId,
+    responsable:document.getElementById('ot-resp').value,
+    estado:document.getElementById('ot-est').value,
+    servicios:svcs.length?svcs:['General'],
+    insumos:ins,mano_obra:mo,
+    insumos_items:OT_INS,mano_obra_items:OT_MO,
+    precio_cobrado:totalCobrado,
+    costo_proveedor_items:OT_PROV,
+    costo_proveedor_total:totalProv,
+    pago_caja:cajaPago,
+    descripcion:document.getElementById('ot-desc').value,
+    fecha_ingreso:document.getElementById('ot-fing').value||hoyD(),
+    fecha_entrega:document.getElementById('ot-fent').value||null,
+    pagado
+  });
+  // Si pagó → entra a caja taller
+  if(pagado&&totalCobrado>0){
+    await db.from('caja_taller').insert({
+      detalle:`Cobro OT — ${nombreCliente}`,
+      subcuenta:cajaPago,categoria:'Cobro trabajo',
+      cobrado:totalCobrado,pagado:0,
+      fecha:hoyD(),tipo_mov:'movimiento'
+    });
+  }
+  // Vincular costos a CC de proveedores
+  for(const prov of OT_PROV){
+    if(prov.provId){
+      const p=C.prov.find(x=>String(x.id)===String(prov.provId));
+      if(p){
+        const items=[...(p.items||[]),{descripcion:`OT ${nombreCliente} — ${prov.desc}`,valor:prov.valor,fecha:hoyD()}];
+        await db.from('cc_proveedores').update({items}).eq('id',p.id);
+        p.items=items;
+      }
+    }
+  }
   setSyncStatus('ok');closeM('m-ot');
-  ['ot-pr','ot-desc','ot-fing','ot-fent','ot-nuevo-nombre','ot-nuevo-tel','ot-nuevo-veh','ot-nuevo-pat'].forEach(id=>document.getElementById(id).value='');
+  ['ot-desc','ot-fing','ot-fent','ot-nuevo-nombre','ot-nuevo-tel','ot-nuevo-veh','ot-nuevo-pat'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('ot-pagado').value='false';
-  OT_INS=[];OT_MO=[];
+  document.getElementById('ot-caja-pago-row').style.display='none';
+  OT_INS=[];OT_MO=[];OT_PROV=[];
   svcsReset('os-');await loadOT();renderOT();
 }
 function verDetalleOT(id){

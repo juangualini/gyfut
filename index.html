@@ -1375,7 +1375,19 @@ async function agregarPagoCC(){
   }
   // marcar saldada si corresponde
   const t=totalesCC(c);
-  if(t.deuda<=0&&c.estado!=='saldada'){await db.from(tabla).update({estado:'saldada'}).eq('id',id);c.estado='saldada';}
+  if(t.deuda<=0&&c.estado!=='saldada'){
+    await db.from(tabla).update({estado:'saldada'}).eq('id',id);
+    c.estado='saldada';
+    // si es CC de taller → marcar OTs del cliente como pagadas
+    if(tipo==='taller'&&c.cliente_id){
+      const otsPendientes=C.ots.filter(o=>o.cliente_id===c.cliente_id&&!o.pagado);
+      for(const ot of otsPendientes){
+        await db.from('ordenes_trabajo').update({pagado:true,pago_caja:subcuenta}).eq('id',ot.id);
+        ot.pagado=true;
+      }
+      if(otsPendientes.length>0)renderOT();
+    }
+  }
   setSyncStatus('ok');
   document.getElementById('ccd-pago-monto').value='';document.getElementById('ccd-pago-nota').value='';
   renderDetalleCC();

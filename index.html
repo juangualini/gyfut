@@ -235,7 +235,7 @@ tr:hover td{background:var(--s2)}
     <div class="nl">Taller</div>
     <div class="ni" onclick="navTo('ordenes',this)"><i class="ti ti-tool"></i> Órdenes de trabajo</div>
     <div class="ni" onclick="navTo('caja-taller',this)"><i class="ti ti-cash"></i> Caja taller</div>
-    <div class="ni restricted-hide" data-perm="admin" onclick="navTo('cc-taller',this)"><i class="ti ti-receipt-2"></i> Cuenta corriente</div>
+    <div class="ni" onclick="navTo('cc-taller',this)"><i class="ti ti-receipt-2"></i> Cuenta corriente</div>
   </div>
   <div style="padding:4px 0" data-perm="admin">
     <div class="nl">Admin</div>
@@ -1070,7 +1070,7 @@ function getActions(pg){
     return`<button class="btn btn-p" onclick="abrirMovDia()"><i class="ti ti-plus"></i> Movimiento</button>`;
   }
   if(pg==='costos-fijos')return'<button class="btn btn-p" onclick="openM(\'m-cf\')"><i class="ti ti-plus"></i> Agregar costo</button>';
-  if(pg==='cc-taller')return'<button class="btn btn-p" onclick="abrirCCT()"><i class="ti ti-plus"></i> Nueva cuenta</button>';
+  if(pg==='cc-taller')return SESSION.rol==='admin'?'<button class="btn btn-p" onclick="abrirCCT()"><i class="ti ti-plus"></i> Nueva cuenta</button>':'';
   if(pg==='cc-vehiculos')return'<button class="btn btn-p" onclick="abrirCCV()"><i class="ti ti-plus"></i> Nueva cuenta</button>';
   if(pg==='proveedores')return'<button class="btn btn-p" onclick="openM(\'m-prov\')"><i class="ti ti-plus"></i> Nuevo proveedor</button>';
   return'';
@@ -1084,7 +1084,7 @@ async function navTo(pg,el){
   document.getElementById('topbar-title').textContent=titles[pg]||pg;
   document.getElementById('topbar-actions').innerHTML=getActions(pg);
   closeDetail();
-  const r={dashboard:loadDash,'leads-autos':()=>loadLeadsA().then(()=>renderKanban('autos')),'contactos-autos':()=>loadLeadsA().then(renderContactosAutos),'leads-taller':()=>loadLeadsT().then(()=>renderKanban('taller')),'clientes-taller':()=>loadCLT().then(renderClientesTaller),inventario:()=>loadVeh().then(renderInv),ventas:()=>loadVentas().then(renderVentas),gestoria:()=>Promise.all([loadGestoria(),loadVeh()]).then(renderGestoria),'caja-vehiculos':loadCajaVehiculos,ordenes:()=>Promise.all([loadOT(),loadCLT()]).then(()=>renderOT()),'caja-taller':loadCajaTaller,'costos-fijos':()=>loadCF().then(renderCF),recordatorios:()=>loadRecs().then(renderRecs),'cc-taller':()=>Promise.all([loadCCT(),loadCLT(),loadOT()]).then(()=>renderCCT()),'cc-vehiculos':()=>Promise.all([loadCCV(),loadVeh()]).then(()=>renderCCVList()),'costos-fijos':()=>Promise.all([loadCF(),loadCFPagos()]).then(()=>renderCF()),proveedores:()=>loadProv().then(renderProv)};
+  const r={dashboard:loadDash,'leads-autos':()=>loadLeadsA().then(()=>renderKanban('autos')),'contactos-autos':()=>loadLeadsA().then(renderContactosAutos),'leads-taller':()=>loadLeadsT().then(()=>renderKanban('taller')),'clientes-taller':()=>loadCLT().then(renderClientesTaller),inventario:()=>loadVeh().then(renderInv),ventas:()=>loadVentas().then(renderVentas),gestoria:()=>Promise.all([loadGestoria(),loadVeh()]).then(renderGestoria),'caja-vehiculos':loadCajaVehiculos,ordenes:()=>Promise.all([loadOT(),loadCLT()]).then(()=>renderOT()),'caja-taller':loadCajaTaller,'costos-fijos':()=>loadCF().then(renderCF),recordatorios:()=>loadRecs().then(renderRecs),'cc-taller':()=>{const loads=[loadCCT(),loadOT()];if(SESSION.rol==='admin')loads.push(loadCLT());return Promise.all(loads).then(()=>renderCCT());},'cc-vehiculos':()=>Promise.all([loadCCV(),loadVeh()]).then(()=>renderCCVList()),'costos-fijos':()=>Promise.all([loadCF(),loadCFPagos()]).then(()=>renderCF()),proveedores:()=>loadProv().then(renderProv)};
   if(r[pg])await r[pg]();
 }
 
@@ -1195,7 +1195,8 @@ function renderCCT(){
   if(!C.cct.length){tb.innerHTML='<tr><td colspan="6"><div class="empty"><i class="ti ti-receipt-2"></i>Sin cuentas corrientes.</div></td></tr>';return;}
   tb.innerHTML=C.cct.map(c=>{
     const t=totalesCC(c);
-    return`<tr style="cursor:pointer" onclick="abrirDetalleCC(${c.id},'taller')"><td><strong>${c.cliente_texto}</strong></td><td>${fmt(t.total)}</td><td class="ing">${fmt(t.pagado)}</td><td class="${t.deuda>0?'eg':'ing'}">${fmt(t.deuda)}</td><td>${b(c.estado==='saldada'?'bg':'ba',c.estado==='saldada'?'Saldada':'Abierta')}</td><td onclick="event.stopPropagation()"><button class="icon-btn" onclick="elimCC(${c.id},'taller')"><i class="ti ti-trash"></i></button></td></tr>`;
+    const esAdmin=SESSION.rol==='admin';
+    return`<tr style="cursor:pointer" onclick="abrirDetalleCC(${c.id},'taller')"><td><strong>${c.cliente_texto}</strong></td><td>${fmt(t.total)}</td><td class="ing">${fmt(t.pagado)}</td><td class="${t.deuda>0?'eg':'ing'}">${fmt(t.deuda)}</td><td>${b(c.estado==='saldada'?'bg':'ba',c.estado==='saldada'?'Saldada':'Abierta')}</td><td onclick="event.stopPropagation()">${esAdmin?`<button class="icon-btn" onclick="elimCC(${c.id},'taller')"><i class="ti ti-trash"></i></button>`:''}</td></tr>`;
   }).join('');
 }
 async function elimCC(id,tipo){if(!confirm('¿Eliminar cuenta corriente?'))return;setSyncStatus('syncing');await db.from(tipo==='taller'?'cc_taller':'cc_vehiculos').delete().eq('id',id);setSyncStatus('ok');if(tipo==='taller'){await loadCCT();renderCCT();}else{await loadCCV();renderCCVList();}}

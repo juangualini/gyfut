@@ -416,6 +416,21 @@ tr:hover td{background:var(--s2)}
 
     <!-- ÓRDENES -->
     <div class="page" id="page-ordenes">
+      <div class="sbar">
+        <input id="ot-q" placeholder="Buscar cliente..." oninput="renderOT()">
+        <select id="ot-orden" onchange="renderOT()">
+          <option value="reciente">Más reciente primero</option>
+          <option value="alfa">Alfabético (A→Z)</option>
+          <option value="estado">Por estado</option>
+        </select>
+        <select id="ot-filtro-estado" onchange="renderOT()">
+          <option value="">Todos los estados</option>
+          <option>Ingresado</option>
+          <option>En proceso</option>
+          <option>Listo</option>
+          <option>Entregado</option>
+        </select>
+      </div>
       <div class="tw"><table><thead><tr><th>N°</th><th>Cliente</th><th>Servicios</th><th>Asignado</th><th>Ingreso</th><th>Entrega</th><th class="restricted-hide" data-perm="admin">Costo</th><th class="restricted-hide" data-perm="admin">Cobrado</th><th class="restricted-hide" data-perm="admin">Margen</th><th>Pagó</th><th>Estado</th><th></th></tr></thead><tbody id="tb-ot"></tbody></table></div>
     </div>
 
@@ -619,7 +634,7 @@ tr:hover td{background:var(--s2)}
     <div class="fg2"><div class="fr"><label>Vehículo</label><input id="ot-nuevo-veh" placeholder="VW Vento 2019"></div><div class="fr"><label>Patente</label><input id="ot-nuevo-pat" placeholder="AB123CD"></div></div>
   </div>
   <hr class="divider">
-  <div class="fg2"><div class="fr"><label>Asignado a</label><select id="ot-resp"><option>Martín (mecánica)</option><option>Theo (detailing/PPF)</option><option>Ambos</option></select></div><div class="fr"><label>Estado</label><select id="ot-est"><option>Ingresado</option><option>En proceso</option><option>Listo</option><option>Entregado</option></select></div></div>
+  <div class="fg2"><div class="fr"><label>Asignado a</label><select id="ot-resp"><option>Martín</option><option>Theo</option><option>Lucho</option><option>Lucas</option><option>Elías</option><option>Georgi</option><option>Martín + Theo</option><option>Todos</option></select></div><div class="fr"><label>Estado</label><select id="ot-est"><option>Ingresado</option><option>En proceso</option><option>Listo</option><option>Entregado</option></select></div></div>
   <div class="fg2"><div class="fr"><label>Fecha de ingreso</label><input id="ot-fing" type="date"></div><div class="fr"><label>Fecha de entrega</label><input id="ot-fent" type="date"></div></div>
   <div class="sub-label">Servicios</div>
   <div class="chk-group"><label class="chk-label"><input type="checkbox" id="os-mec"> Mecánica</label><label class="chk-label"><input type="checkbox" id="os-det"> Detailing</label><label class="chk-label"><input type="checkbox" id="os-ppf"> PPF</label><label class="chk-label"><input type="checkbox" id="os-lav"> Lavado</label><label class="chk-label"><input type="checkbox" id="os-otro"> Otro</label></div>
@@ -863,7 +878,7 @@ tr:hover td{background:var(--s2)}
 </div></div>
 
 <!-- DETALLE CUENTA CORRIENTE (debe y haber) -->
-<div class="mo" id="m-cc-detalle"><div class="modal" style="width:620px">
+<div class="mo" id="m-cc-detalle"><div class="modal" style="width:640px">
   <div class="mt" id="ccd-titulo">Cuenta corriente</div>
   <input type="hidden" id="ccd-id" value="">
   <input type="hidden" id="ccd-tipo" value="">
@@ -872,6 +887,7 @@ tr:hover td{background:var(--s2)}
     <div class="sc" style="padding:10px 12px"><div class="sl">Pagado</div><div class="sv ing" id="ccd-pagado" style="font-size:16px">$0</div></div>
     <div class="sc" style="padding:10px 12px"><div class="sl">Deuda</div><div class="sv eg" id="ccd-deuda" style="font-size:16px">$0</div></div>
   </div>
+  <div id="ccd-cruce"></div>
   <div class="sub-label">Debe — ítems del trabajo / trato</div>
   <div class="tw" style="margin-bottom:10px">
     <table><thead><tr><th>Fecha</th><th>Descripción</th><th>Valor</th><th></th></tr></thead><tbody id="ccd-items"></tbody></table>
@@ -1041,7 +1057,7 @@ async function navTo(pg,el){
   document.getElementById('topbar-title').textContent=titles[pg]||pg;
   document.getElementById('topbar-actions').innerHTML=getActions(pg);
   closeDetail();
-  const r={dashboard:loadDash,'leads-autos':()=>loadLeadsA().then(()=>renderKanban('autos')),'contactos-autos':()=>loadLeadsA().then(renderContactosAutos),'leads-taller':()=>loadLeadsT().then(()=>renderKanban('taller')),'clientes-taller':()=>loadCLT().then(renderClientesTaller),inventario:()=>loadVeh().then(renderInv),ventas:()=>loadVentas().then(renderVentas),gestoria:()=>Promise.all([loadGestoria(),loadVeh()]).then(renderGestoria),'caja-vehiculos':loadCajaVehiculos,ordenes:()=>Promise.all([loadOT(),loadCLT()]).then(()=>renderOT()),'caja-taller':loadCajaTaller,'costos-fijos':()=>loadCF().then(renderCF),recordatorios:()=>loadRecs().then(renderRecs),'cc-taller':()=>Promise.all([loadCCT(),loadCLT()]).then(()=>renderCCT()),'cc-vehiculos':()=>Promise.all([loadCCV(),loadVeh()]).then(()=>renderCCVList()),'costos-fijos':()=>Promise.all([loadCF(),loadCFPagos()]).then(()=>renderCF()),proveedores:()=>loadProv().then(renderProv)};
+  const r={dashboard:loadDash,'leads-autos':()=>loadLeadsA().then(()=>renderKanban('autos')),'contactos-autos':()=>loadLeadsA().then(renderContactosAutos),'leads-taller':()=>loadLeadsT().then(()=>renderKanban('taller')),'clientes-taller':()=>loadCLT().then(renderClientesTaller),inventario:()=>loadVeh().then(renderInv),ventas:()=>loadVentas().then(renderVentas),gestoria:()=>Promise.all([loadGestoria(),loadVeh()]).then(renderGestoria),'caja-vehiculos':loadCajaVehiculos,ordenes:()=>Promise.all([loadOT(),loadCLT()]).then(()=>renderOT()),'caja-taller':loadCajaTaller,'costos-fijos':()=>loadCF().then(renderCF),recordatorios:()=>loadRecs().then(renderRecs),'cc-taller':()=>Promise.all([loadCCT(),loadCLT(),loadOT()]).then(()=>renderCCT()),'cc-vehiculos':()=>Promise.all([loadCCV(),loadVeh()]).then(()=>renderCCVList()),'costos-fijos':()=>Promise.all([loadCF(),loadCFPagos()]).then(()=>renderCF()),proveedores:()=>loadProv().then(renderProv)};
   if(r[pg])await r[pg]();
 }
 
@@ -1201,6 +1217,7 @@ function abrirDetalleCC(id,tipo){
   const lista=tipo==='taller'?C.cct:C.ccv;
   const c=lista.find(x=>x.id===id);if(!c)return;
   document.getElementById('ccd-titulo').textContent=`${c.cliente_texto}${c.vehiculo_texto?' — '+c.vehiculo_texto:''}`;
+  document.getElementById('ccd-cruce').innerHTML='';
   renderDetalleCC();
   openM('m-cc-detalle');
 }
@@ -1214,6 +1231,22 @@ function renderDetalleCC(){
   document.getElementById('ccd-pagado').textContent=fmt(t.pagado);
   document.getElementById('ccd-deuda').textContent=fmt(t.deuda);
   document.getElementById('ccd-deuda').style.color=t.deuda>0?'var(--er)':'var(--ok)';
+  // CRUCE: costo real desde OTs del cliente (solo taller)
+  if(tipo==='taller'&&c.cliente_id){
+    const otsCliente=C.ots.filter(o=>o.cliente_id===c.cliente_id);
+    const costoOTs=otsCliente.reduce((a,o)=>a+(parseFloat(o.insumos)||0)+(parseFloat(o.mano_obra)||0),0);
+    const margen=t.total-costoOTs;
+    const margenPct=t.total>0?Math.round(margen/t.total*100):0;
+    const cruce=document.getElementById('ccd-cruce');
+    if(cruce)cruce.innerHTML=`
+      <div class="sg g4" style="margin-bottom:10px">
+        <div class="sc" style="padding:10px 12px"><div class="sl">Cobrado al cliente</div><div class="sv ing" style="font-size:14px">${fmt(t.total)}</div></div>
+        <div class="sc" style="padding:10px 12px"><div class="sl">Costo real (OTs)</div><div class="sv eg" style="font-size:14px">${fmt(costoOTs)}</div></div>
+        <div class="sc" style="padding:10px 12px"><div class="sl">Margen</div><div class="sv ${margen>=0?'ing':'eg'}" style="font-size:14px">${fmt(margen)}</div></div>
+        <div class="sc" style="padding:10px 12px"><div class="sl">% Margen</div><div class="sv ${margen>=0?'ing':'eg'}" style="font-size:14px">${margenPct}%</div></div>
+      </div>
+      ${otsCliente.length?`<div style="font-size:10px;color:var(--tx3);margin-bottom:10px">${otsCliente.length} orden(es) de trabajo vinculadas</div>`:'<div style="font-size:10px;color:var(--tx3);margin-bottom:10px">Sin órdenes de trabajo vinculadas a este cliente</div>'}`;
+  }
   const items=c.items||[];
   document.getElementById('ccd-items').innerHTML=items.length?items.map((it,idx)=>`<tr><td style="font-size:10px;color:var(--tx3)">${it.fecha||'—'}</td><td>${it.descripcion}</td><td>${fmt(it.valor)}</td><td><button class="icon-btn" onclick="elimItemCC(${idx})"><i class="ti ti-trash"></i></button></td></tr>`).join(''):'<tr><td colspan="4"><div class="empty" style="padding:14px"><i class="ti ti-list"></i>Sin ítems.</div></td></tr>';
   const pagos=c.pagos||[];
@@ -1813,7 +1846,7 @@ function verDetalleOT(id){
     <input type="hidden" id="otd-id" value="${o.id}">
     <div class="fr"><label>Cliente</label><input id="otd-cliente" value="${(o.cliente||'').replace(/"/g,'&quot;')}"></div>
     ${esAdmin?`<div class="fg2"><div class="fr"><label>Teléfono</label><input id="otd-tel" value="${c?.telefono||''}" ${c?'':'placeholder="Sin cliente vinculado"'}></div><div class="fr"><label>Patente</label><input id="otd-pat" value="${c?.patente||''}" ${c?'':'placeholder="Sin cliente vinculado"'}></div></div>`:''}
-    <div class="fg2"><div class="fr"><label>Asignado a</label><select id="otd-resp"><option ${o.responsable==='Martín (mecánica)'?'selected':''}>Martín (mecánica)</option><option ${o.responsable==='Theo (detailing/PPF)'?'selected':''}>Theo (detailing/PPF)</option><option ${o.responsable==='Ambos'?'selected':''}>Ambos</option></select></div><div class="fr"><label>Estado</label><select id="otd-estado"><option ${o.estado==='Ingresado'?'selected':''}>Ingresado</option><option ${o.estado==='En proceso'?'selected':''}>En proceso</option><option ${o.estado==='Listo'?'selected':''}>Listo</option><option ${o.estado==='Entregado'?'selected':''}>Entregado</option></select></div></div>
+    <div class="fg2"><div class="fr"><label>Asignado a</label><select id="otd-resp"><option ${o.responsable==='Martín'?'selected':''}>Martín</option><option ${o.responsable==='Theo'?'selected':''}>Theo</option><option ${o.responsable==='Lucho'?'selected':''}>Lucho</option><option ${o.responsable==='Lucas'?'selected':''}>Lucas</option><option ${o.responsable==='Elías'?'selected':''}>Elías</option><option ${o.responsable==='Georgi'?'selected':''}>Georgi</option><option ${o.responsable==='Martín + Theo'?'selected':''}>Martín + Theo</option><option ${o.responsable==='Todos'?'selected':''}>Todos</option></select></div><div class="fr"><label>Estado</label><select id="otd-estado"><option ${o.estado==='Ingresado'?'selected':''}>Ingresado</option><option ${o.estado==='En proceso'?'selected':''}>En proceso</option><option ${o.estado==='Listo'?'selected':''}>Listo</option><option ${o.estado==='Entregado'?'selected':''}>Entregado</option></select></div></div>
     <div class="fg2"><div class="fr"><label>Fecha ingreso</label><input id="otd-fing" type="date" value="${o.fecha_ingreso||''}"></div><div class="fr"><label>Fecha entrega</label><input id="otd-fent" type="date" value="${o.fecha_entrega||''}"></div></div>
     <div class="sub-label">Servicios</div>
     <div class="chk-group">
@@ -1860,10 +1893,19 @@ function renderOT(){
   const esAdmin=SESSION.rol==='admin';
   const tb=document.getElementById('tb-ot');
   const bm={'Ingresado':'bgr','En proceso':'bb','Listo':'bg','Entregado':'bgr'};
-  tb.innerHTML=C.ots.length?C.ots.map(o=>{
+  const q=((document.getElementById('ot-q')||{}).value||'').toLowerCase();
+  const orden=(document.getElementById('ot-orden')||{}).value||'reciente';
+  const filtroEstado=(document.getElementById('ot-filtro-estado')||{}).value||'';
+  let lista=[...C.ots];
+  if(q)lista=lista.filter(o=>(o.cliente||'').toLowerCase().includes(q));
+  if(filtroEstado)lista=lista.filter(o=>o.estado===filtroEstado);
+  if(orden==='alfa')lista.sort((a,b)=>(a.cliente||'').localeCompare(b.cliente||''));
+  else if(orden==='estado')lista.sort((a,b)=>a.estado.localeCompare(b.estado));
+  // reciente: ya viene en orden de created_at desc desde el loader
+  tb.innerHTML=lista.length?lista.map(o=>{
     const margen=(o.precio_cobrado||0)-(o.insumos||0)-(o.mano_obra||0);
-    return`<tr style="cursor:pointer" onclick="verDetalleOT(${o.id})"><td style="color:var(--tx3);font-size:10px">#${o.id}</td><td><strong>${o.cliente}</strong></td><td>${(o.servicios||[]).map(s=>b('bgr',s)).join(' ')}</td><td style="font-size:10px">${o.responsable||'—'}</td><td style="font-size:10px;color:var(--tx3)">${o.fecha_ingreso||'—'}</td><td style="font-size:10px;color:var(--tx3)">${o.fecha_entrega||'—'}</td>${esAdmin?`<td class="eg">${fmt((o.insumos||0)+(o.mano_obra||0))}</td><td class="ing">${fmt(o.precio_cobrado)}</td><td class="${margen>=0?'ing':'eg'}">${fmt(margen)}</td>`:''}<td>${o.pagado?b('bg','Sí'):b('br','No')}</td><td>${b(bm[o.estado]||'bgr',o.estado)}</td><td onclick="event.stopPropagation()"><button class="icon-btn" onclick="elimOT(${o.id})"><i class="ti ti-trash"></i></button></td></tr>`;
-  }).join(''):'<tr><td colspan="11"><div class="empty"><i class="ti ti-tool"></i>Sin órdenes.</div></td></tr>';
+    return`<tr style="cursor:pointer" onclick="verDetalleOT(${o.id})"><td style="color:var(--tx3);font-size:10px">#${o.id}</td><td><strong>${o.cliente}</strong></td><td>${(o.servicios||[]).map(s=>b('bgr',s)).join(' ')}</td><td style="font-size:10px">${o.responsable||'—'}</td><td style="font-size:10px;color:var(--tx3)">${o.fecha_ingreso||'—'}</td><td style="font-size:10px;color:var(--tx3)">${o.fecha_entrega||'—'}</td>${esAdmin?`<td class="eg">${fmt((o.insumos||0)+(o.mana_obra||0))}</td><td class="ing">${fmt(o.precio_cobrado)}</td><td class="${margen>=0?'ing':'eg'}">${fmt(margen)}</td>`:''}<td>${o.pagado?b('bg','Sí'):b('br','No')}</td><td>${b(bm[o.estado]||'bgr',o.estado)}</td><td onclick="event.stopPropagation()"><button class="icon-btn" onclick="elimOT(${o.id})"><i class="ti ti-trash"></i></button></td></tr>`;
+  }).join(''):`<tr><td colspan="11"><div class="empty"><i class="ti ti-tool"></i>${q?'Sin resultados para "'+q+'"':'Sin órdenes.'}</div></td></tr>`;
 }
 async function elimOT(id){if(!confirm('¿Eliminar orden?'))return;setSyncStatus('syncing');await db.from('ordenes_trabajo').delete().eq('id',id);setSyncStatus('ok');await loadOT();renderOT();}
 

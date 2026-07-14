@@ -2049,6 +2049,31 @@ async function guardarOT(){
       }
     }
   }
+  // Si NO pagó → crear o actualizar CC taller del cliente con la deuda
+  if(!pagado&&totalCobrado>0&&clienteId){
+    await loadCCT();
+    let cc=C.cct.find(x=>x.cliente_id===clienteId&&x.estado==='abierta');
+    const itemsCC=[
+      ...OT_INS.map(i=>({fecha:hoyD(),descripcion:`[OT] Insumos — ${i.desc}`,valor:i.valor})),
+      ...OT_MO.map(i=>({fecha:hoyD(),descripcion:`[OT] Mano de obra — ${i.desc}`,valor:i.valor}))
+    ];
+    if(itemsCC.length===0)itemsCC.push({fecha:hoyD(),descripcion:`Trabajo — ${(svcs.length?svcs:['General']).join(', ')}`,valor:totalCobrado});
+    if(cc){
+      // agregar ítems a CC existente
+      const nuevosItems=[...(cc.items||[]),...itemsCC];
+      await db.from('cc_taller').update({items:nuevosItems,estado:'abierta'}).eq('id',cc.id);
+    } else {
+      // crear CC nueva para este cliente
+      const cliente=C.clt.find(x=>x.id===clienteId);
+      await db.from('cc_taller').insert({
+        cliente_texto:nombreCliente,
+        cliente_id:clienteId,
+        items:itemsCC,
+        pagos:[],
+        estado:'abierta'
+      });
+    }
+  }
   setSyncStatus('ok');closeM('m-ot');
   ['ot-desc','ot-fing','ot-fent','ot-nuevo-nombre','ot-nuevo-tel','ot-nuevo-veh','ot-nuevo-pat'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('ot-pagado').value='false';

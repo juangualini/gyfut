@@ -1083,7 +1083,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   if(saved){SESSION=JSON.parse(saved);iniciarApp();}
   // aplicar máscara a todos los campos de plata
   ['ct-cobrado','ct-pagado','su-monto','cv-cobrado','cv-pagado','suv-monto',
-   'ot-ins','ot-mo','ot-pr','ccd-item-valor','ccd-pago-monto',
+   'ot-ins','ot-mo','ccd-item-valor','ccd-pago-monto',
    'provd-item-valor','provd-pago-monto','cfp-monto','cf-m',
    'v-costo','v-prep','v-gest','v-otros','v-precio','vt-p'
   ].forEach(id=>{const el=document.getElementById(id);if(el)maskMoney(el);});

@@ -2158,10 +2158,25 @@ function renderOT(){
   if(filtroEstado)lista=lista.filter(o=>o.estado===filtroEstado);
   if(orden==='alfa')lista.sort((a,b)=>(a.cliente||'').localeCompare(b.cliente||''));
   else if(orden==='estado')lista.sort((a,b)=>a.estado.localeCompare(b.estado));
-  // reciente: ya viene en orden de created_at desc desde el loader
   tb.innerHTML=lista.length?lista.map(o=>{
-    const margen=(o.precio_cobrado||0)-(o.insumos||0)-(o.mano_obra||0);
-    return`<tr style="cursor:pointer" onclick="verDetalleOT(${o.id})"><td style="color:var(--tx3);font-size:10px">#${o.id}</td><td><strong>${o.cliente}</strong></td><td>${(o.servicios||[]).map(s=>b('bgr',s)).join(' ')}</td><td style="font-size:10px">${o.responsable||'—'}</td><td style="font-size:10px;color:var(--tx3)">${o.fecha_ingreso||'—'}</td><td style="font-size:10px;color:var(--tx3)">${o.fecha_entrega||'—'}</td>${esAdmin?`<td class="eg">${fmt((o.insumos||0)+(o.mana_obra||0))}</td><td class="ing">${fmt(o.precio_cobrado)}</td><td class="${margen>=0?'ing':'eg'}">${fmt(margen)}</td>`:''}<td>${o.pagado?b('bg','Sí'):b('br','No')}</td><td>${b(bm[o.estado]||'bgr',o.estado)}</td><td onclick="event.stopPropagation()"><button class="icon-btn" onclick="elimOT(${o.id})"><i class="ti ti-trash"></i></button></td></tr>`;
+    const costo=(o.insumos||0)+(o.mano_obra||0);
+    const cobrado=o.precio_cobrado||0;
+    const margen=cobrado-costo;
+    const cobradoCell=o.pagado
+      ?`<td class="ing">${fmt(cobrado)}</td>`
+      :`<td><span style="color:var(--wa);font-size:10px;font-weight:700">Pendiente ${fmt(cobrado)}</span></td>`;
+    return`<tr style="cursor:pointer" onclick="verDetalleOT(${o.id})">
+      <td style="color:var(--tx3);font-size:10px">#${o.id}</td>
+      <td><strong>${o.cliente}</strong></td>
+      <td>${(o.servicios||[]).map(s=>b('bgr',s)).join(' ')}</td>
+      <td style="font-size:10px">${o.responsable||'—'}</td>
+      <td style="font-size:10px;color:var(--tx3)">${o.fecha_ingreso||'—'}</td>
+      <td style="font-size:10px;color:var(--tx3)">${o.fecha_entrega||'—'}</td>
+      ${esAdmin?`<td class="eg">${fmt(costo)}</td>${cobradoCell}<td class="${margen>=0?'ing':'eg'}">${fmt(margen)}</td>`:''}
+      <td>${o.pagado?b('bg','Pagado'):b('br','No pagó')}</td>
+      <td>${b(bm[o.estado]||'bgr',o.estado)}</td>
+      <td onclick="event.stopPropagation()"><button class="icon-btn" onclick="elimOT(${o.id})"><i class="ti ti-trash"></i></button></td>
+    </tr>`;
   }).join(''):`<tr><td colspan="11"><div class="empty"><i class="ti ti-tool"></i>${q?'Sin resultados para "'+q+'"':'Sin órdenes.'}</div></td></tr>`;
 }
 async function elimOT(id){if(!confirm('¿Eliminar orden?'))return;setSyncStatus('syncing');await db.from('ordenes_trabajo').delete().eq('id',id);setSyncStatus('ok');await loadOT();renderOT();}

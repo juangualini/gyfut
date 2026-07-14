@@ -622,7 +622,8 @@ tr:hover td{background:var(--s2)}
     <div class="tab" id="ot-tab-nuevo" onclick="otTabCliente('nuevo')">Cliente nuevo</div>
   </div>
   <div id="ot-bloque-existente">
-    <div class="fr"><label>Cliente</label><select id="ot-cliente-sel" onchange="otSeleccionarCliente()"><option value="">— elegir cliente —</option></select></div>
+    <div class="fr"><label>Buscar cliente</label><input id="ot-cliente-buscar" placeholder="Escribí el nombre..." oninput="poblarSelectorClientes(this.value)" autocomplete="off"></div>
+    <div class="fr"><label>Seleccionar</label><select id="ot-cliente-sel" onchange="otSeleccionarCliente()" size="5" style="height:auto;border-radius:var(--r)"><option value="">— elegir cliente —</option></select></div>
     <div id="ot-cliente-info" style="display:none;background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);padding:10px 12px;margin-bottom:11px;font-size:11px">
       <div class="dpf"><span class="dpfl">Teléfono</span><span class="dpfv" id="ot-info-tel">—</span></div>
       <div class="dpf"><span class="dpfl">Vehículo</span><span class="dpfv" id="ot-info-veh">—</span></div>
@@ -1773,8 +1774,8 @@ function abrirOT(){
   const tabExistente=document.getElementById('ot-tab-existente');
   if(esAdmin){
     tabExistente.style.display='';
-    const sel=document.getElementById('ot-cliente-sel');
-    sel.innerHTML='<option value="">— elegir cliente —</option>'+C.clt.map(c=>`<option value="${c.id}">${c.nombre}${c.vehiculo?' — '+c.vehiculo:''}</option>`).join('');
+    document.getElementById('ot-cliente-buscar').value='';
+    poblarSelectorClientes('');
     otTabCliente('existente');
   } else {
     tabExistente.style.display='none';
@@ -1782,6 +1783,12 @@ function abrirOT(){
   }
   document.getElementById('ot-cliente-info').style.display='none';
   openM('m-ot');
+}
+function poblarSelectorClientes(q){
+  const sel=document.getElementById('ot-cliente-sel');
+  let lista=[...C.clt].sort((a,b)=>a.nombre.localeCompare(b.nombre,'es'));
+  if(q)lista=lista.filter(c=>(c.nombre+' '+(c.vehiculo||'')).toLowerCase().includes(q.toLowerCase()));
+  sel.innerHTML='<option value="">— elegir cliente —</option>'+lista.map(c=>`<option value="${c.id}">${c.nombre}${c.vehiculo?' — '+c.vehiculo:''}</option>`).join('');
 }
 function otTabCliente(tipo){
   document.getElementById('ot-tab-existente').classList.toggle('active',tipo==='existente');

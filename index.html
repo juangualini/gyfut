@@ -2059,19 +2059,18 @@ async function guardarOT(){
     ];
     if(itemsCC.length===0)itemsCC.push({fecha:hoyD(),descripcion:`Trabajo — ${(svcs.length?svcs:['General']).join(', ')}`,valor:totalCobrado});
     if(cc){
-      // agregar ítems a CC existente
       const nuevosItems=[...(cc.items||[]),...itemsCC];
-      await db.from('cc_taller').update({items:nuevosItems,estado:'abierta'}).eq('id',cc.id);
+      const{error}=await db.from('cc_taller').update({items:nuevosItems,estado:'abierta'}).eq('id',cc.id);
+      if(error)console.error('Error actualizando CC taller:',error);
     } else {
-      // crear CC nueva para este cliente
-      const cliente=C.clt.find(x=>x.id===clienteId);
-      await db.from('cc_taller').insert({
+      const{error}=await db.from('cc_taller').insert({
         cliente_texto:nombreCliente,
         cliente_id:clienteId,
         items:itemsCC,
         pagos:[],
         estado:'abierta'
       });
+      if(error)console.error('Error creando CC taller:',error);
     }
   }
   setSyncStatus('ok');closeM('m-ot');

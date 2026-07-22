@@ -1912,7 +1912,44 @@ function toggleCajaPago(){
 }
 
 // Estado temporal para edición
-let OTD_INS=[],OTD_MO=[];
+let OTD_INS=[],OTD_MO=[],OTD_PROV=[];
+function renderItemsProvOTEdit(){
+  const cont=document.getElementById('otd-prov-lista');if(!cont)return;
+  const totalProv=OTD_PROV.reduce((a,i)=>a+(i.valor||0),0);
+  const tel=document.getElementById('otd-prov-total');if(tel)tel.textContent=fmt(totalProv);
+  actualizarTotalesOTEdit();
+  if(!OTD_PROV.length){cont.innerHTML='';return;}
+  cont.innerHTML=`<div class="tw" style="margin-bottom:6px"><table><thead><tr><th>Descripción</th><th>Proveedor</th><th>Costo</th><th></th></tr></thead><tbody>${
+    OTD_PROV.map((it,idx)=>`<tr><td style="font-size:11px">${it.desc}</td><td style="font-size:10px;color:var(--tx3)">${it.provNombre||'—'}</td><td class="eg" style="font-size:11px">${fmt(it.valor)}</td><td><button class="icon-btn" onclick="elimItemProvOTEdit(${idx})"><i class="ti ti-trash"></i></button></td></tr>`).join('')
+  }</tbody></table></div>`;
+}
+function agregarItemProvOTEdit(){
+  const desc=document.getElementById('otd-prov-desc').value.trim();
+  const valor=getMaskValue('otd-prov-val');
+  const sel=document.getElementById('otd-prov-sel');
+  const provId=sel?.value||'';
+  const provNombre=sel?.options[sel.selectedIndex]?.text||'';
+  if(!desc||!valor)return alert('Completá descripción y costo');
+  OTD_PROV.push({desc,valor,provId,provNombre});
+  document.getElementById('otd-prov-desc').value='';document.getElementById('otd-prov-val').value='';
+  renderItemsProvOTEdit();
+}
+function elimItemProvOTEdit(idx){OTD_PROV.splice(idx,1);renderItemsProvOTEdit();}
+function actualizarTotalesOTEdit(){
+  const totalIns=OTD_INS.reduce((a,i)=>a+(i.valor||0),0);
+  const totalMo=OTD_MO.reduce((a,i)=>a+(i.valor||0),0);
+  const totalProv=OTD_PROV.reduce((a,i)=>a+(i.valor||0),0);
+  const totalCobrado=totalIns+totalMo;
+  const neto=totalCobrado-totalProv;
+  const set=(id,v,col)=>{const el=document.getElementById(id);if(el){el.textContent=v;if(col)el.style.color=col;}};
+  set('otd-total-cobrado',fmt(totalCobrado));
+  set('otd-neto',fmt(neto),neto>=0?'var(--ac)':'var(--er)');
+}
+function toggleCajaPagoEdit(){
+  const pago=document.getElementById('otd-pagado')?.value==='true';
+  const row=document.getElementById('otd-caja-pago-row');
+  if(row)row.style.display=pago?'block':'none';
+}
 function renderItemsOTD(tipo){
   const items=tipo==='ins'?OTD_INS:OTD_MO;
   const containerId=tipo==='ins'?'otd-ins-lista':'otd-mo-lista';
@@ -1920,10 +1957,11 @@ function renderItemsOTD(tipo){
   const cont=document.getElementById(containerId);if(!cont)return;
   const total=items.reduce((a,i)=>a+(i.valor||0),0);
   const tel=document.getElementById(totalId);if(tel)tel.textContent=fmt(total);
-  if(!items.length){cont.innerHTML='';return;}
+  if(!items.length){cont.innerHTML='';actualizarTotalesOTEdit();return;}
   cont.innerHTML=`<div class="tw" style="margin-bottom:6px"><table><thead><tr><th>Descripción</th><th>Valor</th><th></th></tr></thead><tbody>${
-    items.map((it,idx)=>`<tr><td style="font-size:11px">${it.desc}</td><td class="eg" style="font-size:11px">${fmt(it.valor)}</td><td><button class="icon-btn" onclick="elimItemOTEdit('${tipo}',${idx})"><i class="ti ti-trash"></i></button></td></tr>`).join('')
+    items.map((it,idx)=>`<tr><td style="font-size:11px">${it.desc}</td><td class="ing" style="font-size:11px">${fmt(it.valor)}</td><td><button class="icon-btn" onclick="elimItemOTEdit('${tipo}',${idx})"><i class="ti ti-trash"></i></button></td></tr>`).join('')
   }</tbody></table></div>`;
+  actualizarTotalesOTEdit();
 }
 function agregarItemOTEdit(tipo){
   const descId=tipo==='ins'?'otd-ins-desc':'otd-mo-desc';
@@ -1952,6 +1990,8 @@ function abrirOT(){
   // poblar selector de proveedores
   const sel=document.getElementById('ot-prov-sel');
   if(sel)sel.innerHTML='<option value="">Sin proveedor</option>'+C.prov.map(p=>`<option value="${p.id}">${p.nombre}</option>`).join('');
+  // aplicar máscaras a campos del modal
+  ['ot-ins-val','ot-mo-val','ot-prov-val'].forEach(id=>{const el=document.getElementById(id);if(el)maskMoney(el);});
   const esAdmin=SESSION.rol==='admin';
   const tabExistente=document.getElementById('ot-tab-existente');
   if(esAdmin){
@@ -2095,18 +2135,21 @@ async function guardarOT(){
 function verDetalleOT(id){
   const o=C.ots.find(x=>x.id===id);if(!o)return;
   const c=o.cliente_id?C.clt.find(x=>x.id===o.cliente_id):null;
-  // cargar items existentes
   OTD_INS=(o.insumos_items||[]).map(i=>({desc:i.desc,valor:i.valor}));
   OTD_MO=(o.mano_obra_items||[]).map(i=>({desc:i.desc,valor:i.valor}));
+  OTD_PROV=(o.costo_proveedor_items||[]).map(i=>({desc:i.desc,valor:i.valor,provId:i.provId||'',provNombre:i.provNombre||''}));
   document.getElementById('otd-titulo').textContent=`Editar orden #${o.id}`;
   const esAdmin=SESSION.rol==='admin';
-  const svcMap={Mecánica:'mec',Detailing:'det',PPF:'ppf',Lavado:'lav',Otro:'otro'};
   const svcsActuales=o.servicios||[];
+  const provOpts='<option value="">Sin proveedor</option>'+C.prov.map(p=>`<option value="${p.id}">${p.nombre}</option>`).join('');
   document.getElementById('otd-content').innerHTML=`
     <input type="hidden" id="otd-id" value="${o.id}">
     <div class="fr"><label>Cliente</label><input id="otd-cliente" value="${(o.cliente||'').replace(/"/g,'&quot;')}"></div>
-    ${esAdmin?`<div class="fg2"><div class="fr"><label>Teléfono</label><input id="otd-tel" value="${c?.telefono||''}" ${c?'':'placeholder="Sin cliente vinculado"'}></div><div class="fr"><label>Patente</label><input id="otd-pat" value="${c?.patente||''}" ${c?'':'placeholder="Sin cliente vinculado"'}></div></div>`:''}
-    <div class="fg2"><div class="fr"><label>Asignado a</label><select id="otd-resp"><option ${o.responsable==='Martín'?'selected':''}>Martín</option><option ${o.responsable==='Theo'?'selected':''}>Theo</option><option ${o.responsable==='Lucho'?'selected':''}>Lucho</option><option ${o.responsable==='Lucas'?'selected':''}>Lucas</option><option ${o.responsable==='Elías'?'selected':''}>Elías</option><option ${o.responsable==='Georgi'?'selected':''}>Georgi</option><option ${o.responsable==='Martín + Theo'?'selected':''}>Martín + Theo</option><option ${o.responsable==='Todos'?'selected':''}>Todos</option></select></div><div class="fr"><label>Estado</label><select id="otd-estado"><option ${o.estado==='Ingresado'?'selected':''}>Ingresado</option><option ${o.estado==='En proceso'?'selected':''}>En proceso</option><option ${o.estado==='Listo'?'selected':''}>Listo</option><option ${o.estado==='Entregado'?'selected':''}>Entregado</option></select></div></div>
+    ${esAdmin?`<div class="fg2"><div class="fr"><label>Teléfono</label><input id="otd-tel" value="${c?.telefono||''}"></div><div class="fr"><label>Patente</label><input id="otd-pat" value="${c?.patente||''}"></div></div>`:''}
+    <div class="fg2">
+      <div class="fr"><label>Asignado a</label><select id="otd-resp"><option ${o.responsable==='Martín'?'selected':''}>Martín</option><option ${o.responsable==='Theo'?'selected':''}>Theo</option><option ${o.responsable==='Lucho'?'selected':''}>Lucho</option><option ${o.responsable==='Lucas'?'selected':''}>Lucas</option><option ${o.responsable==='Elías'?'selected':''}>Elías</option><option ${o.responsable==='Georgi'?'selected':''}>Georgi</option><option ${o.responsable==='Martín + Theo'?'selected':''}>Martín + Theo</option><option ${o.responsable==='Todos'?'selected':''}>Todos</option></select></div>
+      <div class="fr"><label>Estado</label><select id="otd-estado"><option ${o.estado==='Ingresado'?'selected':''}>Ingresado</option><option ${o.estado==='En proceso'?'selected':''}>En proceso</option><option ${o.estado==='Listo'?'selected':''}>Listo</option><option ${o.estado==='Entregado'?'selected':''}>Entregado</option></select></div>
+    </div>
     <div class="fg2"><div class="fr"><label>Fecha ingreso</label><input id="otd-fing" type="date" value="${o.fecha_ingreso||''}"></div><div class="fr"><label>Fecha entrega</label><input id="otd-fent" type="date" value="${o.fecha_entrega||''}"></div></div>
     <div class="sub-label">Servicios</div>
     <div class="chk-group">
@@ -2117,41 +2160,72 @@ function verDetalleOT(id){
       <label class="chk-label"><input type="checkbox" id="otd-svc-otro" ${svcsActuales.includes('Otro')||svcsActuales.includes('General')?'checked':''}> Otro</label>
     </div>
     <hr class="divider">
-    <hr class="divider">
-    <div class="sub-label">Insumos</div>
+    ${esAdmin?`
+    <div class="sub-label" style="color:var(--ok)">↑ Lo que le cobrás al cliente</div>
+    <div class="sub-label">Insumos cobrados</div>
     <div id="otd-ins-lista" style="margin-bottom:8px"></div>
-    <div class="fg3" style="margin-bottom:10px">
-      <div class="fr" style="margin-bottom:0"><input id="otd-ins-desc" placeholder="Descripción"></div>
+    <div class="fg3" style="margin-bottom:6px">
+      <div class="fr" style="margin-bottom:0"><input id="otd-ins-desc" placeholder="Ej: cubiertas"></div>
       <div class="fr" style="margin-bottom:0"><input id="otd-ins-val" type="text" inputmode="numeric" placeholder="Valor $"></div>
       <button class="btn" onclick="agregarItemOTEdit('ins')" style="height:34px"><i class="ti ti-plus"></i> Agregar</button>
     </div>
-    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);margin-bottom:12px">
-      <span>Total insumos:</span><span class="eg" id="otd-ins-total">$0</span>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);margin-bottom:10px">
+      <span>Total insumos:</span><span class="ing" id="otd-ins-total">$0</span>
     </div>
-    <div class="sub-label">Mano de obra</div>
+    <div class="sub-label">Mano de obra cobrada</div>
     <div id="otd-mo-lista" style="margin-bottom:8px"></div>
-    <div class="fg3" style="margin-bottom:10px">
-      <div class="fr" style="margin-bottom:0"><input id="otd-mo-desc" placeholder="Descripción"></div>
+    <div class="fg3" style="margin-bottom:6px">
+      <div class="fr" style="margin-bottom:0"><input id="otd-mo-desc" placeholder="Ej: alineación"></div>
       <div class="fr" style="margin-bottom:0"><input id="otd-mo-val" type="text" inputmode="numeric" placeholder="Valor $"></div>
       <button class="btn" onclick="agregarItemOTEdit('mo')" style="height:34px"><i class="ti ti-plus"></i> Agregar</button>
     </div>
-    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);margin-bottom:12px">
-      <span>Total mano de obra:</span><span class="eg" id="otd-mo-total">$0</span>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);margin-bottom:10px">
+      <span>Total mano de obra:</span><span class="ing" id="otd-mo-total">$0</span>
+    </div>
+    <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:var(--r);padding:10px 14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:12px;font-weight:600;color:var(--ok)">Total cobrado al cliente</span>
+      <span style="font-size:18px;font-weight:700;color:var(--ok)" id="otd-total-cobrado">$0</span>
+    </div>
+    <hr class="divider">
+    <div class="sub-label" style="color:var(--er)">↓ Costo para vos (proveedores)</div>
+    <div id="otd-prov-lista" style="margin-bottom:8px"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;margin-bottom:6px;align-items:end">
+      <div class="fr" style="margin-bottom:0"><input id="otd-prov-desc" placeholder="Ej: cubiertas costo"></div>
+      <div class="fr" style="margin-bottom:0"><input id="otd-prov-val" type="text" inputmode="numeric" placeholder="Costo $"></div>
+      <div class="fr" style="margin-bottom:0"><select id="otd-prov-sel" style="width:100%;padding:8px 10px;border-radius:var(--r);border:1px solid var(--bd2);background:var(--s2);color:var(--tx);font-size:11px">${provOpts}</select></div>
+      <button class="btn" onclick="agregarItemProvOTEdit()" style="height:34px"><i class="ti ti-plus"></i></button>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);margin-bottom:10px">
+      <span>Total costo proveedor:</span><span class="eg" id="otd-prov-total">$0</span>
+    </div>
+    <div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:var(--r);padding:10px 14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:12px;font-weight:600;color:var(--ac)">Neto (cobrado − costo)</span>
+      <span style="font-size:18px;font-weight:700;color:var(--ac)" id="otd-neto">$0</span>
     </div>
     <hr class="divider">
     <div class="fg2">
-      <div class="fr"><label>Precio del servicio ($)</label><input id="otd-pr" type="text" inputmode="numeric" value="${o.precio_cobrado||0}"></div>
-      <div class="fr"><label>¿Pagó?</label><select id="otd-pagado"><option value="false" ${!o.pagado?'selected':''}>No</option><option value="true" ${o.pagado?'selected':''}>Sí</option></select></div>
-    </div>
-    <div class="fr"><label>¿Pagó?</label><select id="otd-pagado"><option value="false" ${!o.pagado?'selected':''}>No</option><option value="true" ${o.pagado?'selected':''}>Sí</option></select></div>
-    <div class="fr"><label>Descripción</label><textarea id="otd-desc">${o.descripcion||''}</textarea></div>
+      <div class="fr"><label>¿Pagó?</label><select id="otd-pagado" onchange="toggleCajaPagoEdit()"><option value="false" ${!o.pagado?'selected':''}>No</option><option value="true" ${o.pagado?'selected':''}>Sí</option></select></div>
+      <div class="fr" id="otd-caja-pago-row" style="display:${o.pagado?'block':'none'}"><label>Caja donde entró</label>
+        <select id="otd-pago-caja">
+          <option value="1" ${(o.pago_caja||1)===1?'selected':''}>1 — Efectivo</option>
+          <option value="2" ${(o.pago_caja||1)===2?'selected':''}>2 — Banco</option>
+          <option value="3" ${(o.pago_caja||1)===3?'selected':''}>3 — Jorge</option>
+          <option value="4" ${(o.pago_caja||1)===4?'selected':''}>4 — Cheque</option>
+          <option value="5" ${(o.pago_caja||1)===5?'selected':''}>5 — Mariana</option>
+          <option value="6" ${(o.pago_caja||1)===6?'selected':''}>6 — Martín</option>
+          <option value="7" ${(o.pago_caja||1)===7?'selected':''}>7 — Lucho</option>
+          <option value="8" ${(o.pago_caja||1)===8?'selected':''}>8 — USD</option>
+        </select>
+      </div>
+    </div>`:''}
+    <div class="fr"><label>Descripción / notas</label><textarea id="otd-desc">${o.descripcion||''}</textarea></div>
+    <div class="ma"><button class="btn" onclick="closeM('m-otd')">Cancelar</button><button class="btn btn-p" onclick="guardarOTEdit()">Guardar cambios</button></div>
   `;
-  document.querySelector('#m-ot-detalle .ma').innerHTML=`<button class="btn" onclick="closeM('m-ot-detalle')">Cancelar</button><button class="btn btn-p" onclick="guardarEdicionOT()">Guardar cambios</button>`;
-  // aplicar máscara al campo de precio
-  const prEl=document.getElementById('otd-pr');if(prEl){maskMoney(prEl);prEl.value=o.precio_cobrado?Number(o.precio_cobrado).toLocaleString('de-DE'):'';}
-  renderItemsOTD('ins');
-  renderItemsOTD('mo');
-  openM('m-ot-detalle');
+  if(esAdmin){
+    renderItemsOTD('ins');renderItemsOTD('mo');renderItemsProvOTEdit();
+    ['otd-ins-val','otd-mo-val','otd-prov-val'].forEach(id=>{const el=document.getElementById(id);if(el)maskMoney(el);});
+  }
+  openM('m-otd');
 }
 async function guardarEdicionOT(){
   const id=parseInt(document.getElementById('otd-id').value);
@@ -2175,8 +2249,11 @@ async function guardarEdicionOT(){
     mano_obra:mo,
     insumos_items:OTD_INS,
     mano_obra_items:OTD_MO,
-    precio_cobrado:getMaskValue('otd-pr'),
-    pagado:document.getElementById('otd-pagado').value==='true',
+    precio_cobrado:ins+mo,
+    costo_proveedor_items:OTD_PROV,
+    costo_proveedor_total:OTD_PROV.reduce((a,i)=>a+(i.valor||0),0),
+    pagado:document.getElementById('otd-pagado')?.value==='true',
+    pago_caja:parseInt(document.getElementById('otd-pago-caja')?.value||'1'),
     descripcion:document.getElementById('otd-desc').value
   }).eq('id',id);
   setSyncStatus('ok');closeM('m-ot-detalle');

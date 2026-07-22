@@ -1980,18 +1980,6 @@ function elimItemOTEdit(tipo,idx){
 
 function abrirOT(){
   OT_INS=[];OT_MO=[];OT_PROV=[];
-  renderItemsOT('ins','ot-ins-lista','ot-ins-total');
-  renderItemsOT('mo','ot-mo-lista','ot-mo-total');
-  renderItemsProvOT();
-  actualizarTotalesOT();
-  document.getElementById('ot-fing').value=hoyD();
-  document.getElementById('ot-pagado').value='false';
-  document.getElementById('ot-caja-pago-row').style.display='none';
-  // poblar selector de proveedores
-  const sel=document.getElementById('ot-prov-sel');
-  if(sel)sel.innerHTML='<option value="">Sin proveedor</option>'+C.prov.map(p=>`<option value="${p.id}">${p.nombre}</option>`).join('');
-  // aplicar máscaras a campos del modal
-  ['ot-ins-val','ot-mo-val','ot-prov-val'].forEach(id=>{const el=document.getElementById(id);if(el)maskMoney(el);});
   const esAdmin=SESSION.rol==='admin';
   const tabExistente=document.getElementById('ot-tab-existente');
   if(esAdmin){
@@ -2004,7 +1992,18 @@ function abrirOT(){
     otTabCliente('nuevo');
   }
   document.getElementById('ot-cliente-info').style.display='none';
+  document.getElementById('ot-fing').value=hoyD();
+  document.getElementById('ot-pagado').value='false';
+  document.getElementById('ot-caja-pago-row').style.display='none';
   openM('m-ot');
+  // poblar selector de proveedores y aplicar máscaras DESPUÉS de abrir
+  const sel=document.getElementById('ot-prov-sel');
+  if(sel)sel.innerHTML='<option value="">Sin proveedor</option>'+C.prov.map(p=>`<option value="${p.id}">${p.nombre}</option>`).join('');
+  ['ot-ins-val','ot-mo-val','ot-prov-val'].forEach(id=>{const el=document.getElementById(id);if(el)maskMoney(el);});
+  renderItemsOT('ins','ot-ins-lista','ot-ins-total');
+  renderItemsOT('mo','ot-mo-lista','ot-mo-total');
+  renderItemsProvOT();
+  actualizarTotalesOT();
 }
 function poblarSelectorClientes(q){
   const sel=document.getElementById('ot-cliente-sel');

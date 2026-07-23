@@ -2259,6 +2259,25 @@ async function guardarEdicionOT(){
     pago_caja:parseInt(document.getElementById('otd-pago-caja')?.value||'1'),
     descripcion:document.getElementById('otd-desc').value
   }).eq('id',id);
+  // Sincronizar ítems de proveedor con CC proveedores
+  if(!C.prov.length)await loadProv();
+  const o=C.ots.find(x=>x.id===id);
+  const nombreCliente=document.getElementById('otd-cliente').value;
+  for(const prov of OTD_PROV){
+    if(prov.provId){
+      const p=C.prov.find(x=>String(x.id)===String(prov.provId));
+      if(p){
+        // evitar duplicados — buscar si ya existe este ítem de esta OT
+        const items=p.items||[];
+        const yaExiste=items.some(i=>i.descripcion===`OT ${nombreCliente} — ${prov.desc}`);
+        if(!yaExiste){
+          const nuevosItems=[...items,{descripcion:`OT ${nombreCliente} — ${prov.desc}`,valor:prov.valor,fecha:hoyD()}];
+          await db.from('cc_proveedores').update({items:nuevosItems}).eq('id',p.id);
+          p.items=nuevosItems;
+        }
+      }
+    }
+  }
   setSyncStatus('ok');closeM('m-ot-detalle');
   await loadOT();renderOT();
 }

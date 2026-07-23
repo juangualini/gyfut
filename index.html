@@ -2218,9 +2218,9 @@ function verDetalleOT(id){
       </div>
     </div>`:''}
     <div class="fr"><label>Descripción / notas</label><textarea id="otd-desc">${o.descripcion||''}</textarea></div>
-    <div class="ma"><button class="btn" onclick="closeM('m-otd')">Cancelar</button><button class="btn btn-p" onclick="guardarOTEdit()">Guardar cambios</button></div>
+    <div class="ma"><button class="btn" onclick="closeM('m-ot-detalle')">Cancelar</button><button class="btn btn-p" onclick="guardarOTEdit()">Guardar cambios</button></div>
   `;
-  openM('m-otd');
+  openM('m-ot-detalle');
   if(esAdmin){
     renderItemsOTD('ins');renderItemsOTD('mo');renderItemsProvOTEdit();
     ['otd-ins-val','otd-mo-val','otd-prov-val'].forEach(id=>{const el=document.getElementById(id);if(el)maskMoney(el);});

@@ -1132,7 +1132,7 @@ const loadLeadsA=async()=>{const{data}=await db.from('leads_autos').select('*').
 const loadLeadsT=async()=>{const{data}=await db.from('leads_taller').select('*').order('created_at',{ascending:false});C.leadsT=data||[];};
 const loadCLT=async()=>{const{data}=await db.from('clientes_taller').select('*').order('created_at',{ascending:false});C.clt=data||[];};
 const loadVeh=async()=>{const{data}=await db.from('vehiculos').select('*').order('created_at',{ascending:false});C.veh=data||[];};
-const loadOT=async()=>{const{data}=await db.from('ordenes_trabajo').select('*').order('created_at',{ascending:false});C.ots=data||[];};
+const loadOT=async()=>{const{data}=await db.from('ordenes_trabajo').select('*').order('created_at',{ascending:false});C.ots=data||[];console.log('OT sample:',C.ots[0]?.costo_proveedor_total,C.ots[0]?.precio_cobrado);};
 const loadCajaV=async()=>{const{data}=await db.from('caja_vehiculos').select('*').order('created_at',{ascending:true});C.cajav=data||[];};
 const loadCajaT=async()=>{const{data}=await db.from('caja_taller').select('*').order('created_at',{ascending:true});C.cajat=data||[];};
 const loadCF=async()=>{const{data}=await db.from('costos_fijos').select('*').order('created_at',{ascending:false});C.cf=data||[];};
@@ -2275,8 +2275,8 @@ function renderOT(){
   if(orden==='alfa')lista.sort((a,b)=>(a.cliente||'').localeCompare(b.cliente||''));
   else if(orden==='estado')lista.sort((a,b)=>a.estado.localeCompare(b.estado));
   tb.innerHTML=lista.length?lista.map(o=>{
-    const costo=parseFloat(o.costo_proveedor_total)||0;
-    const cobrado=o.precio_cobrado||0;
+    const costo=Number(o.costo_proveedor_total)||0;
+    const cobrado=Number(o.precio_cobrado)||0;
     const margen=cobrado-costo;
     const cobradoCell=o.pagado
       ?`<td class="ing">${fmt(cobrado)}</td>`

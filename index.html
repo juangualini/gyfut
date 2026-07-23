@@ -2278,6 +2278,22 @@ async function guardarEdicionOT(){
       }
     }
   }
+  // Actualizar CC del cliente si existe
+  const otActual=C.ots.find(x=>x.id===id);
+  if(otActual?.cliente_id){
+    await loadCCT();
+    const cc=C.cct.find(x=>x.cliente_id===otActual.cliente_id&&x.estado==='abierta');
+    if(cc){
+      // sacar ítems viejos de esta OT y reemplazar con los nuevos
+      const itemsSinEstaOT=(cc.items||[]).filter(i=>!i.descripcion?.startsWith('[OT]'));
+      const insTotal=OTD_INS.reduce((a,i)=>a+(i.valor||0),0);
+      const moTotal=OTD_MO.reduce((a,i)=>a+(i.valor||0),0);
+      const nuevosItems=[...itemsSinEstaOT];
+      if(insTotal>0)OTD_INS.forEach(i=>nuevosItems.push({fecha:hoyD(),descripcion:`[OT] Insumos — ${i.desc}`,valor:i.valor}));
+      if(moTotal>0)OTD_MO.forEach(i=>nuevosItems.push({fecha:hoyD(),descripcion:`[OT] Mano de obra — ${i.desc}`,valor:i.valor}));
+      await db.from('cc_taller').update({items:nuevosItems}).eq('id',cc.id);
+    }
+  }
   setSyncStatus('ok');closeM('m-ot-detalle');
   await loadOT();renderOT();
 }

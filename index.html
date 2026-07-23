@@ -1864,7 +1864,8 @@ function agregarItemOT(tipo){
   const descId=tipo==='ins'?'ot-ins-desc':'ot-mo-desc';
   const valId=tipo==='ins'?'ot-ins-val':'ot-mo-val';
   const desc=document.getElementById(descId).value.trim();
-  const valor=getMaskValue(valId);
+  const rawVal=document.getElementById(valId).value.replace(/\./g,'').replace(/[^\d]/g,'');
+  const valor=parseFloat(rawVal)||0;
   if(!desc||!valor)return alert('Completá descripción y valor');
   if(tipo==='ins')OT_INS.push({desc,valor});else OT_MO.push({desc,valor});
   document.getElementById(descId).value='';document.getElementById(valId).value='';
@@ -1896,7 +1897,8 @@ function renderItemsProvOT(){
 }
 function agregarItemProvOT(){
   const desc=document.getElementById('ot-prov-desc').value.trim();
-  const valor=getMaskValue('ot-prov-val');
+  const rawVal=document.getElementById('ot-prov-val').value.replace(/\./g,'').replace(/[^\d]/g,'');
+  const valor=parseFloat(rawVal)||0;
   const sel=document.getElementById('ot-prov-sel');
   const provId=sel?.value||'';
   const provNombre=sel?.options[sel.selectedIndex]?.text||'';
@@ -1925,7 +1927,8 @@ function renderItemsProvOTEdit(){
 }
 function agregarItemProvOTEdit(){
   const desc=document.getElementById('otd-prov-desc').value.trim();
-  const valor=getMaskValue('otd-prov-val');
+  const rawVal=document.getElementById('otd-prov-val').value.replace(/\./g,'').replace(/[^\d]/g,'');
+  const valor=parseFloat(rawVal)||0;
   const sel=document.getElementById('otd-prov-sel');
   const provId=sel?.value||'';
   const provNombre=sel?.options[sel.selectedIndex]?.text||'';
@@ -1967,7 +1970,8 @@ function agregarItemOTEdit(tipo){
   const descId=tipo==='ins'?'otd-ins-desc':'otd-mo-desc';
   const valId=tipo==='ins'?'otd-ins-val':'otd-mo-val';
   const desc=document.getElementById(descId).value.trim();
-  const valor=getMaskValue(valId);
+  const rawVal=document.getElementById(valId).value.replace(/\./g,'').replace(/[^\d]/g,'');
+  const valor=parseFloat(rawVal)||0;
   if(!desc||!valor)return alert('Completá descripción y valor');
   if(tipo==='ins')OTD_INS.push({desc,valor});else OTD_MO.push({desc,valor});
   document.getElementById(descId).value='';document.getElementById(valId).value='';

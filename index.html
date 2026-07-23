@@ -2275,7 +2275,7 @@ function renderOT(){
   if(orden==='alfa')lista.sort((a,b)=>(a.cliente||'').localeCompare(b.cliente||''));
   else if(orden==='estado')lista.sort((a,b)=>a.estado.localeCompare(b.estado));
   tb.innerHTML=lista.length?lista.map(o=>{
-    const costo=(o.insumos||0)+(o.mano_obra||0);
+    const costo=parseFloat(o.costo_proveedor_total)||0;
     const cobrado=o.precio_cobrado||0;
     const margen=cobrado-costo;
     const cobradoCell=o.pagado

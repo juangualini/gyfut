@@ -1612,6 +1612,7 @@ function renderMes(){
   cont.innerHTML=html;
 }
 function abrirMovDiaT(){document.getElementById('ct-fecha').value=C.diaActual;document.getElementById('ct-tipo-mov').value='movimiento';document.getElementById('cajat-title').textContent='Nuevo movimiento — caja taller';openM('m-cajat');}
+function abrirMovDia(){abrirMovDiaT();}
 function abrirSueldo(){document.getElementById('su-fecha').value=C.diaActual;openM('m-sueldo');}
 
 async function guardarCajaT(){

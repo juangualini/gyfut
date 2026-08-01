@@ -93,7 +93,7 @@ tr:hover td{background:var(--s2)}
 .kht{font-size:10px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em}
 .kcnt{font-size:10px;color:var(--tx3);background:var(--s1);border-radius:10px;padding:1px 7px;border:1px solid var(--bd)}
 .kcards{padding:8px;display:flex;flex-direction:column;gap:6px;min-height:60px}
-.kcard{background:var(--s2);border:1px solid var(--bd);border-radius:7px;padding:10px;cursor:pointer;transition:border-color .12s}
+.kcard{background:var(--s2);border:1px solid var(--bd);border-radius:7px;padding:10px;transition:border-color .12s;overflow:visible}
 .kcard:hover{border-color:var(--ac)}
 .kn{font-size:12px;font-weight:600;color:var(--tx);margin-bottom:3px}
 .km{font-size:10px;color:var(--tx3);margin-bottom:6px}
@@ -342,6 +342,19 @@ tr:hover td{background:var(--s2)}
         <div class="sc"><div class="sl">Total adeudado</div><div class="sv eg" id="cct-deuda">—</div></div>
         <div class="sc"><div class="sl">Cuentas saldadas</div><div class="sv ing" id="cct-saldadas">—</div></div>
       </div>
+      <div class="sbar">
+        <input id="cct-q" placeholder="Buscar cliente..." oninput="renderCCT()">
+        <select id="cct-orden" onchange="renderCCT()">
+          <option value="alfa">Alfabético (A→Z)</option>
+          <option value="deuda">Mayor deuda primero</option>
+          <option value="reciente">Más reciente</option>
+        </select>
+        <select id="cct-estado" onchange="renderCCT()">
+          <option value="">Todos</option>
+          <option value="abierta">Abiertas</option>
+          <option value="saldada">Saldadas</option>
+        </select>
+      </div>
       <div class="tw">
         <table><thead><tr><th>Cliente</th><th>Total</th><th>Pagado</th><th>Deuda</th><th>Estado</th><th></th></tr></thead><tbody id="tb-cc-taller"></tbody></table>
       </div>
@@ -416,8 +429,8 @@ tr:hover td{background:var(--s2)}
 
     <!-- ÓRDENES -->
     <div class="page" id="page-ordenes">
-      <div class="sbar">
-        <input id="ot-q" placeholder="Buscar cliente..." oninput="renderOT()">
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;align-items:center">
+        <input id="ot-q" placeholder="Buscar cliente o apellido..." oninput="renderOT()" style="flex:1;min-width:180px">
         <select id="ot-orden" onchange="renderOT()">
           <option value="reciente">Más reciente primero</option>
           <option value="alfa">Alfabético (A→Z)</option>
@@ -430,7 +443,18 @@ tr:hover td{background:var(--s2)}
           <option>Listo</option>
           <option>Entregado</option>
         </select>
+        <select id="ot-filtro-pago" onchange="renderOT()">
+          <option value="">Pagado y pendiente</option>
+          <option value="pagado">Solo pagadas</option>
+          <option value="pendiente">Solo pendientes</option>
+        </select>
+        <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--tx3)">
+          <span>Desde</span><input id="ot-fecha-desde" type="date" onchange="renderOT()" style="padding:6px 8px;border-radius:var(--r);border:1px solid var(--bd2);background:var(--s2);color:var(--tx);font-size:11px">
+          <span>Hasta</span><input id="ot-fecha-hasta" type="date" onchange="renderOT()" style="padding:6px 8px;border-radius:var(--r);border:1px solid var(--bd2);background:var(--s2);color:var(--tx);font-size:11px">
+          <button class="btn" onclick="limpiarFiltrosOT()" style="padding:6px 10px;font-size:10px">✕ Limpiar</button>
+        </div>
       </div>
+      <div style="font-size:10px;color:var(--tx3);margin-bottom:8px" id="ot-count"></div>
       <div class="tw"><table><thead><tr><th>N°</th><th>Cliente</th><th>Servicios</th><th>Asignado</th><th>Ingreso</th><th>Entrega</th><th class="restricted-hide" data-perm="admin">Costo</th><th class="restricted-hide" data-perm="admin">Cobrado</th><th class="restricted-hide" data-perm="admin">Margen</th><th>Pagó</th><th>Estado</th><th></th></tr></thead><tbody id="tb-ot"></tbody></table></div>
     </div>
 
@@ -1232,11 +1256,20 @@ function renderCCT(){
   document.getElementById('cct-saldadas').textContent=saldadas.length;
   const tb=document.getElementById('tb-cc-taller');
   if(!C.cct.length){tb.innerHTML='<tr><td colspan="6"><div class="empty"><i class="ti ti-receipt-2"></i>Sin cuentas corrientes.</div></td></tr>';return;}
-  tb.innerHTML=C.cct.map(c=>{
+  const q=((document.getElementById('cct-q')||{}).value||'').toLowerCase();
+  const orden=(document.getElementById('cct-orden')||{}).value||'alfa';
+  const filtroEst=(document.getElementById('cct-estado')||{}).value||'';
+  let lista=[...C.cct];
+  if(q)lista=lista.filter(c=>(c.cliente_texto||'').toLowerCase().includes(q));
+  if(filtroEst)lista=lista.filter(c=>c.estado===filtroEst);
+  if(orden==='alfa')lista.sort((a,b)=>(a.cliente_texto||'').localeCompare(b.cliente_texto||''));
+  else if(orden==='deuda')lista.sort((a,b)=>totalesCC(b).deuda-totalesCC(a).deuda);
+  else lista.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+  const esAdmin=SESSION.rol==='admin';
+  tb.innerHTML=lista.length?lista.map(c=>{
     const t=totalesCC(c);
-    const esAdmin=SESSION.rol==='admin';
     return`<tr style="cursor:pointer" onclick="abrirDetalleCC(${c.id},'taller')"><td><strong>${c.cliente_texto}</strong></td><td>${fmt(t.total)}</td><td class="ing">${fmt(t.pagado)}</td><td class="${t.deuda>0?'eg':'ing'}">${fmt(t.deuda)}</td><td>${b(c.estado==='saldada'?'bg':'ba',c.estado==='saldada'?'Saldada':'Abierta')}</td><td onclick="event.stopPropagation()">${esAdmin?`<button class="icon-btn" onclick="elimCC(${c.id},'taller')"><i class="ti ti-trash"></i></button>`:''}</td></tr>`;
-  }).join('');
+  }).join(''):'<tr><td colspan="6"><div class="empty"><i class="ti ti-receipt-2"></i>Sin resultados.</div></td></tr>';
 }
 async function elimCC(id,tipo){if(!confirm('¿Eliminar cuenta corriente?'))return;setSyncStatus('syncing');await db.from(tipo==='taller'?'cc_taller':'cc_vehiculos').delete().eq('id',id);setSyncStatus('ok');if(tipo==='taller'){await loadCCT();renderCCT();}else{await loadCCV();renderCCVList();}}
 
@@ -1795,7 +1828,15 @@ function renderKanban(tipo){
   const fi=(document.getElementById(esA?'la-origen':'lt-svc')||{}).value||'';
   const board=document.getElementById(esA?'kanban-autos':'kanban-taller');if(!board)return;
   const fil=lista.filter(l=>{if(q&&!(l.nombre+(l.interes||l.servicio||'')).toLowerCase().includes(q))return false;if(fi){if(esA&&l.origen!==fi)return false;if(!esA&&l.servicio!==fi)return false;}return true;});
-  board.innerHTML=estados.map(est=>{const ls=fil.filter(l=>l.estado===est);return`<div class="kcol"><div class="khdr"><span class="kht">${est}</span><span class="kcnt">${ls.length}</span></div><div class="kcards">${ls.length?ls.map(l=>{const v=esA&&l.vehiculo_id?C.veh.find(x=>x.id===l.vehiculo_id):null;const sub=esA?(l.interes||'—'):(l.servicio+(l.vehiculo_cliente?` · ${l.vehiculo_cliente}`:''));return`<div class="kcard" onclick="openDetail('${esA?'la':'lt'}',${l.id})"><div class="kn">${l.nombre}</div><div class="km">${sub}</div><div class="ktags">${b(badge[l.estado]||'bgr',l.estado)} ${l.telefono?`<span class="badge bgr">${l.telefono}</span>`:''}</div></div>`;}).join(''):'<div class="kempty">Sin leads</div>'}</div></div>`;}).join('');
+  board.innerHTML=estados.map(est=>{const ls=fil.filter(l=>l.estado===est);return`<div class="kcol"><div class="khdr"><span class="kht">${est}</span><span class="kcnt">${ls.length}</span></div><div class="kcards">${ls.length?ls.map(l=>{const sub=esA?(l.interes||'—'):(l.servicio+(l.vehiculo_cliente?` · ${l.vehiculo_cliente}`:''));return`<div class="kcard"><div class="kcard-header" style="display:flex;justify-content:space-between;align-items:flex-start"><div onclick="openDetail('${esA?'la':'lt'}',${l.id})" style="cursor:pointer;flex:1"><div class="kn">${l.nombre}</div><div class="km">${sub}</div><div class="ktags">${b(badge[l.estado]||'bgr',l.estado)} ${l.telefono?`<span class="badge bgr">${l.telefono}</span>`:''}</div></div><button class="icon-btn" style="margin-left:6px;flex-shrink:0" onclick="elimLead('${esA?'autos':'taller'}',${l.id})"><i class="ti ti-trash"></i></button></div></div>`;}).join(''):'<div class="kempty">Sin leads</div>'}</div></div>`;}).join('');
+}
+async function elimLead(tipo,id){
+  if(!confirm('¿Eliminar esta tarjeta del pipeline?'))return;
+  setSyncStatus('syncing');
+  await db.from(tipo==='autos'?'leads_autos':'leads_taller').delete().eq('id',id);
+  setSyncStatus('ok');
+  if(tipo==='autos'){await loadLeadsA();renderKanban('autos');renderContactosAutos();}
+  else{await loadLeadsT();renderKanban('taller');}
 }
 function renderContactosAutos(){const q=((document.getElementById('ca-q')||{}).value||'').toLowerCase();const tb=document.getElementById('tb-ca');const lista=q?C.leadsA.filter(l=>(l.nombre+l.telefono).toLowerCase().includes(q)):C.leadsA;tb.innerHTML=lista.length?lista.map(l=>`<tr><td><strong>${l.nombre}</strong></td><td>${l.telefono||'—'}</td><td>${b('bgr',l.origen||'—')}</td><td>${l.interes||'—'}</td><td>${b(BA[l.estado]||'bgr',l.estado)}</td><td style="color:var(--tx3);font-size:10px">${l.created_at?.slice(0,10)||'—'}</td><td><button class="icon-btn" onclick="openDetail('la',${l.id})"><i class="ti ti-eye"></i></button></td></tr>`).join(''):'<tr><td colspan="7"><div class="empty"><i class="ti ti-users"></i>Sin contactos.</div></td></tr>';}
 function renderClientesTaller(){const q=((document.getElementById('ct-q')||{}).value||'').toLowerCase();const tb=document.getElementById('tb-ct');const lista=q?C.clt.filter(c=>(c.nombre+c.telefono+c.vehiculo).toLowerCase().includes(q)):C.clt;const today=hoyD();tb.innerHTML=lista.length?lista.map(c=>{const hist=c.historial||[];const ult=hist.length?hist[hist.length-1]:null;let rtxt='—',rcls='vok';if(c.prox_recordatorio){const d=Math.ceil((new Date(c.prox_recordatorio)-new Date(today))/(864e5));if(d<=0){rtxt='VENCIDO';rcls='vh';}else if(d<=7){rtxt=`${d}d`;rcls='vp';}else rtxt=c.prox_recordatorio;}return`<tr><td><strong>${c.nombre}</strong></td><td>${c.telefono||'—'}</td><td>${c.vehiculo||'—'}${c.patente?` <span style="font-size:9px;color:var(--tx3)">${c.patente}</span>`:''}</td><td style="font-size:10px;color:var(--tx3)">${ult?ult.fecha:'—'}</td><td>${ult?ult.svcs.map(s=>b('bgr',s)).join(' '):'—'}</td><td class="${rcls}" style="font-size:10px;font-weight:700">${rtxt}</td><td><button class="icon-btn" onclick="openDetail('clt',${c.id})"><i class="ti ti-eye"></i></button></td></tr>`;}).join(''):'<tr><td colspan="7"><div class="empty"><i class="ti ti-user-check"></i>Sin clientes.</div></td></tr>';}
@@ -2047,8 +2088,9 @@ async function guardarOT(){
     nombreCliente=nombre;
     vehiculoCliente=veh;
     telefonoCliente=tel;
-    // crear lead automático en pipeline de servicios
-    await db.from('leads_taller').insert({nombre,telefono:tel,origen:'Visita directa',estado:'Trabajo en proceso',servicio:svcsPreview[0]||'Otro',vehiculo_cliente:veh,seguimiento:[{fecha:hoy(),txt:'Lead creado automáticamente al cargar orden de trabajo.'}]});
+    // crear lead en pipeline solo si no existe ya
+    const leadExiste=C.leadsT.some(l=>l.nombre?.toLowerCase()===nombre.toLowerCase());
+    if(!leadExiste)await db.from('leads_taller').insert({nombre,telefono:tel,origen:'Visita directa',estado:'Trabajo en proceso',servicio:svcsPreview[0]||'Otro',vehiculo_cliente:veh,seguimiento:[{fecha:hoy(),txt:'Lead creado automáticamente al cargar orden de trabajo.'}]});
     await loadCLT();await loadLeadsT();
   } else {
     const selId=document.getElementById('ot-cliente-sel').value;
@@ -2057,6 +2099,9 @@ async function guardarOT(){
     clienteId=c?.id||null;
     nombreCliente=c?.nombre||'';
     vehiculoCliente=c?.vehiculo||'';
+    // crear lead en pipeline si no existe
+    const leadExisteExt=C.leadsT.some(l=>l.nombre?.toLowerCase()===nombreCliente.toLowerCase());
+    if(!leadExisteExt&&nombreCliente)await db.from('leads_taller').insert({nombre:nombreCliente,telefono:c?.telefono||'',origen:'Visita directa',estado:'Trabajo en proceso',servicio:svcsGet('os-')[0]||'Otro',vehiculo_cliente:vehiculoCliente,seguimiento:[{fecha:hoy(),txt:'Lead creado automáticamente desde orden de trabajo.'}]});
   }
   const svcs=svcsGet('os-');
   const ins=OT_INS.reduce((a,i)=>a+(i.valor||0),0);
@@ -2297,6 +2342,11 @@ async function guardarEdicionOT(){
   setSyncStatus('ok');closeM('m-ot-detalle');
   await loadOT();renderOT();
 }
+function limpiarFiltrosOT(){
+  ['ot-q','ot-fecha-desde','ot-fecha-hasta'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['ot-orden','ot-filtro-estado','ot-filtro-pago'].forEach(id=>{const el=document.getElementById(id);if(el)el.selectedIndex=0;});
+  renderOT();
+}
 function renderOT(){
   const esAdmin=SESSION.rol==='admin';
   const tb=document.getElementById('tb-ot');
@@ -2304,36 +2354,28 @@ function renderOT(){
   const q=((document.getElementById('ot-q')||{}).value||'').toLowerCase();
   const orden=(document.getElementById('ot-orden')||{}).value||'reciente';
   const filtroEstado=(document.getElementById('ot-filtro-estado')||{}).value||'';
+  const filtroPago=(document.getElementById('ot-filtro-pago')||{}).value||'';
+  const fechaDesde=(document.getElementById('ot-fecha-desde')||{}).value||'';
+  const fechaHasta=(document.getElementById('ot-fecha-hasta')||{}).value||'';
   let lista=[...C.ots];
   if(q)lista=lista.filter(o=>(o.cliente||'').toLowerCase().includes(q));
   if(filtroEstado)lista=lista.filter(o=>o.estado===filtroEstado);
+  if(filtroPago==='pagado')lista=lista.filter(o=>o.pagado);
+  else if(filtroPago==='pendiente')lista=lista.filter(o=>!o.pagado);
+  if(fechaDesde)lista=lista.filter(o=>o.fecha_ingreso&&o.fecha_ingreso>=fechaDesde);
+  if(fechaHasta)lista=lista.filter(o=>o.fecha_ingreso&&o.fecha_ingreso<=fechaHasta);
   if(orden==='alfa')lista.sort((a,b)=>(a.cliente||'').localeCompare(b.cliente||''));
   else if(orden==='estado')lista.sort((a,b)=>a.estado.localeCompare(b.estado));
+  const count=document.getElementById('ot-count');
+  if(count)count.textContent=lista.length+' orden'+(lista.length!==1?'es':'')+' encontrada'+(lista.length!==1?'s':'');
   tb.innerHTML=lista.length?lista.map(o=>{
     const costo=Number(o.costo_proveedor_total)||0;
     const cobrado=Number(o.precio_cobrado)||0;
     const margen=cobrado-costo;
-    const cobradoCell=o.pagado
-      ?`<td class="ing">${fmt(cobrado)}</td>`
-      :`<td><span style="color:var(--wa);font-size:10px;font-weight:700">Pendiente ${fmt(cobrado)}</span></td>`;
-    return`<tr style="cursor:pointer" onclick="verDetalleOT(${o.id})">
-      <td style="color:var(--tx3);font-size:10px">#${o.id}</td>
-      <td><strong>${o.cliente}</strong></td>
-      <td>${(o.servicios||[]).map(s=>b('bgr',s)).join(' ')}</td>
-      <td style="font-size:10px">${o.responsable||'—'}</td>
-      <td style="font-size:10px;color:var(--tx3)">${o.fecha_ingreso||'—'}</td>
-      <td style="font-size:10px;color:var(--tx3)">${o.fecha_entrega||'—'}</td>
-      ${esAdmin?`<td class="eg">${fmt(costo)}</td>${cobradoCell}<td class="${margen>=0?'ing':'eg'}">${fmt(margen)}</td>`:''}
-      <td>${o.pagado?b('bg','Pagado'):b('br','No pagó')}</td>
-      <td>${b(bm[o.estado]||'bgr',o.estado)}</td>
-      <td onclick="event.stopPropagation()"><button class="icon-btn" onclick="elimOT(${o.id})"><i class="ti ti-trash"></i></button></td>
-    </tr>`;
-  }).join(''):`<tr><td colspan="11"><div class="empty"><i class="ti ti-tool"></i>${q?'Sin resultados para "'+q+'"':'Sin órdenes.'}</div></td></tr>`;
+    const cobradoCell=o.pagado?`<td class="ing">${fmt(cobrado)}</td>`:`<td><span style="color:var(--wa);font-size:10px;font-weight:700">Pendiente ${fmt(cobrado)}</span></td>`;
+    return`<tr style="cursor:pointer" onclick="verDetalleOT(${o.id})"><td style="color:var(--tx3);font-size:10px">#${o.id}</td><td><strong>${o.cliente}</strong></td><td>${(o.servicios||[]).map(s=>b('bgr',s)).join(' ')}</td><td style="font-size:10px">${o.responsable||'—'}</td><td style="font-size:10px;color:var(--tx3)">${o.fecha_ingreso||'—'}</td><td style="font-size:10px;color:var(--tx3)">${o.fecha_entrega||'—'}</td>${esAdmin?`<td class="eg">${fmt(costo)}</td>${cobradoCell}<td class="${margen>=0?'ing':'eg'}">${fmt(margen)}</td>`:''}<td>${o.pagado?b('bg','Pagado'):b('br','No pagó')}</td><td>${b(bm[o.estado]||'bgr',o.estado)}</td><td onclick="event.stopPropagation()"><button class="icon-btn" onclick="elimOT(${o.id})"><i class="ti ti-trash"></i></button></td></tr>`;
+  }).join(''):`<tr><td colspan="11"><div class="empty"><i class="ti ti-tool"></i>Sin órdenes.</div></td></tr>`;
 }
-async function elimOT(id){if(!confirm('¿Eliminar orden?'))return;setSyncStatus('syncing');await db.from('ordenes_trabajo').delete().eq('id',id);setSyncStatus('ok');await loadOT();renderOT();}
-
-// CF
-async function guardarCF(){const nombre=document.getElementById('cf-n').value,monto=getMaskValue('cf-m');if(!nombre||!monto)return alert('Completá nombre y monto');setSyncStatus('syncing');await db.from('costos_fijos').insert({nombre,categoria:document.getElementById('cf-cat').value,monto,dia_vencimiento:parseInt(document.getElementById('cf-dia').value)||null,estado:document.getElementById('cf-est').value,notas:document.getElementById('cf-notas').value});setSyncStatus('ok');closeM('m-cf');['cf-n','cf-m','cf-dia','cf-notas'].forEach(id=>document.getElementById(id).value='');await loadCF();renderCF();}
 function renderCF(){
   const mes=mesActualStr();
   const activos=C.cf.filter(c=>c.estado==='activo');

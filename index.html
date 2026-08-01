@@ -995,6 +995,7 @@ tr:hover td{background:var(--s2)}
   </div>
   <div class="fg3">
     <div class="fr" style="margin-bottom:0"><input id="ccd-pago-monto" type="text" inputmode="numeric" placeholder="Monto $"></div>
+    <div class="fr" style="margin-bottom:0"><input id="ccd-pago-fecha" type="date"></div>
     <div class="fr" style="margin-bottom:0">
       <select id="ccd-pago-caja">
         <option value="1">1 — Efectivo</option><option value="2">2 — Banco</option><option value="3">3 — Jorge</option>
@@ -1318,6 +1319,8 @@ function abrirDetalleCC(id,tipo){
   const c=lista.find(x=>x.id===id);if(!c)return;
   document.getElementById('ccd-titulo').textContent=`${c.cliente_texto}${c.vehiculo_texto?' — '+c.vehiculo_texto:''}`;
   document.getElementById('ccd-cruce').innerHTML='';
+  const fechaEl=document.getElementById('ccd-pago-fecha');
+  if(fechaEl)fechaEl.value=hoyD();
   renderDetalleCC();
   openM('m-cc-detalle');
 }
@@ -1392,7 +1395,7 @@ async function agregarPagoCC(){
   const tabla=tipo==='taller'?'cc_taller':'cc_vehiculos';
   const lista=tipo==='taller'?C.cct:C.ccv;
   const c=lista.find(x=>x.id===id);if(!c)return;
-  const fecha=hoyD();
+  const fecha=document.getElementById('ccd-pago-fecha').value||hoyD();
   const pagos=[...(c.pagos||[]),{fecha,monto,subcuenta,nota}];
   setSyncStatus('syncing');
   // actualizar cuenta corriente

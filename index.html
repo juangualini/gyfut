@@ -1571,6 +1571,9 @@ function renderMes(){
   const{y,m}=C.mesActual;
   document.getElementById('mes-titulo').textContent=`${MESES[m]} ${y}`;
   const prefijo=`${y}-${String(m+1).padStart(2,'0')}`;
+  // saldo arrastrado de meses anteriores
+  const movsPrevios=C.cajat.filter(mov=>mov.fecha&&mov.fecha<prefijo);
+  const saldoArrastrado=movsPrevios.reduce((a,x)=>a+(parseFloat(x.cobrado)||0)-(parseFloat(x.pagado)||0),0);
   const movsMes=C.cajat.filter(mov=>mov.fecha&&mov.fecha.startsWith(prefijo));
   const movs=movsMes.filter(x=>!x.tipo_mov||x.tipo_mov==='movimiento');
   const sueldos=movsMes.filter(x=>x.tipo_mov==='sueldo'||x.tipo_mov==='gasto_fijo');
@@ -1590,8 +1593,9 @@ function renderMes(){
   const diasOrdenadosAsc=Object.keys(diasMap).sort((a,c)=>a.localeCompare(c));
   const cont=document.getElementById('mes-dias');if(!cont)return;
   if(!diasOrdenadosAsc.length){cont.innerHTML='<div class="empty"><i class="ti ti-calendar"></i>Sin movimientos este mes.</div>';return;}
-  let acumulado=0;
-  const bloques=diasOrdenadosAsc.map(fecha=>{
+  let html=`<div class="cierre-box" style="background:rgba(59,130,246,.06);border-color:rgba(59,130,246,.2);margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:11px;color:var(--tx2);font-weight:600">Saldo arrastrado del mes anterior</span><span style="font-size:16px;font-weight:700;color:var(--ac)">${fmt(saldoArrastrado)}</span></div></div>`;
+  let acumulado=saldoArrastrado;
+  html+=diasOrdenadosAsc.map(fecha=>{
     const movsDia=diasMap[fecha].filter(x=>!x.tipo_mov||x.tipo_mov==='movimiento');
     const sueldosDia=diasMap[fecha].filter(x=>x.tipo_mov==='sueldo'||x.tipo_mov==='gasto_fijo');
     const cobDia=movsDia.reduce((a,x)=>a+(parseFloat(x.cobrado)||0),0);
@@ -1602,25 +1606,12 @@ function renderMes(){
     acumulado+=netoDia;
     const cierreDia=acumulado;
     const d=new Date(fecha+'T12:00:00');
-    const diasSemana=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-    return`<div class="dia-bloque">
-      <div class="dia-bloque-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
-        <span class="dia-bloque-fecha">${diasSemana[d.getDay()]} ${d.getDate()} de ${MESES[d.getMonth()]}</span>
-        <div class="dia-bloque-resumen">
-          <span class="dia-bloque-stat" style="color:var(--tx3)">apertura ${fmt(aperturaDia)}</span>
-          ${cobDia?`<span class="dia-bloque-stat ing">+${fmt(cobDia)}</span>`:''}${(pagDia+sueldoDia)?`<span class="dia-bloque-stat eg">-${fmt(pagDia+sueldoDia)}</span>`:''}
-          <span class="dia-bloque-stat" style="color:var(--ac);font-weight:700">cierre ${fmt(cierreDia)}</span>
-        </div>
-      </div>
-      <div style="display:none">
-        <div class="mov-hdr"><div class="mov-hdr-cell">Caja</div><div class="mov-hdr-cell">Detalle</div><div class="mov-hdr-cell">Tipo</div><div class="mov-hdr-cell">Cobrado</div><div class="mov-hdr-cell">Pagado</div><div class="mov-hdr-cell"></div></div>
-        ${diasMap[fecha].map(x=>{const caja=CAJAS.find(c=>c.n===x.subcuenta);const esSueldo=x.tipo_mov==='sueldo'||x.tipo_mov==='gasto_fijo';const tipoBadge=x.tipo_mov==='sueldo'?b('ba','Sueldo'):x.tipo_mov==='gasto_fijo'?b('bgr','Gasto fijo'):b('bgr',x.categoria||'Movimiento');return`<div class="mov-row"><div class="mov-cell"><span class="num-caja ${esSueldo?'sueldo':''}">${x.subcuenta}</span></div><div class="mov-cell"><strong>${x.detalle}</strong><br><span style="font-size:9px;color:var(--tx3)">${caja?.nombre||'—'}</span></div><div class="mov-cell muted">${tipoBadge}</div><div class="mov-cell cobrado">${(x.cobrado&&x.cobrado>0)?fmt(x.cobrado):'—'}</div><div class="mov-cell pagado">${(x.pagado&&x.pagado>0)?fmt(x.pagado):'—'}</div><div class="mov-cell"><button class="icon-btn" onclick="elimMovDia(${x.id})"><i class="ti ti-trash"></i></button></div></div>`;}).join('')}
-      </div>
-    </div>`;
-  });
-  cont.innerHTML=bloques.reverse().join('');
+    const ds=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    return`<div class="dia-bloque"><div class="dia-bloque-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'"><span class="dia-bloque-fecha">${ds[d.getDay()]} ${d.getDate()} de ${MESES[d.getMonth()]}</span><div class="dia-bloque-resumen"><span class="dia-bloque-stat" style="color:var(--tx3)">apertura ${fmt(aperturaDia)}</span>${cobDia?`<span class="dia-bloque-stat ing">+${fmt(cobDia)}</span>`:''}${(pagDia+sueldoDia)?`<span class="dia-bloque-stat eg">-${fmt(pagDia+sueldoDia)}</span>`:''}<span class="dia-bloque-stat" style="color:var(--ac);font-weight:700">cierre ${fmt(cierreDia)}</span></div></div><div style="display:none"><div class="mov-hdr"><div class="mov-hdr-cell">Caja</div><div class="mov-hdr-cell">Detalle</div><div class="mov-hdr-cell">Tipo</div><div class="mov-hdr-cell">Cobrado</div><div class="mov-hdr-cell">Pagado</div><div class="mov-hdr-cell"></div></div>${diasMap[fecha].map(x=>{const caja=CAJAS.find(c=>c.n===x.subcuenta);const esSueldo=x.tipo_mov==='sueldo'||x.tipo_mov==='gasto_fijo';const tipoBadge=x.tipo_mov==='sueldo'?b('ba','Sueldo'):x.tipo_mov==='gasto_fijo'?b('bgr','Gasto fijo'):b('bgr',x.categoria||'Movimiento');return`<div class="mov-row"><div class="mov-cell"><span class="num-caja ${esSueldo?'sueldo':''}">${x.subcuenta}</span></div><div class="mov-cell"><strong>${x.detalle}</strong><br><span style="font-size:9px;color:var(--tx3)">${caja?.nombre||'—'}</span></div><div class="mov-cell muted">${tipoBadge}</div><div class="mov-cell cobrado">${(x.cobrado&&x.cobrado>0)?fmt(x.cobrado):'—'}</div><div class="mov-cell pagado">${(x.pagado&&x.pagado>0)?fmt(x.pagado):'—'}</div><div class="mov-cell"><button class="icon-btn" onclick="elimMovDia(${x.id})"><i class="ti ti-trash"></i></button></div></div>`;}).join('')}</div></div>`;
+  }).join('');
+  cont.innerHTML=html;
 }
-function abrirMovDia(){document.getElementById('ct-fecha').value=C.diaActual;document.getElementById('ct-tipo-mov').value='movimiento';document.getElementById('cajat-title').textContent='Nuevo movimiento — caja taller';openM('m-cajat');}
+function abrirMovDiaT(){document.getElementById('ct-fecha').value=C.diaActual;document.getElementById('ct-tipo-mov').value='movimiento';document.getElementById('cajat-title').textContent='Nuevo movimiento — caja taller';openM('m-cajat');}
 function abrirSueldo(){document.getElementById('su-fecha').value=C.diaActual;openM('m-sueldo');}
 
 async function guardarCajaT(){

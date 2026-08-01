@@ -869,6 +869,7 @@ tr:hover td{background:var(--s2)}
   </div>
   <div class="fg3">
     <div class="fr" style="margin-bottom:0"><input id="provd-pago-monto" type="text" inputmode="numeric" placeholder="Monto $"></div>
+    <div class="fr" style="margin-bottom:0"><input id="provd-pago-fecha" type="date"></div>
     <div class="fr" style="margin-bottom:0">
       <select id="provd-pago-caja">
         <option value="1">1 — Efectivo</option><option value="2">2 — Banco</option><option value="3">3 — Jorge</option>
@@ -2435,6 +2436,8 @@ function abrirDetalleProv(id){
   const p=C.prov.find(x=>x.id===id);if(!p)return;
   document.getElementById('provd-id').value=id;
   document.getElementById('provd-titulo').textContent=p.nombre;
+  const fechaEl=document.getElementById('provd-pago-fecha');
+  if(fechaEl)fechaEl.value=hoyD();
   renderDetalleProv();openM('m-prov-detalle');
 }
 function renderDetalleProv(){
@@ -2475,7 +2478,7 @@ async function agregarPagoProv(){
   const nota=document.getElementById('provd-pago-nota').value;
   const id=parseInt(document.getElementById('provd-id').value);
   const p=C.prov.find(x=>x.id===id);if(!p)return;
-  const fecha=hoyD();
+  const fecha=document.getElementById('provd-pago-fecha').value||hoyD();
   const pagos=[...(p.pagos||[]),{fecha,monto,subcuenta,nota}];
   setSyncStatus('syncing');
   await db.from('cc_proveedores').update({pagos}).eq('id',id);p.pagos=pagos;

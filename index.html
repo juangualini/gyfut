@@ -94,6 +94,16 @@ tr:hover td{background:var(--s2)}
 .kcnt{font-size:10px;color:var(--tx3);background:var(--s1);border-radius:10px;padding:1px 7px;border:1px solid var(--bd)}
 .kcards{padding:8px;display:flex;flex-direction:column;gap:6px;min-height:60px}
 .kcard{background:var(--s2);border:1px solid var(--bd);border-radius:7px;padding:10px;transition:border-color .12s;overflow:visible}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px}
+.cal-dow{font-size:10px;font-weight:600;color:var(--tx3);text-align:center;padding:4px 0;text-transform:uppercase}
+.cal-dia{min-height:80px;background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:6px;cursor:pointer;transition:border-color .12s}
+.cal-dia:hover{border-color:var(--ac)}
+.cal-dia.hoy{border-color:var(--ac);background:rgba(59,130,246,.06)}
+.cal-dia.otro-mes{opacity:.35}
+.cal-dia-num{font-size:11px;font-weight:700;color:var(--tx2);margin-bottom:4px}
+.cal-ot-chip{font-size:9px;background:var(--ac);color:#fff;border-radius:3px;padding:2px 5px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.cal-ot-chip.pagada{background:var(--ok)}
+.cal-ot-chip.pendiente{background:var(--wa)}
 .kcard:hover{border-color:var(--ac)}
 .kn{font-size:12px;font-weight:600;color:var(--tx);margin-bottom:3px}
 .km{font-size:10px;color:var(--tx3);margin-bottom:6px}
@@ -429,6 +439,14 @@ tr:hover td{background:var(--s2)}
 
     <!-- ÓRDENES -->
     <div class="page" id="page-ordenes">
+      <!-- PESTAÑAS -->
+      <div class="tab-bar" id="ot-tabs" style="margin-bottom:14px">
+        <div class="tab active" onclick="otVista('tabla',this)"><i class="ti ti-list" style="font-size:12px;margin-right:4px"></i>Lista</div>
+        <div class="tab" onclick="otVista('calendario',this)"><i class="ti ti-calendar" style="font-size:12px;margin-right:4px"></i>Calendario</div>
+      </div>
+
+      <!-- VISTA LISTA -->
+      <div id="ot-vista-tabla">
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;align-items:center">
         <input id="ot-q" placeholder="Buscar cliente o apellido..." oninput="renderOT()" style="flex:1;min-width:180px">
         <select id="ot-orden" onchange="renderOT()">
@@ -456,6 +474,18 @@ tr:hover td{background:var(--s2)}
       </div>
       <div style="font-size:10px;color:var(--tx3);margin-bottom:8px" id="ot-count"></div>
       <div class="tw"><table><thead><tr><th>N°</th><th>Cliente</th><th>Servicios</th><th>Asignado</th><th>Ingreso</th><th>Entrega</th><th class="restricted-hide" data-perm="admin">Costo</th><th class="restricted-hide" data-perm="admin">Cobrado</th><th class="restricted-hide" data-perm="admin">Margen</th><th>Pagó</th><th>Estado</th><th></th></tr></thead><tbody id="tb-ot"></tbody></table></div>
+      </div>
+
+      <!-- VISTA CALENDARIO -->
+      <div id="ot-vista-calendario" style="display:none">
+        <div class="mes-nav" style="margin-bottom:14px">
+          <button class="btn" onclick="navCalOT(-1)"><i class="ti ti-chevron-left"></i></button>
+          <div class="mes-label" id="ot-cal-titulo">—</div>
+          <button class="btn" onclick="navCalOT(1)"><i class="ti ti-chevron-right"></i></button>
+          <button class="btn" onclick="irHoyCalOT()"><i class="ti ti-home"></i> Hoy</button>
+        </div>
+        <div id="ot-calendario"></div>
+      </div>
     </div>
 
     <!-- CAJA TALLER -->
@@ -2523,7 +2553,66 @@ async function guardarPagoCF(){
   await Promise.all([loadCF(),loadCFPagos()]);renderCF();
 }
 
-loadDash();
+// ============ CALENDARIO OT ============
+function otVista(vista,el){
+  document.querySelectorAll('#ot-tabs .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('ot-vista-tabla').style.display=vista==='tabla'?'block':'none';
+  document.getElementById('ot-vista-calendario').style.display=vista==='calendario'?'block':'none';
+  if(vista==='calendario')renderCalOT();
+}
+function navCalOT(delta){
+  if(!C.calOT)C.calOT={y:new Date().getFullYear(),m:new Date().getMonth()};
+  C.calOT.m+=delta;
+  if(C.calOT.m>11){C.calOT.m=0;C.calOT.y++;}
+  if(C.calOT.m<0){C.calOT.m=11;C.calOT.y--;}
+  renderCalOT();
+}
+function irHoyCalOT(){C.calOT={y:new Date().getFullYear(),m:new Date().getMonth()};renderCalOT();}
+function renderCalOT(){
+  if(!C.calOT)C.calOT={y:new Date().getFullYear(),m:new Date().getMonth()};
+  const{y,m}=C.calOT;
+  document.getElementById('ot-cal-titulo').textContent=`${MESES[m]} ${y}`;
+  const hoy=new Date();
+  const primerDia=new Date(y,m,1);
+  const ultimoDia=new Date(y,m+1,0);
+  const startDow=(primerDia.getDay()+6)%7; // lunes=0
+  const dias=[];
+  // días del mes anterior
+  for(let i=startDow-1;i>=0;i--){
+    const d=new Date(y,m,0-i);
+    dias.push({fecha:d,otroMes:true});
+  }
+  // días del mes
+  for(let i=1;i<=ultimoDia.getDate();i++){
+    dias.push({fecha:new Date(y,m,i),otroMes:false});
+  }
+  // completar hasta múltiplo de 7
+  while(dias.length%7!==0)dias.push({fecha:new Date(y,m+1,dias.length-ultimoDia.getDate()-startDow+1),otroMes:true});
+  const prefijo=`${y}-${String(m+1).padStart(2,'0')}`;
+  const otsMes=C.ots.filter(o=>o.fecha_ingreso&&o.fecha_ingreso.startsWith(prefijo));
+  const dows=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  let html=`<div class="cal-grid">${dows.map(d=>`<div class="cal-dow">${d}</div>`).join('')}`;
+  dias.forEach(({fecha,otroMes})=>{
+    const fechaStr=fecha.toISOString().split('T')[0];
+    const esHoy=fecha.toDateString()===hoy.toDateString();
+    const otsDia=otsMes.filter(o=>o.fecha_ingreso===fechaStr);
+    html+=`<div class="cal-dia${otroMes?' otro-mes':''}${esHoy?' hoy':''}" onclick="clickDiaCalOT('${fechaStr}')">
+      <div class="cal-dia-num">${fecha.getDate()}</div>
+      ${otsDia.map(o=>`<div class="cal-ot-chip ${o.pagado?'pagada':'pendiente'}" onclick="event.stopPropagation();verDetalleOT(${o.id})" title="${o.cliente}">${o.cliente.split('—')[0].trim()}</div>`).join('')}
+    </div>`;
+  });
+  html+='</div>';
+  document.getElementById('ot-calendario').innerHTML=html;
+}
+function clickDiaCalOT(fechaStr){
+  // abrir nueva OT con esa fecha preseleccionada
+  abrirOT();
+  setTimeout(()=>{
+    const el=document.getElementById('ot-fing');
+    if(el)el.value=fechaStr;
+  },100);
+}
 </script>
 </body>
 </html>

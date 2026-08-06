@@ -2613,6 +2613,22 @@ function clickDiaCalOT(fechaStr){
     if(el)el.value=fechaStr;
   },100);
 }
+async function elimOT(id){
+  if(!confirm('¿Eliminar orden?'))return;
+  const ot=C.ots.find(x=>x.id===id);
+  setSyncStatus('syncing');
+  await db.from('ordenes_trabajo').delete().eq('id',id);
+  if(ot?.cliente_id){
+    if(!C.cct.length)await loadCCT();
+    const cc=C.cct.find(x=>x.cliente_id===ot.cliente_id&&x.estado==='abierta');
+    if(cc){
+      const itemsLimpios=(cc.items||[]).filter(i=>!i.descripcion?.startsWith('[OT]'));
+      await db.from('cc_taller').update({items:itemsLimpios}).eq('id',cc.id);
+    }
+  }
+  setSyncStatus('ok');
+  await loadOT();renderOT();
+}
 </script>
 </body>
 </html>

@@ -2177,8 +2177,10 @@ async function guardarOT(){
   }
   // Si NO pagó → crear o actualizar CC taller del cliente con la deuda
   if(!pagado&&totalCobrado>0&&clienteId){
+    console.log('Creando CC para cliente:', clienteId, nombreCliente, 'items:', itemsCC?.length);
     await loadCCT();
     let cc=C.cct.find(x=>x.cliente_id===clienteId&&x.estado==='abierta');
+    console.log('CC existente:', cc?.id||'ninguna');
     const itemsCC=[
       ...OT_INS.map(i=>({fecha:hoyD(),descripcion:`[OT] Insumos — ${i.desc}`,valor:i.valor})),
       ...OT_MO.map(i=>({fecha:hoyD(),descripcion:`[OT] Mano de obra — ${i.desc}`,valor:i.valor}))

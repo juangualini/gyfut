@@ -2224,15 +2224,14 @@ async function guardarOT(){
   }
   // Si NO pagó → crear o actualizar CC taller del cliente con la deuda
   if(!pagado&&totalCobrado>0&&clienteId){
-    console.log('Creando CC para cliente:', clienteId, nombreCliente, 'items:', itemsCC?.length);
     await loadCCT();
     let cc=C.cct.find(x=>x.cliente_id===clienteId&&x.estado==='abierta');
-    console.log('CC existente:', cc?.id||'ninguna');
     const itemsCC=[
       ...OT_INS.map(i=>({fecha:hoyD(),descripcion:`[OT] Insumos — ${i.desc}`,valor:i.valor})),
       ...OT_MO.map(i=>({fecha:hoyD(),descripcion:`[OT] Mano de obra — ${i.desc}`,valor:i.valor}))
     ];
     if(itemsCC.length===0)itemsCC.push({fecha:hoyD(),descripcion:`Trabajo — ${(svcs.length?svcs:['General']).join(', ')}`,valor:totalCobrado});
+    console.log('Creando CC para cliente:', clienteId, nombreCliente, 'items:', itemsCC.length, 'CC existente:', cc?.id||'ninguna');
     if(cc){
       const nuevosItems=[...(cc.items||[]),...itemsCC];
       const{error}=await db.from('cc_taller').update({items:nuevosItems,estado:'abierta'}).eq('id',cc.id);
@@ -2253,7 +2252,14 @@ async function guardarOT(){
   document.getElementById('ot-pagado').value='false';
   document.getElementById('ot-caja-pago-row').style.display='none';
   OT_INS=[];OT_MO=[];OT_PROV=[];
-  svcsReset('os-');await loadOT();renderOT();
+  svcsReset('os-');
+  await loadOT();
+  renderOT();
+  // asegurar que la vista de tabla esté activa
+  const tablaEl=document.getElementById('ot-vista-tabla');
+  const calEl=document.getElementById('ot-vista-calendario');
+  if(tablaEl)tablaEl.style.display='block';
+  if(calEl)calEl.style.display='none';
 }
 function verDetalleOT(id){
   const o=C.ots.find(x=>x.id===id);if(!o)return;

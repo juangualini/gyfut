@@ -2742,8 +2742,12 @@ async function guardarEditMov(){
   const tablaDB=tabla==='cajat'?'caja_taller':'caja_vehiculos';
   await db.from(tablaDB).update({detalle:det,cobrado,pagado,subcuenta,fecha}).eq('id',id);
   setSyncStatus('ok');closeM('m-edit-mov');
-  if(tabla==='cajat'){await loadCajaT();renderDia();}
-  else{await loadCajaV();renderDiaV();}
+  if(tabla==='cajat'){
+    await loadCajaT();
+    await loadSaldosIniciales();
+    renderDia();
+    if(C.cajaVistaActual==='mes')renderMes();
+  } else{await loadCajaV();renderDiaV();}
 }
 
 

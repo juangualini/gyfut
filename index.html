@@ -804,7 +804,7 @@ tr:hover td{background:var(--s2)}
     </div>
     <div class="fr"><label>Fecha</label><input id="edit-mov-fecha" type="date"></div>
   </div>
-  <div class="ma"><button class="btn" onclick="closeM('m-edit-mov')">Cancelar</button><button class="btn btn-p" onclick="guardarEditMov()">Guardar</button></div>
+  <div class="ma"><button class="btn btn-er" onclick="elimMovDesdeEdit()">Eliminar</button><button class="btn" onclick="closeM('m-edit-mov')">Cancelar</button><button class="btn btn-p" onclick="guardarEditMov()">Guardar</button></div>
 </div></div>
 
 <div class="mo" id="m-cajat"><div class="modal">
@@ -2732,6 +2732,16 @@ function abrirEditMov(id,tabla){
     const v=el.value.replace(/[^\d]/g,'');
     if(v)el.value=Number(v).toLocaleString('de-DE');
   });
+}
+async function elimMovDesdeEdit(){
+  const id=parseInt(document.getElementById('edit-mov-id').value);
+  const tabla=document.getElementById('edit-mov-tabla').value;
+  if(!confirm('¿Eliminar este movimiento?'))return;
+  setSyncStatus('syncing');
+  await db.from(tabla==='cajat'?'caja_taller':'caja_vehiculos').delete().eq('id',id);
+  setSyncStatus('ok');closeM('m-edit-mov');
+  if(tabla==='cajat'){await loadCajaT();await loadSaldosIniciales();renderDia();}
+  else{await loadCajaV();renderDiaV();}
 }
 async function guardarEditMov(){
   const id=parseInt(document.getElementById('edit-mov-id').value);

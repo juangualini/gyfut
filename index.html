@@ -522,7 +522,10 @@ tr:hover td{background:var(--s2)}
           <div id="dia-sueldos-list"></div>
         </div>
         <div class="restricted-hide" data-perm="admin">
-          <div style="margin-bottom:8px;font-size:11px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em">Saldo por caja — solo de hoy</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-size:11px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em">Saldo por caja — acumulado real</span>
+            <button class="btn" style="font-size:10px;padding:4px 10px" onclick="abrirSaldoInicial()"><i class="ti ti-adjustments"></i> Saldo inicial</button>
+          </div>
           <div class="caja-grid" id="dia-saldos-cards"></div>
         </div>
       </div>
@@ -770,6 +773,38 @@ tr:hover td{background:var(--s2)}
   <div class="mt" id="otd-titulo">Orden de trabajo</div>
   <div id="otd-content"></div>
   <div class="ma"><button class="btn" onclick="closeM('m-ot-detalle')">Cerrar</button></div>
+</div></div>
+
+<!-- SALDO INICIAL POR CAJA -->
+<div class="mo" id="m-saldo-inicial"><div class="modal">
+  <div class="mt">Cargar saldo inicial por caja</div>
+  <div style="font-size:11px;color:var(--tx3);margin-bottom:14px">Ingresá el saldo real que tenés hoy en cada caja. Esto se usa como punto de partida para calcular el saldo acumulado.</div>
+  <div id="saldo-inicial-form"></div>
+  <div class="fr"><label>Fecha de referencia</label><input id="si-fecha" type="date"></div>
+  <div class="ma"><button class="btn" onclick="closeM('m-saldo-inicial')">Cancelar</button><button class="btn btn-p" onclick="guardarSaldoInicial()">Guardar saldos</button></div>
+</div></div>
+
+<!-- EDITAR MOVIMIENTO DE CAJA -->
+<div class="mo" id="m-edit-mov"><div class="modal">
+  <div class="mt">Editar movimiento</div>
+  <input type="hidden" id="edit-mov-id">
+  <input type="hidden" id="edit-mov-tabla">
+  <div class="fr"><label>Detalle</label><input id="edit-mov-det"></div>
+  <div class="fg2">
+    <div class="fr"><label>Cobrado ($)</label><input id="edit-mov-cobrado" type="text" inputmode="numeric" placeholder="0"></div>
+    <div class="fr"><label>Pagado ($)</label><input id="edit-mov-pagado" type="text" inputmode="numeric" placeholder="0"></div>
+  </div>
+  <div class="fg2">
+    <div class="fr"><label>Caja</label>
+      <select id="edit-mov-caja">
+        <option value="1">1 — Efectivo</option><option value="2">2 — Banco</option><option value="3">3 — Jorge</option>
+        <option value="4">4 — Cheque</option><option value="5">5 — Mariana</option><option value="6">6 — Martín</option>
+        <option value="7">7 — Lucho</option><option value="8">8 — USD</option>
+      </select>
+    </div>
+    <div class="fr"><label>Fecha</label><input id="edit-mov-fecha" type="date"></div>
+  </div>
+  <div class="ma"><button class="btn" onclick="closeM('m-edit-mov')">Cancelar</button><button class="btn btn-p" onclick="guardarEditMov()">Guardar</button></div>
 </div></div>
 
 <div class="mo" id="m-cajat"><div class="modal">
@@ -1050,7 +1085,7 @@ const CAJAS=[{n:1,nombre:'Efectivo'},{n:2,nombre:'Banco'},{n:3,nombre:'Jorge'},{
 const MESES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
 let SESSION=null;
-let C={leadsA:[],leadsT:[],clt:[],veh:[],ots:[],cajav:[],cajat:[],cf:[],cfPagos:[],ventas:[],recs:[],gestoria:[],cct:[],ccv:[],prov:[],activeId:null,activeType:null,recFiltro:'todos',diaActual:new Date().toISOString().split('T')[0],mesActual:{y:new Date().getFullYear(),m:new Date().getMonth()},diaVActual:new Date().toISOString().split('T')[0],mesVActual:{y:new Date().getFullYear(),m:new Date().getMonth()},cajaVistaActual:'dia',cajaVVistaActual:'dia'};
+let C={leadsA:[],leadsT:[],clt:[],veh:[],ots:[],cajav:[],cajat:[],cf:[],cfPagos:[],ventas:[],recs:[],gestoria:[],cct:[],ccv:[],prov:[],saldosIniciales:[],activeId:null,activeType:null,recFiltro:'todos',diaActual:new Date().toISOString().split('T')[0],mesActual:{y:new Date().getFullYear(),m:new Date().getMonth()},diaVActual:new Date().toISOString().split('T')[0],mesVActual:{y:new Date().getFullYear(),m:new Date().getMonth()},cajaVistaActual:'dia',cajaVVistaActual:'dia'};
 
 const fmt=n=>{const num=Math.round(Number(n||0));return'$'+num.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.')};
 const hoy=()=>new Date().toLocaleDateString('es-AR');
@@ -1474,7 +1509,7 @@ async function elimPagoCC(idx){
 }
 
 // ============ CAJA TALLER (diaria + mensual) ============
-async function loadCajaTaller(){await loadCajaT();if(C.cajaVistaActual==='dia')renderDia();else renderMes();}
+async function loadCajaTaller(){await Promise.all([loadCajaT(),loadSaldosIniciales()]);if(C.cajaVistaActual==='dia')renderDia();else renderMes();}
 function cajaTab(vista,el){
   C.cajaVistaActual=vista;
   document.querySelectorAll('#caja-tabs .tab').forEach(t=>t.classList.remove('active'));
@@ -1576,7 +1611,16 @@ function renderDia(){
     const saldos={};CAJAS.forEach(c=>saldos[c.n]=0);
     todoElDia.forEach(m=>{saldos[m.subcuenta]=(saldos[m.subcuenta]||0)+(parseFloat(m.cobrado)||0)-(parseFloat(m.pagado)||0);});
     const cont=document.getElementById('dia-saldos-cards');
-    if(cont)cont.innerHTML=CAJAS.map(c=>{const s=saldos[c.n]||0;const cls=s>0?'pos':s<0?'neg':'zer';return`<div class="caja-card"><div class="caja-num">${String(c.n).padStart(3,'0')}</div><div class="caja-nombre">${c.nombre}</div><div class="caja-saldo ${cls}">${fmt(s)}</div><div class="caja-sub">resultado de hoy</div></div>`;}).join('');
+    if(cont)cont.innerHTML=CAJAS.map(c=>{
+      const si=(C.saldosIniciales||[]).find(x=>x.subcuenta===c.n);
+      const saldoInicial=si?parseFloat(si.monto)||0:0;
+      const fechaSI=si?.fecha||'9999-12-31';
+      // sumar todos los movimientos desde el saldo inicial
+      const acum=C.cajat.filter(x=>x.subcuenta===c.n&&x.fecha>=fechaSI).reduce((a,x)=>a+(parseFloat(x.cobrado)||0)-(parseFloat(x.pagado)||0),0);
+      const total=saldoInicial+acum;
+      const cls=total>0?'pos':total<0?'neg':'zer';
+      return`<div class="caja-card"><div class="caja-num">${String(c.n).padStart(3,'0')}</div><div class="caja-nombre">${c.nombre}</div><div class="caja-saldo ${cls}">${fmt(total)}</div><div class="caja-sub">${si?'saldo real':'sin saldo inicial'}</div></div>`;
+    }).join('');
     renderMovList('dia-sueldos-list',sueldosDia,true,esAdmin);
   }
   renderMovList('dia-movs',movsDia,false,esAdmin);
@@ -1593,7 +1637,10 @@ function renderMovList(containerId,movs,esSueldo,esAdmin){
       <div class="mov-cell muted">${tipoBadge}</div>
       <div class="mov-cell cobrado">${(m.cobrado&&m.cobrado>0)?fmt(m.cobrado):'—'}</div>
       <div class="mov-cell pagado">${(m.pagado&&m.pagado>0)?fmt(m.pagado):'—'}</div>
-      <div class="mov-cell"><button class="icon-btn" onclick="elimMovDia(${m.id})"><i class="ti ti-trash"></i></button></div>
+      <div class="mov-cell" style="display:flex;gap:4px">
+        <button class="icon-btn" onclick="abrirEditMov(${m.id},'cajat')"><i class="ti ti-pencil"></i></button>
+        <button class="icon-btn" onclick="elimMovDia(${m.id})"><i class="ti ti-trash"></i></button>
+      </div>
     </div>`;
   }).join('');
 }
@@ -2524,8 +2571,28 @@ async function agregarPagoProv(){
 async function elimPagoProv(idx){
   const id=parseInt(document.getElementById('provd-id').value);
   const p=C.prov.find(x=>x.id===id);if(!p)return;
-  const pagos=[...(p.pagos||[])];pagos.splice(idx,1);
-  setSyncStatus('syncing');await db.from('cc_proveedores').update({pagos,estado:'abierta'}).eq('id',id);p.pagos=pagos;p.estado='abierta';setSyncStatus('ok');
+  const pagos=[...(p.pagos||[])];
+  const pagoEliminado=pagos[idx];
+  pagos.splice(idx,1);
+  setSyncStatus('syncing');
+  await db.from('cc_proveedores').update({pagos,estado:'abierta'}).eq('id',id);
+  p.pagos=pagos;p.estado='abierta';
+  // buscar y eliminar el movimiento de caja correspondiente
+  if(pagoEliminado){
+    const detalleBuscado=`Pago proveedor — ${p.nombre}`;
+    const{data:movsCaja}=await db.from('caja_taller')
+      .select('id,detalle,pagado,fecha')
+      .eq('fecha',pagoEliminado.fecha)
+      .eq('subcuenta',pagoEliminado.subcuenta)
+      .ilike('detalle',`%${p.nombre}%`);
+    if(movsCaja&&movsCaja.length){
+      // borrar el que tenga el mismo monto
+      const movMatch=movsCaja.find(m=>parseFloat(m.pagado)===parseFloat(pagoEliminado.monto));
+      if(movMatch)await db.from('caja_taller').delete().eq('id',movMatch.id);
+    }
+    await loadCajaT();
+  }
+  setSyncStatus('ok');
   renderDetalleProv();
 }
 
@@ -2615,6 +2682,65 @@ function clickDiaCalOT(fechaStr){
     if(el)el.value=fechaStr;
   },100);
 }
+// ============ SALDO INICIAL ============
+const loadSaldosIniciales=async()=>{const{data}=await db.from('saldos_iniciales').select('*');C.saldosIniciales=data||[];};
+function abrirSaldoInicial(){
+  const form=document.getElementById('saldo-inicial-form');
+  form.innerHTML=CAJAS.map(c=>{
+    const si=C.saldosIniciales?.find(x=>x.subcuenta===c.n);
+    return`<div class="fg2" style="margin-bottom:8px"><label style="font-size:11px;color:var(--tx2);min-width:120px">${String(c.n).padStart(3,'0')} — ${c.nombre}</label><input id="si-${c.n}" type="text" inputmode="numeric" placeholder="$0" value="${si?Number(si.monto).toLocaleString('de-DE'):''}" style="flex:1"></div>`;
+  }).join('');
+  document.getElementById('si-fecha').value=hoyD();
+  openM('m-saldo-inicial');
+  CAJAS.forEach(c=>{const el=document.getElementById('si-'+c.n);if(el)maskMoney(el);});
+}
+async function guardarSaldoInicial(){
+  setSyncStatus('syncing');
+  for(const c of CAJAS){
+    const el=document.getElementById('si-'+c.n);
+    if(!el)continue;
+    const raw=el.value.replace(/\./g,'').replace(/[^\d]/g,'');
+    const monto=parseFloat(raw)||0;
+    const fecha=document.getElementById('si-fecha').value||hoyD();
+    await db.from('saldos_iniciales').upsert({subcuenta:c.n,monto,fecha},{onConflict:'subcuenta'});
+  }
+  setSyncStatus('ok');closeM('m-saldo-inicial');
+  await loadSaldosIniciales();renderDia();
+}
+
+// ============ EDITAR MOVIMIENTO ============
+function abrirEditMov(id,tabla){
+  const movs=tabla==='cajat'?C.cajat:C.cajav;
+  const m=movs.find(x=>x.id===id);if(!m)return;
+  document.getElementById('edit-mov-id').value=id;
+  document.getElementById('edit-mov-tabla').value=tabla;
+  document.getElementById('edit-mov-det').value=m.detalle||'';
+  document.getElementById('edit-mov-cobrado').value=m.cobrado?Number(m.cobrado).toLocaleString('de-DE'):'';
+  document.getElementById('edit-mov-pagado').value=m.pagado?Number(m.pagado).toLocaleString('de-DE'):'';
+  document.getElementById('edit-mov-caja').value=m.subcuenta||1;
+  document.getElementById('edit-mov-fecha').value=m.fecha||hoyD();
+  openM('m-edit-mov');
+  ['edit-mov-cobrado','edit-mov-pagado'].forEach(id=>{const el=document.getElementById(id);if(el)maskMoney(el);});
+}
+async function guardarEditMov(){
+  const id=parseInt(document.getElementById('edit-mov-id').value);
+  const tabla=document.getElementById('edit-mov-tabla').value;
+  const det=document.getElementById('edit-mov-det').value;
+  const rawCob=document.getElementById('edit-mov-cobrado').value.replace(/\./g,'').replace(/[^\d]/g,'');
+  const rawPag=document.getElementById('edit-mov-pagado').value.replace(/\./g,'').replace(/[^\d]/g,'');
+  const cobrado=parseFloat(rawCob)||0;
+  const pagado=parseFloat(rawPag)||0;
+  const subcuenta=parseInt(document.getElementById('edit-mov-caja').value);
+  const fecha=document.getElementById('edit-mov-fecha').value||hoyD();
+  setSyncStatus('syncing');
+  const tablaDB=tabla==='cajat'?'caja_taller':'caja_vehiculos';
+  await db.from(tablaDB).update({detalle:det,cobrado,pagado,subcuenta,fecha}).eq('id',id);
+  setSyncStatus('ok');closeM('m-edit-mov');
+  if(tabla==='cajat'){await loadCajaT();renderDia();}
+  else{await loadCajaV();renderDiaV();}
+}
+
+
 async function elimOT(id){
   if(!confirm('¿Eliminar orden?'))return;
   const ot=C.ots.find(x=>x.id===id);

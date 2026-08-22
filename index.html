@@ -2721,12 +2721,17 @@ function abrirEditMov(id,tabla){
   document.getElementById('edit-mov-id').value=id;
   document.getElementById('edit-mov-tabla').value=tabla;
   document.getElementById('edit-mov-det').value=m.detalle||'';
-  document.getElementById('edit-mov-cobrado').value=m.cobrado?Number(m.cobrado).toLocaleString('de-DE'):'';
-  document.getElementById('edit-mov-pagado').value=m.pagado?Number(m.pagado).toLocaleString('de-DE'):'';
+  document.getElementById('edit-mov-cobrado').value=m.cobrado?Math.round(m.cobrado):'';
+  document.getElementById('edit-mov-pagado').value=m.pagado?Math.round(m.pagado):'';
   document.getElementById('edit-mov-caja').value=m.subcuenta||1;
   document.getElementById('edit-mov-fecha').value=m.fecha||hoyD();
   openM('m-edit-mov');
-  ['edit-mov-cobrado','edit-mov-pagado'].forEach(id=>{const el=document.getElementById(id);if(el)maskMoney(el);});
+  ['edit-mov-cobrado','edit-mov-pagado'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    maskMoney(el);
+    const v=el.value.replace(/[^\d]/g,'');
+    if(v)el.value=Number(v).toLocaleString('de-DE');
+  });
 }
 async function guardarEditMov(){
   const id=parseInt(document.getElementById('edit-mov-id').value);

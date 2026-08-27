@@ -1051,16 +1051,18 @@ tr:hover td{background:var(--s2)}
   <div class="fg4" style="margin-bottom:14px">
     <div class="fr" style="margin-bottom:0"><input id="ccd-item-fecha" type="date"></div>
     <div class="fr" style="margin-bottom:0"><input id="ccd-item-desc" placeholder="Descripción del ítem"></div>
-    <div class="fr" style="margin-bottom:0"><input id="ccd-item-valor" type="text" inputmode="numeric" placeholder="Valor $"></div>
+    <div class="fr" style="margin-bottom:0"><input id="ccd-item-valor" type="text" inputmode="numeric" placeholder="Valor"></div>
+    <div class="fr" style="margin-bottom:0"><select id="ccd-item-moneda" style="padding:8px 10px;border-radius:var(--r);border:1px solid var(--bd2);background:var(--s2);color:var(--tx);font-size:11px"><option value="ARS">$ ARS</option><option value="USD">USD</option></select></div>
     <button class="btn btn-p" onclick="agregarItemCC()" style="height:34px"><i class="ti ti-plus"></i> Agregar</button>
   </div>
   <hr class="divider">
   <div class="sub-label">Haber — pagos recibidos</div>
   <div class="tw" style="margin-bottom:10px">
-    <table><thead><tr><th>Fecha</th><th>Caja</th><th>Monto</th><th>Nota</th><th></th></tr></thead><tbody id="ccd-pagos"></tbody></table>
+    <table><thead><tr><th>Fecha</th><th>Caja</th><th>Moneda</th><th>Monto</th><th>Nota</th><th></th></tr></thead><tbody id="ccd-pagos"></tbody></table>
   </div>
   <div class="fg3">
-    <div class="fr" style="margin-bottom:0"><input id="ccd-pago-monto" type="text" inputmode="numeric" placeholder="Monto $"></div>
+    <div class="fr" style="margin-bottom:0"><input id="ccd-pago-monto" type="text" inputmode="numeric" placeholder="Monto"></div>
+    <div class="fr" style="margin-bottom:0"><select id="ccd-pago-moneda" style="padding:8px 10px;border-radius:var(--r);border:1px solid var(--bd2);background:var(--s2);color:var(--tx);font-size:11px"><option value="ARS">$ ARS</option><option value="USD">USD</option></select></div>
     <div class="fr" style="margin-bottom:0"><input id="ccd-pago-fecha" type="date"></div>
     <div class="fr" style="margin-bottom:0">
       <select id="ccd-pago-caja">
@@ -1292,9 +1294,11 @@ async function elimGestoria(id){if(!confirm('¿Eliminar trámite?'))return;setSy
 const loadCCT=async()=>{const{data}=await db.from('cc_taller').select('*').order('created_at',{ascending:false});C.cct=data||[];};
 function totalesCC(cuenta){
   const items=cuenta.items||[];const pagos=cuenta.pagos||[];
-  const total=items.reduce((a,i)=>a+(parseFloat(i.valor)||0),0);
-  const pagado=pagos.reduce((a,p)=>a+(parseFloat(p.monto)||0),0);
-  return{total,pagado,deuda:total-pagado};
+  const totalARS=items.filter(i=>!i.moneda||i.moneda==='ARS').reduce((a,i)=>a+(parseFloat(i.valor)||0),0);
+  const totalUSD=items.filter(i=>i.moneda==='USD').reduce((a,i)=>a+(parseFloat(i.valor)||0),0);
+  const pagadoARS=pagos.filter(p=>!p.moneda||p.moneda==='ARS').reduce((a,p)=>a+(parseFloat(p.monto)||0),0);
+  const pagadoUSD=pagos.filter(p=>p.moneda==='USD').reduce((a,p)=>a+(parseFloat(p.monto)||0),0);
+  return{total:totalARS,pagado:pagadoARS,deuda:totalARS-pagadoARS,totalARS,totalUSD,pagadoARS,pagadoUSD,deudaARS:totalARS-pagadoARS,deudaUSD:totalUSD-pagadoUSD};
 }
 function abrirCCT(){
   const sel=document.getElementById('cct-cliente');
@@ -1396,10 +1400,10 @@ function renderDetalleCC(){
   const lista=tipo==='taller'?C.cct:C.ccv;
   const c=lista.find(x=>x.id===id);if(!c)return;
   const t=totalesCC(c);
-  document.getElementById('ccd-total').textContent=fmt(t.total);
-  document.getElementById('ccd-pagado').textContent=fmt(t.pagado);
-  document.getElementById('ccd-deuda').textContent=fmt(t.deuda);
-  document.getElementById('ccd-deuda').style.color=t.deuda>0?'var(--er)':'var(--ok)';
+  document.getElementById('ccd-total').textContent=fmt(t.totalARS)+(t.totalUSD>0?' + USD '+t.totalUSD:'');
+  document.getElementById('ccd-pagado').textContent=fmt(t.pagadoARS)+(t.pagadoUSD>0?' + USD '+t.pagadoUSD:'');
+  document.getElementById('ccd-deuda').textContent=fmt(t.deudaARS)+(t.deudaUSD>0?' + USD '+t.deudaUSD:'');
+  document.getElementById('ccd-deuda').style.color=(t.deudaARS>0||t.deudaUSD>0)?'var(--er)':'var(--ok)';
   // CRUCE: costo real desde OTs del cliente (solo taller)
   if(tipo==='taller'&&c.cliente_id){
     const otsCliente=C.ots.filter(o=>o.cliente_id===c.cliente_id);
@@ -1417,21 +1421,23 @@ function renderDetalleCC(){
       ${otsCliente.length?`<div style="font-size:10px;color:var(--tx3);margin-bottom:10px">${otsCliente.length} orden(es) de trabajo vinculadas</div>`:'<div style="font-size:10px;color:var(--tx3);margin-bottom:10px">Sin órdenes de trabajo vinculadas a este cliente</div>'}`;
   }
   const items=c.items||[];
-  document.getElementById('ccd-items').innerHTML=items.length?items.map((it,idx)=>`<tr><td style="font-size:10px;color:var(--tx3)">${it.fecha||'—'}</td><td>${it.descripcion}</td><td>${fmt(it.valor)}</td><td><button class="icon-btn" onclick="elimItemCC(${idx})"><i class="ti ti-trash"></i></button></td></tr>`).join(''):'<tr><td colspan="4"><div class="empty" style="padding:14px"><i class="ti ti-list"></i>Sin ítems.</div></td></tr>';
+  document.getElementById('ccd-items').innerHTML=items.length?items.map((it,idx)=>`<tr><td style="font-size:10px;color:var(--tx3)">${it.fecha||'—'}</td><td>${it.descripcion}</td><td>${b(it.moneda==='USD'?'bb':'bgr',it.moneda||'ARS')}</td><td>${it.moneda==='USD'?'USD '+it.valor:fmt(it.valor)}</td><td><button class="icon-btn" onclick="elimItemCC(${idx})"><i class="ti ti-trash"></i></button></td></tr>`).join(''):'<tr><td colspan="5"><div class="empty" style="padding:14px"><i class="ti ti-list"></i>Sin ítems.</div></td></tr>';
   const pagos=c.pagos||[];
-  document.getElementById('ccd-pagos').innerHTML=pagos.length?pagos.map((p,idx)=>{const caja=CAJAS.find(x=>x.n===p.subcuenta);return`<tr><td style="font-size:10px;color:var(--tx3)">${p.fecha}</td><td>${b('bgr',caja?.nombre||'—')}</td><td class="ing">${fmt(p.monto)}</td><td style="font-size:10px;color:var(--tx3)">${p.nota||'—'}</td><td><button class="icon-btn" onclick="elimPagoCC(${idx})"><i class="ti ti-trash"></i></button></td></tr>`}).join(''):'<tr><td colspan="5"><div class="empty" style="padding:14px"><i class="ti ti-cash"></i>Sin pagos registrados.</div></td></tr>';
+  document.getElementById('ccd-pagos').innerHTML=pagos.length?pagos.map((p,idx)=>{const caja=CAJAS.find(x=>x.n===p.subcuenta);return`<tr><td style="font-size:10px;color:var(--tx3)">${p.fecha}</td><td>${b('bgr',caja?.nombre||'—')}</td><td>${b(p.moneda==='USD'?'bb':'bgr',p.moneda||'ARS')}</td><td class="ing">${p.moneda==='USD'?'USD '+p.monto:fmt(p.monto)}</td><td style="font-size:10px;color:var(--tx3)">${p.nota||'—'}</td><td><button class="icon-btn" onclick="elimPagoCC(${idx})"><i class="ti ti-trash"></i></button></td></tr>`}).join(''):'<tr><td colspan="5"><div class="empty" style="padding:14px"><i class="ti ti-cash"></i>Sin pagos registrados.</div></td></tr>';
 }
 async function agregarItemCC(){
   const desc=document.getElementById('ccd-item-desc').value;
-  const valor=getMaskValue('ccd-item-valor');
+  const rawVal=document.getElementById('ccd-item-valor').value.replace(/\./g,'').replace(/[^\d]/g,'');
+  const valor=parseFloat(rawVal)||0;
   const fecha=document.getElementById('ccd-item-fecha').value||hoyD();
+  const moneda=document.getElementById('ccd-item-moneda')?.value||'ARS';
   if(!desc||!valor)return alert('Completá descripción y valor');
   const id=parseInt(document.getElementById('ccd-id').value);
   const tipo=document.getElementById('ccd-tipo').value;
   const tabla=tipo==='taller'?'cc_taller':'cc_vehiculos';
   const lista=tipo==='taller'?C.cct:C.ccv;
   const c=lista.find(x=>x.id===id);if(!c)return;
-  const items=[...(c.items||[]),{descripcion:desc,valor,fecha}];
+  const items=[...(c.items||[]),{descripcion:desc,valor,fecha,moneda}];
   setSyncStatus('syncing');
   await db.from(tabla).update({items}).eq('id',id);
   c.items=items;
@@ -1452,17 +1458,19 @@ async function elimItemCC(idx){
   renderDetalleCC();
 }
 async function agregarPagoCC(){
-  const monto=getMaskValue('ccd-pago-monto');
+  const rawMonto=document.getElementById('ccd-pago-monto').value.replace(/\./g,'').replace(/[^\d]/g,'');
+  const monto=parseFloat(rawMonto)||0;
   if(!monto)return alert('Ingresá el monto del pago');
   const subcuenta=parseInt(document.getElementById('ccd-pago-caja').value);
   const nota=document.getElementById('ccd-pago-nota').value;
+  const moneda=document.getElementById('ccd-pago-moneda')?.value||'ARS';
   const id=parseInt(document.getElementById('ccd-id').value);
   const tipo=document.getElementById('ccd-tipo').value;
   const tabla=tipo==='taller'?'cc_taller':'cc_vehiculos';
   const lista=tipo==='taller'?C.cct:C.ccv;
   const c=lista.find(x=>x.id===id);if(!c)return;
   const fecha=document.getElementById('ccd-pago-fecha').value||hoyD();
-  const pagos=[...(c.pagos||[]),{fecha,monto,subcuenta,nota}];
+  const pagos=[...(c.pagos||[]),{fecha,monto,subcuenta,nota,moneda}];
   setSyncStatus('syncing');
   // actualizar cuenta corriente
   await db.from(tabla).update({pagos}).eq('id',id);

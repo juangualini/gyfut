@@ -2356,13 +2356,83 @@ function verDetalleOT(id){
       </div>
     </div>`:''}
     <div class="fr"><label>Descripción / notas</label><textarea id="otd-desc">${o.descripcion||''}</textarea></div>
-    <div class="ma"><button class="btn" onclick="closeM('m-ot-detalle')">Cancelar</button><button class="btn btn-p" onclick="guardarEdicionOT()">Guardar cambios</button></div>
+    <div class="ma"><button class="btn" onclick="descargarPDFOT()"><i class="ti ti-file-type-pdf"></i> PDF cliente</button><button class="btn" onclick="closeM('m-ot-detalle')">Cancelar</button><button class="btn btn-p" onclick="guardarEdicionOT()">Guardar cambios</button></div>
   `;
   openM('m-ot-detalle');
   if(esAdmin){
     renderItemsOTD('ins');renderItemsOTD('mo');renderItemsProvOTEdit();
     ['otd-ins-val','otd-mo-val','otd-prov-val'].forEach(id=>{const el=document.getElementById(id);if(el)maskMoney(el);});
   }
+}
+function descargarPDFOT(){
+  const id=parseInt(document.getElementById('otd-id').value);
+  const o=C.ots.find(x=>x.id===id);if(!o)return;
+  const ins=o.insumos_items||[];
+  const mo=o.mano_obra_items||[];
+  const totalIns=ins.reduce((a,i)=>a+(i.valor||0),0);
+  const totalMO=mo.reduce((a,i)=>a+(i.valor||0),0);
+  const total=totalIns+totalMO;
+  const fecha=new Date().toLocaleDateString('es-AR');
+  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+  <style>
+    body{font-family:'Segoe UI',Arial,sans-serif;margin:0;padding:40px;color:#1a1a2e;background:#fff}
+    .header{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #3b82f6;padding-bottom:20px;margin-bottom:30px}
+    .logo{font-size:32px;font-weight:800;color:#3b82f6;letter-spacing:-1px}
+    .logo-sub{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:2px;margin-top:2px}
+    .doc-info{text-align:right;font-size:12px;color:#64748b}
+    .cliente-box{background:#f8fafc;border-radius:8px;padding:16px 20px;margin-bottom:24px}
+    .cliente-box h3{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin:0 0 6px}
+    .cliente-box p{font-size:18px;font-weight:700;color:#1e293b;margin:0}
+    .cliente-det{font-size:12px;color:#64748b;margin-top:4px}
+    .section{margin-bottom:24px}
+    .section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b;border-bottom:1px solid #e2e8f0;padding-bottom:8px;margin-bottom:12px}
+    table{width:100%;border-collapse:collapse}
+    th{text-align:left;font-size:11px;font-weight:600;color:#64748b;padding:8px 0;text-transform:uppercase;letter-spacing:.5px}
+    td{padding:10px 0;font-size:13px;border-bottom:1px solid #f1f5f9}
+    td.monto{text-align:right;font-weight:600}
+    .total-box{background:#1e293b;color:#fff;border-radius:8px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;margin-top:24px}
+    .total-label{font-size:13px;opacity:.8}
+    .total-valor{font-size:24px;font-weight:800;color:#3b82f6}
+    .footer{margin-top:40px;text-align:center;font-size:11px;color:#94a3b8;border-top:1px solid #e2e8f0;padding-top:16px}
+    .badge{display:inline-block;background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px}
+  </style></head><body>
+  <div class="header">
+    <div><div class="logo">Gyfut</div><div class="logo-sub">Sistema automotriz • Puerto de Santa Fe</div></div>
+    <div class="doc-info">
+      <div style="font-weight:700;font-size:14px;color:#1e293b">Orden #${o.id}</div>
+      <div>${fecha}</div>
+      <div style="margin-top:4px"><span class="badge">${o.estado||'—'}</span></div>
+    </div>
+  </div>
+  <div class="cliente-box">
+    <h3>Cliente</h3>
+    <p>${o.cliente||'—'}</p>
+    ${o.servicios?.length?`<div class="cliente-det">Servicios: ${o.servicios.join(', ')}</div>`:''}
+    ${o.fecha_ingreso?`<div class="cliente-det">Ingreso: ${o.fecha_ingreso}${o.fecha_entrega?' · Entrega: '+o.fecha_entrega:''}</div>`:''}
+  </div>
+  ${ins.length?`<div class="section">
+    <div class="section-title">Insumos</div>
+    <table><thead><tr><th>Descripción</th><th style="text-align:right">Valor</th></tr></thead><tbody>
+    ${ins.map(i=>`<tr><td>${i.desc}</td><td class="monto">${fmt(i.valor)}</td></tr>`).join('')}
+    ${ins.length>1?`<tr><td style="font-weight:600;padding-top:12px">Subtotal insumos</td><td class="monto" style="padding-top:12px">${fmt(totalIns)}</td></tr>`:''}
+    </tbody></table></div>`:''}
+  ${mo.length?`<div class="section">
+    <div class="section-title">Mano de obra</div>
+    <table><thead><tr><th>Descripción</th><th style="text-align:right">Valor</th></tr></thead><tbody>
+    ${mo.map(i=>`<tr><td>${i.desc}</td><td class="monto">${fmt(i.valor)}</td></tr>`).join('')}
+    ${mo.length>1?`<tr><td style="font-weight:600;padding-top:12px">Subtotal mano de obra</td><td class="monto" style="padding-top:12px">${fmt(totalMO)}</td></tr>`:''}
+    </tbody></table></div>`:''}
+  <div class="total-box">
+    <div class="total-label">Total a pagar</div>
+    <div class="total-valor">${fmt(total)}</div>
+  </div>
+  <div class="footer">Gyfut • Puerto de Santa Fe, Argentina • @gyfut_</div>
+  </body></html>`;
+  const win=window.open('','_blank');
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(()=>win.print(),500);
 }
 async function guardarEdicionOT(){
   const id=parseInt(document.getElementById('otd-id').value);

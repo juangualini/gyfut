@@ -1624,7 +1624,9 @@ function renderDia(){
       const saldoInicial=si?parseFloat(si.monto)||0:0;
       const fechaSI=si?.fecha||'9999-12-31';
       // sumar movimientos desde saldo inicial hasta el día que se está viendo
-      const acum=C.cajat.filter(x=>x.subcuenta===c.n&&x.fecha>=fechaSI&&x.fecha<=C.diaActual).reduce((a,x)=>a+(parseFloat(x.cobrado)||0)-(parseFloat(x.pagado)||0),0);
+      // acumular desde el día SIGUIENTE al saldo inicial
+const fechaSINext=fechaSI&&fechaSI!=='9999-12-31'?new Date(new Date(fechaSI+'T12:00:00').getTime()+86400000).toISOString().split('T')[0]:fechaSI;
+      const acum=C.cajat.filter(x=>x.subcuenta===c.n&&x.fecha>=fechaSINext&&x.fecha<=C.diaActual).reduce((a,x)=>a+(parseFloat(x.cobrado)||0)-(parseFloat(x.pagado)||0),0);
       const total=saldoInicial+acum;
       const cls=total>0?'pos':total<0?'neg':'zer';
       return`<div class="caja-card"><div class="caja-num">${String(c.n).padStart(3,'0')}</div><div class="caja-nombre">${c.nombre}</div><div class="caja-saldo ${cls}">${fmt(total)}</div><div class="caja-sub">${si?'saldo real':'sin saldo inicial'}</div></div>`;

@@ -1167,6 +1167,7 @@ function iniciarApp(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('main-app').style.display='flex';
   aplicarPermisos();
+  loadSaldosIniciales(); // cargar siempre al inicio
   if(SESSION.rol==='admin')navTo('dashboard',document.querySelector('.ni.active'));
   else navTo('ordenes',document.querySelector('.ni[onclick*="ordenes"]'));
 }

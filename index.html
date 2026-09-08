@@ -1710,7 +1710,8 @@ async function guardarCajaT(){
   const pagado=getMaskValue('ct-pagado');
   if(!cobrado&&!pagado)return alert('Ingresá cobrado o pagado');
   setSyncStatus('syncing');
-  await db.from('caja_taller').insert({detalle:det,subcuenta:parseInt(document.getElementById('ct-caja').value),categoria:document.getElementById('ct-cat').value,cobrado,pagado,fecha:document.getElementById('ct-fecha').value,tipo_mov:'movimiento'});
+  const{error}=await db.from('caja_taller').insert({detalle:det,subcuenta:parseInt(document.getElementById('ct-caja').value),categoria:document.getElementById('ct-cat').value,cobrado,pagado,fecha:document.getElementById('ct-fecha').value,tipo_mov:'movimiento'});
+  if(error){console.error('Error insert caja_taller:',error);alert('Error al guardar: '+error.message);return;}
   setSyncStatus('ok');closeM('m-cajat');
   ['ct-det','ct-cobrado','ct-pagado'].forEach(id=>document.getElementById(id).value='');
   await loadCajaT();renderDia();

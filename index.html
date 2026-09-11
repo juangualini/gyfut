@@ -222,6 +222,7 @@ tr:hover td{background:var(--s2)}
     <div class="nl">General</div>
     <div class="ni active" onclick="navTo('dashboard',this)"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
     <div class="ni restricted-hide" data-perm="admin" onclick="navTo('recordatorios',this)"><i class="ti ti-bell"></i> Recordatorios <span class="nb" id="badge-rec" style="display:none">0</span></div>
+    <div class="ni" onclick="navTo('lavados',this)"><i class="ti ti-car"></i> Lavados</div>
   </div>
   <div style="padding:4px 0" data-perm="admin">
     <div class="nl">CRM — Autos</div>
@@ -291,6 +292,18 @@ tr:hover td{background:var(--s2)}
       <div id="dash-operador" style="display:none">
         <div class="card"><div class="card-title"><i class="ti ti-tool"></i> Órdenes de trabajo activas</div><div id="dash-ot-operador"></div></div>
       </div>
+    </div>
+
+    <!-- LAVADOS -->
+    <div class="page" id="page-lavados">
+      <div class="mes-nav" style="margin-bottom:14px">
+        <button class="btn" onclick="navFechaLav(-1)"><i class="ti ti-chevron-left"></i></button>
+        <div class="mes-label" id="lav-fecha-titulo">—</div>
+        <button class="btn" onclick="navFechaLav(1)"><i class="ti ti-chevron-right"></i></button>
+        <button class="btn" onclick="irHoyLav()"><i class="ti ti-home"></i> Hoy</button>
+      </div>
+      <!-- GRILLA HORARIA -->
+      <div id="lav-grilla" style="overflow-x:auto"></div>
     </div>
 
     <div class="page" id="page-recordatorios">
@@ -807,6 +820,59 @@ tr:hover td{background:var(--s2)}
   <div class="ma"><button class="btn btn-er" onclick="elimMovDesdeEdit()">Eliminar</button><button class="btn" onclick="closeM('m-edit-mov')">Cancelar</button><button class="btn btn-p" onclick="guardarEditMov()">Guardar</button></div>
 </div></div>
 
+<!-- NUEVO TURNO LAVADO -->
+<div class="mo" id="m-lav"><div class="modal" style="width:520px">
+  <div class="mt" id="lav-modal-titulo">Nuevo turno de lavado</div>
+  <input type="hidden" id="lav-edit-id">
+  <div class="fg2">
+    <div class="fr"><label>Hora de ingreso</label>
+      <input id="lav-hora" type="time" min="08:00" max="17:00" value="08:00">
+    </div>
+    <div class="fr"><label>Hora de retiro (aprox.)</label>
+      <input id="lav-hora-ret" type="time" min="08:00" max="17:00" placeholder="Sin definir">
+    </div>
+  </div>
+  <div class="fg2">
+    <div class="fr"><label>Cliente</label><input id="lav-cliente" placeholder="Nombre del cliente"></div>
+    <div class="fr"><label>Teléfono</label><input id="lav-tel" placeholder="341..."></div>
+  </div>
+  <div class="fg2">
+    <div class="fr"><label>Vehículo</label><input id="lav-vehiculo" placeholder="VW Golf, Toyota..."></div>
+    <div class="fr"><label>Patente</label><input id="lav-patente" placeholder="AB123CD"></div>
+  </div>
+  <div class="fg2">
+    <div class="fr"><label>Tipo de lavado</label>
+      <select id="lav-tipo">
+        <option value="exterior">Exterior</option>
+        <option value="interior">Interior</option>
+        <option value="completo">Completo (ext. + int.)</option>
+        <option value="motor">Motor</option>
+        <option value="otro">Otro</option>
+      </select>
+    </div>
+    <div class="fr"><label>Estado</label>
+      <select id="lav-estado">
+        <option value="pendiente">Pendiente</option>
+        <option value="en_proceso">En proceso</option>
+        <option value="listo">Listo</option>
+        <option value="entregado">Entregado</option>
+      </select>
+    </div>
+  </div>
+  <div class="fr"><label>Pedido especial / notas</label><input id="lav-pedido" placeholder="Ej: sin perfume, prestar atención al techo..."></div>
+  <div class="fr"><label>Asignado a</label>
+    <select id="lav-asignado">
+      <option value="">Sin asignar</option>
+      <option>Martín</option><option>Theo</option><option>Lucho</option>
+      <option>Lucas</option><option>Elías</option><option>Georgi</option>
+    </select>
+  </div>
+  <div class="ma">
+    <button class="btn" onclick="closeM('m-lav')">Cancelar</button>
+    <button class="btn btn-p" onclick="guardarLavado()"><i class="ti ti-check"></i> Guardar turno</button>
+  </div>
+</div></div>
+
 <div class="mo" id="m-cajat"><div class="modal">
   <div class="mt" id="cajat-title">Nuevo movimiento — caja taller</div>
   <div class="fr"><label>Detalle</label><input id="ct-det" placeholder="Cobro PPF / Insumos..."></div>
@@ -1087,7 +1153,7 @@ const CAJAS=[{n:1,nombre:'Efectivo'},{n:2,nombre:'Banco'},{n:3,nombre:'Jorge'},{
 const MESES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
 let SESSION=null;
-let C={leadsA:[],leadsT:[],clt:[],veh:[],ots:[],cajav:[],cajat:[],cf:[],cfPagos:[],ventas:[],recs:[],gestoria:[],cct:[],ccv:[],prov:[],saldosIniciales:[],activeId:null,activeType:null,recFiltro:'todos',diaActual:new Date().toISOString().split('T')[0],mesActual:{y:new Date().getFullYear(),m:new Date().getMonth()},diaVActual:new Date().toISOString().split('T')[0],mesVActual:{y:new Date().getFullYear(),m:new Date().getMonth()},cajaVistaActual:'dia',cajaVVistaActual:'dia'};
+let C={leadsA:[],leadsT:[],clt:[],veh:[],ots:[],cajav:[],cajat:[],cf:[],cfPagos:[],ventas:[],recs:[],gestoria:[],cct:[],ccv:[],prov:[],saldosIniciales:[],lavados:[],lavFecha:new Date().toISOString().split('T')[0],activeId:null,activeType:null,recFiltro:'todos',diaActual:new Date().toISOString().split('T')[0],mesActual:{y:new Date().getFullYear(),m:new Date().getMonth()},diaVActual:new Date().toISOString().split('T')[0],mesVActual:{y:new Date().getFullYear(),m:new Date().getMonth()},cajaVistaActual:'dia',cajaVVistaActual:'dia'};
 
 const fmt=n=>{const num=Math.round(Number(n||0));return'$'+num.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.')};
 const hoy=()=>new Date().toLocaleDateString('es-AR');
@@ -1185,7 +1251,7 @@ window.addEventListener('DOMContentLoaded',()=>{
 
 function setSyncStatus(s){const d=document.getElementById('sdot'),t=document.getElementById('stxt');if(s==='ok'){d.className='sdot';t.textContent='Conectado';}else if(s==='syncing'){d.className='sdot spin';t.textContent='Guardando...';}else{d.className='sdot err';t.textContent='Error';}}
 
-const titles={dashboard:'Dashboard',recordatorios:'Recordatorios','leads-autos':'Pipeline — ventas de autos','contactos-autos':'Contactos leads autos','leads-taller':'Pipeline — servicios de taller','clientes-taller':'Clientes de taller',inventario:'Inventario',ventas:'Ventas','caja-vehiculos':'Caja — vehículos',gestoria:'Gestoría',ordenes:'Órdenes de trabajo','caja-taller':'Caja — taller','costos-fijos':'Costos fijos','cc-taller':'Cuenta corriente — taller','cc-vehiculos':'Cuenta corriente — vehículos',proveedores:'Proveedores'};
+const titles={dashboard:'Dashboard',recordatorios:'Recordatorios',lavados:'Planilla de lavados','leads-autos':'Pipeline — ventas de autos','contactos-autos':'Contactos leads autos','leads-taller':'Pipeline — servicios de taller','clientes-taller':'Clientes de taller',inventario:'Inventario',ventas:'Ventas','caja-vehiculos':'Caja — vehículos',gestoria:'Gestoría',ordenes:'Órdenes de trabajo','caja-taller':'Caja — taller','costos-fijos':'Costos fijos','cc-taller':'Cuenta corriente — taller','cc-vehiculos':'Cuenta corriente — vehículos',proveedores:'Proveedores'};
 
 function getActions(pg){
   const esAdmin=SESSION.rol==='admin';
@@ -1202,6 +1268,7 @@ function getActions(pg){
     if(esAdmin)return`<div style="display:flex;gap:6px"><button class="btn btn-p" onclick="abrirMovDia()"><i class="ti ti-plus"></i> Movimiento</button><button class="btn btn-wa" onclick="abrirSueldo()"><i class="ti ti-users"></i> Sueldo / gasto</button></div>`;
     return`<button class="btn btn-p" onclick="abrirMovDia()"><i class="ti ti-plus"></i> Movimiento</button>`;
   }
+  if(pg==='lavados')return`<button class="btn btn-p" onclick="abrirNuevoLavado()"><i class="ti ti-plus"></i> Nuevo turno</button>`;
   if(pg==='costos-fijos')return'<button class="btn btn-p" onclick="openM(\'m-cf\')"><i class="ti ti-plus"></i> Agregar costo</button>';
   if(pg==='cc-taller')return SESSION.rol==='admin'?'<button class="btn btn-p" onclick="abrirCCT()"><i class="ti ti-plus"></i> Nueva cuenta</button>':'';
   if(pg==='cc-vehiculos')return'<button class="btn btn-p" onclick="abrirCCV()"><i class="ti ti-plus"></i> Nueva cuenta</button>';
@@ -1217,7 +1284,7 @@ async function navTo(pg,el){
   document.getElementById('topbar-title').textContent=titles[pg]||pg;
   document.getElementById('topbar-actions').innerHTML=getActions(pg);
   closeDetail();
-  const r={dashboard:loadDash,'leads-autos':()=>loadLeadsA().then(()=>renderKanban('autos')),'contactos-autos':()=>loadLeadsA().then(renderContactosAutos),'leads-taller':()=>loadLeadsT().then(()=>renderKanban('taller')),'clientes-taller':()=>loadCLT().then(renderClientesTaller),inventario:()=>loadVeh().then(renderInv),ventas:()=>loadVentas().then(renderVentas),gestoria:()=>Promise.all([loadGestoria(),loadVeh()]).then(renderGestoria),'caja-vehiculos':loadCajaVehiculos,ordenes:()=>Promise.all([loadOT(),loadCLT(),loadProv()]).then(()=>renderOT()),'caja-taller':loadCajaTaller,'costos-fijos':()=>loadCF().then(renderCF),recordatorios:()=>loadRecs().then(renderRecs),'cc-taller':()=>{const loads=[loadCCT(),loadOT()];if(SESSION.rol==='admin')loads.push(loadCLT());return Promise.all(loads).then(()=>renderCCT());},'cc-vehiculos':()=>Promise.all([loadCCV(),loadVeh()]).then(()=>renderCCVList()),'costos-fijos':()=>Promise.all([loadCF(),loadCFPagos()]).then(()=>renderCF()),proveedores:()=>loadProv().then(renderProv)};
+  const r={dashboard:loadDash,'leads-autos':()=>loadLeadsA().then(()=>renderKanban('autos')),'contactos-autos':()=>loadLeadsA().then(renderContactosAutos),'leads-taller':()=>loadLeadsT().then(()=>renderKanban('taller')),'clientes-taller':()=>loadCLT().then(renderClientesTaller),inventario:()=>loadVeh().then(renderInv),ventas:()=>loadVentas().then(renderVentas),gestoria:()=>Promise.all([loadGestoria(),loadVeh()]).then(renderGestoria),'caja-vehiculos':loadCajaVehiculos,ordenes:()=>Promise.all([loadOT(),loadCLT(),loadProv()]).then(()=>renderOT()),'caja-taller':loadCajaTaller,'costos-fijos':()=>loadCF().then(renderCF),recordatorios:()=>loadRecs().then(renderRecs),'cc-taller':()=>{const loads=[loadCCT(),loadOT()];if(SESSION.rol==='admin')loads.push(loadCLT());return Promise.all(loads).then(()=>renderCCT());},'cc-vehiculos':()=>Promise.all([loadCCV(),loadVeh()]).then(()=>renderCCVList()),'costos-fijos':()=>Promise.all([loadCF(),loadCFPagos()]).then(()=>renderCF()),proveedores:()=>loadProv().then(renderProv),lavados:()=>loadLavados().then(()=>renderLavados())};
   if(r[pg])await r[pg]();
 }
 
@@ -2873,6 +2940,145 @@ async function elimOT(id){
   }
   setSyncStatus('ok');
   await loadOT();renderOT();
+}
+
+// ============ LAVADOS ============
+const loadLavados=async()=>{
+  const{data}=await db.from('lavados').select('*').order('hora_ingreso',{ascending:true});
+  C.lavados=data||[];
+};
+function navFechaLav(delta){
+  const d=new Date(C.lavFecha+'T12:00:00');
+  d.setDate(d.getDate()+delta);
+  C.lavFecha=d.toISOString().split('T')[0];
+  renderLavados();
+}
+function irHoyLav(){C.lavFecha=hoyD();renderLavados();}
+function abrirNuevoLavado(hora){
+  document.getElementById('lav-edit-id').value='';
+  document.getElementById('lav-modal-titulo').textContent='Nuevo turno de lavado';
+  document.getElementById('lav-hora').value=hora||'08:00';
+  document.getElementById('lav-hora-ret').value='';
+  document.getElementById('lav-cliente').value='';
+  document.getElementById('lav-tel').value='';
+  document.getElementById('lav-vehiculo').value='';
+  document.getElementById('lav-patente').value='';
+  document.getElementById('lav-tipo').value='exterior';
+  document.getElementById('lav-estado').value='pendiente';
+  document.getElementById('lav-pedido').value='';
+  document.getElementById('lav-asignado').value='';
+  openM('m-lav');
+}
+function abrirEditLavado(id){
+  const l=C.lavados.find(x=>x.id===id);if(!l)return;
+  document.getElementById('lav-edit-id').value=id;
+  document.getElementById('lav-modal-titulo').textContent='Editar turno';
+  document.getElementById('lav-hora').value=l.hora_ingreso?.slice(0,5)||'08:00';
+  document.getElementById('lav-hora-ret').value=l.hora_retiro?.slice(0,5)||'';
+  document.getElementById('lav-cliente').value=l.cliente_nombre||'';
+  document.getElementById('lav-tel').value=l.cliente_tel||'';
+  document.getElementById('lav-vehiculo').value=l.vehiculo||'';
+  document.getElementById('lav-patente').value=l.patente||'';
+  document.getElementById('lav-tipo').value=l.tipo||'exterior';
+  document.getElementById('lav-estado').value=l.estado||'pendiente';
+  document.getElementById('lav-pedido').value=l.pedido_especial||'';
+  document.getElementById('lav-asignado').value=l.asignado||'';
+  openM('m-lav');
+}
+async function guardarLavado(){
+  const cliente=document.getElementById('lav-cliente').value.trim();
+  if(!cliente)return alert('Completá el nombre del cliente');
+  const editId=document.getElementById('lav-edit-id').value;
+  const datos={
+    fecha:C.lavFecha,
+    hora_ingreso:document.getElementById('lav-hora').value,
+    hora_retiro:document.getElementById('lav-hora-ret').value||null,
+    cliente_nombre:cliente,
+    cliente_tel:document.getElementById('lav-tel').value,
+    vehiculo:document.getElementById('lav-vehiculo').value,
+    patente:document.getElementById('lav-patente').value,
+    tipo:document.getElementById('lav-tipo').value,
+    estado:document.getElementById('lav-estado').value,
+    pedido_especial:document.getElementById('lav-pedido').value,
+    asignado:document.getElementById('lav-asignado').value
+  };
+  setSyncStatus('syncing');
+  if(editId){
+    await db.from('lavados').update(datos).eq('id',parseInt(editId));
+  } else {
+    await db.from('lavados').insert(datos);
+  }
+  setSyncStatus('ok');closeM('m-lav');
+  await loadLavados();renderLavados();
+}
+async function elimLavado(id){
+  if(!confirm('¿Eliminar este turno?'))return;
+  setSyncStatus('syncing');
+  await db.from('lavados').delete().eq('id',id);
+  setSyncStatus('ok');
+  await loadLavados();renderLavados();
+}
+async function cambiarEstadoLav(id,estado){
+  setSyncStatus('syncing');
+  await db.from('lavados').update({estado}).eq('id',id);
+  const l=C.lavados.find(x=>x.id===id);if(l)l.estado=estado;
+  setSyncStatus('ok');renderLavados();
+}
+function renderLavados(){
+  if(!C.lavFecha)C.lavFecha=hoyD();
+  const d=new Date(C.lavFecha+'T12:00:00');
+  const dias=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const meses=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  document.getElementById('lav-fecha-titulo').textContent=`${dias[d.getDay()]} ${d.getDate()} de ${meses[d.getMonth()]} ${d.getFullYear()}`;
+  const lavDia=C.lavados.filter(x=>x.fecha===C.lavFecha);
+  // Generar franjas de 30 min entre 8 y 17
+  const horas=[];
+  for(let h=8;h<=17;h++){horas.push(`${String(h).padStart(2,'0')}:00`);if(h<17)horas.push(`${String(h).padStart(2,'0')}:30`);}
+  // agrupar turnos por franja más cercana
+  function franjaHora(hora){
+    if(!hora)return '08:00';
+    const[hh,mm]=hora.split(':').map(Number);
+    const minRedondeado=mm<30?0:30;
+    return `${String(hh).padStart(2,'0')}:${String(minRedondeado).padStart(2,'0')}`;
+  }
+  const colorTipo={exterior:'#3b82f6',interior:'#8b5cf6',completo:'#10b981',motor:'#f59e0b',otro:'#6b7280'};
+  const colorEstado={pendiente:'bgr',en_proceso:'bb',listo:'bg',entregado:'bgr'};
+  const labelEstado={pendiente:'Pendiente',en_proceso:'En proceso',listo:'Listo ✓',entregado:'Entregado'};
+  const labelTipo={exterior:'Ext.',interior:'Int.',completo:'Completo',motor:'Motor',otro:'Otro'};
+  let html=`<div style="display:grid;grid-template-columns:70px 1fr;gap:0;border:1px solid var(--bd);border-radius:8px;overflow:hidden">`;
+  horas.forEach(hora=>{
+    const turnos=lavDia.filter(x=>franjaHora(x.hora_ingreso)===hora);
+    html+=`<div style="background:var(--s2);border-bottom:1px solid var(--bd);padding:8px;font-size:11px;font-weight:600;color:var(--tx3);display:flex;align-items:center;justify-content:center">${hora}</div>`;
+    html+=`<div style="background:var(--bg);border-bottom:1px solid var(--bd);padding:6px 8px;min-height:48px;display:flex;flex-wrap:wrap;gap:6px;align-items:flex-start">`;
+    if(turnos.length){
+      turnos.forEach(l=>{
+        const col=colorTipo[l.tipo]||'#6b7280';
+        html+=`<div style="background:${col}15;border:1px solid ${col}40;border-left:3px solid ${col};border-radius:6px;padding:6px 10px;min-width:180px;max-width:280px;cursor:pointer" onclick="abrirEditLavado(${l.id})">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+            <strong style="font-size:12px;color:var(--tx)">${l.cliente_nombre}</strong>
+            <div style="display:flex;gap:4px">
+              <select style="font-size:9px;padding:2px 4px;border-radius:4px;border:1px solid var(--bd);background:var(--s2);color:var(--tx)" onchange="cambiarEstadoLav(${l.id},this.value)" onclick="event.stopPropagation()">
+                ${['pendiente','en_proceso','listo','entregado'].map(e=>`<option value="${e}" ${l.estado===e?'selected':''}>${labelEstado[e]}</option>`).join('')}
+              </select>
+              <button class="icon-btn" style="font-size:10px" onclick="event.stopPropagation();elimLavado(${l.id})"><i class="ti ti-trash"></i></button>
+            </div>
+          </div>
+          <div style="font-size:10px;color:var(--tx2)">${l.vehiculo||'—'}${l.patente?' · '+l.patente:''}</div>
+          <div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap">
+            <span style="font-size:9px;background:${col};color:#fff;border-radius:3px;padding:2px 6px">${labelTipo[l.tipo]||l.tipo}</span>
+            ${l.hora_retiro?`<span style="font-size:9px;color:var(--tx3)">Retiro: ${l.hora_retiro.slice(0,5)}</span>`:''}
+            ${l.asignado?`<span style="font-size:9px;color:var(--tx3)">${l.asignado}</span>`:''}
+          </div>
+          ${l.pedido_especial?`<div style="font-size:9px;color:var(--wa);margin-top:3px">⚠ ${l.pedido_especial}</div>`:''}
+        </div>`;
+      });
+    }
+    html+=`<button style="background:transparent;border:1px dashed var(--bd);border-radius:6px;padding:4px 10px;font-size:10px;color:var(--tx3);cursor:pointer;align-self:center" onclick="abrirNuevoLavado('${hora}')"><i class="ti ti-plus"></i></button>`;
+    html+='</div>';
+  });
+  html+='</div>';
+  const cont=document.getElementById('lav-grilla');
+  if(cont)cont.innerHTML=html;
 }
 </script>
 </body>

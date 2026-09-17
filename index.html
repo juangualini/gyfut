@@ -583,6 +583,8 @@ tr:hover td{background:var(--s2)}
           </div>
         </div>
         <div class="caja-grid" id="mes-saldos-cards" style="margin-bottom:20px"></div>
+        <!-- DESGLOSE POR CATEGORÍA -->
+        <div id="mes-categorias" style="margin-bottom:20px"></div>
         <div id="mes-dias"></div>
       </div>
 
@@ -901,7 +903,20 @@ tr:hover td{background:var(--s2)}
 <div class="mo" id="m-cajat"><div class="modal">
   <div class="mt" id="cajat-title">Nuevo movimiento — caja taller</div>
   <div class="fr"><label>Detalle</label><input id="ct-det" placeholder="Cobro PPF / Insumos..."></div>
-  <div class="fg2"><div class="fr"><label>Caja</label><select id="ct-caja"><option value="1">1 — Efectivo</option><option value="2">2 — Banco</option><option value="3">3 — Jorge</option><option value="4">4 — Cheque</option><option value="5">5 — Mariana</option><option value="6">6 — Martín</option><option value="7">7 — Lucho</option><option value="8">8 — USD</option></select></div><div class="fr"><label>Categoría</label><select id="ct-cat"><option>Cobro trabajo</option><option>Insumos</option><option>Herramientas</option><option>Lavado</option><option>Otro</option></select></div></div>
+  <div class="fg2"><div class="fr"><label>Caja</label><select id="ct-caja"><option value="1">1 — Efectivo</option><option value="2">2 — Banco</option><option value="3">3 — Jorge</option><option value="4">4 — Cheque</option><option value="5">5 — Mariana</option><option value="6">6 — Martín</option><option value="7">7 — Lucho</option><option value="8">8 — USD</option></select></div><div class="fr"><label>Categoría</label><select id="ct-cat">
+  <option>Cobro trabajo</option>
+  <option>Lavado</option>
+  <option>Insumos taller</option>
+  <option>Herramientas</option>
+  <option>Combustible</option>
+  <option>Almuerzo</option>
+  <option>Servicios</option>
+  <option>Sueldos</option>
+  <option>Alquiler</option>
+  <option>Publicidad</option>
+  <option>Varios</option>
+  <option>Otro</option>
+</select></div></div>
   <div class="fg2"><div class="fr"><label>Cobrado ($)</label><input id="ct-cobrado" type="text" inputmode="numeric" placeholder="0"></div><div class="fr"><label>Pagado ($)</label><input id="ct-pagado" type="text" inputmode="numeric" placeholder="0"></div></div>
   <div class="fr"><label>Fecha</label><input id="ct-fecha" type="date"></div>
   <input type="hidden" id="ct-tipo-mov" value="movimiento">
@@ -1777,6 +1792,29 @@ function renderMes(){
   set('mes-neto',fmt(neto),neto>=0?'var(--ok)':neto<0?'var(--er)':'var(--tx3)');
   const saldosMes={};CAJAS.forEach(c=>saldosMes[c.n]=0);
   movsMes.forEach(x=>{saldosMes[x.subcuenta]=(saldosMes[x.subcuenta]||0)+(parseFloat(x.cobrado)||0)-(parseFloat(x.pagado)||0);});
+  // desglose por categoría
+  const catMap={};
+  movsMes.forEach(x=>{
+    const cat=x.categoria||'Otro';
+    if(!catMap[cat])catMap[cat]={cobrado:0,pagado:0};
+    catMap[cat].cobrado+=(parseFloat(x.cobrado)||0);
+    catMap[cat].pagado+=(parseFloat(x.pagado)||0);
+  });
+  const catEl=document.getElementById('mes-categorias');
+  if(catEl&&Object.keys(catMap).length){
+    const cats=Object.entries(catMap).sort((a,b)=>(b[1].cobrado+b[1].pagado)-(a[1].cobrado+a[1].pagado));
+    catEl.innerHTML=`<div style="margin-bottom:8px;font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em">Desglose por categoría</div>
+    <div style="background:var(--s1);border:1px solid var(--bd);border-radius:8px;overflow:hidden">
+    ${cats.map(([cat,v])=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--bd)">
+      <span style="font-size:12px;color:var(--tx2)">${cat}</span>
+      <div style="display:flex;gap:16px;font-size:12px">
+        ${v.cobrado?`<span style="color:var(--ok)">+${fmt(v.cobrado)}</span>`:''}
+        ${v.pagado?`<span style="color:var(--er)">-${fmt(v.pagado)}</span>`:''}
+      </div>
+    </div>`).join('')}
+    </div>`;
+  } else if(catEl){catEl.innerHTML='';}
+
   const cardsEl=document.getElementById('mes-saldos-cards');
   if(cardsEl)cardsEl.innerHTML=CAJAS.map(c=>{const s=saldosMes[c.n]||0;const cls=s>0?'pos':s<0?'neg':'zer';return`<div class="caja-card"><div class="caja-num">${String(c.n).padStart(3,'0')}</div><div class="caja-nombre">${c.nombre}</div><div class="caja-saldo ${cls}">${fmt(s)}</div><div class="caja-sub">del mes</div></div>`;}).join('');
   const diasMap={};

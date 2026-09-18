@@ -2298,6 +2298,32 @@ function otSeleccionarCliente(){
   document.getElementById('ot-info-veh').textContent=c.vehiculo||'—';
   document.getElementById('ot-info-pat').textContent=c.patente||'—';
 }
+async function crearCCdesdeOT(otId){
+  const o=C.ots.find(x=>x.id===otId);
+  if(!o||!o.cliente_id)return alert('La OT no tiene cliente asignado');
+  if(!C.cct.length)await loadCCT();
+  const cc=C.cct.find(x=>x.cliente_id===o.cliente_id&&x.estado==='abierta');
+  const ins=o.insumos_items||[];
+  const mo=o.mano_obra_items||[];
+  const totalCobrado=o.precio_cobrado||(ins.reduce((a,i)=>a+(i.valor||0),0)+mo.reduce((a,i)=>a+(i.valor||0),0));
+  if(!totalCobrado)return alert('La OT no tiene monto cobrado');
+  const itemsCC=[
+    ...ins.map(i=>({fecha:hoyD(),descripcion:`[OT] Insumos — ${i.desc}`,valor:i.valor})),
+    ...mo.map(i=>({fecha:hoyD(),descripcion:`[OT] Mano de obra — ${i.desc}`,valor:i.valor}))
+  ];
+  if(itemsCC.length===0)itemsCC.push({fecha:hoyD(),descripcion:`[OT#${o.id}] ${(o.servicios||['General']).join(', ')}`,valor:totalCobrado});
+  setSyncStatus('syncing');
+  if(cc){
+    const nuevosItems=[...(cc.items||[]).filter(i=>!i.descripcion?.includes(`[OT#${o.id}]`)&&!i.descripcion?.startsWith('[OT]')),...itemsCC];
+    await db.from('cc_taller').update({items:nuevosItems}).eq('id',cc.id);
+    cc.items=nuevosItems;
+  } else {
+    await db.from('cc_taller').insert({cliente_id:o.cliente_id,cliente_texto:o.cliente,items:itemsCC,pagos:[],estado:'abierta'});
+    await loadCCT();
+  }
+  setSyncStatus('ok');
+  alert('CC creada/actualizada correctamente');
+}
 async function guardarOT(){
   const esNuevo=document.getElementById('ot-tab-nuevo').classList.contains('active');
   let clienteId=null,nombreCliente='',vehiculoCliente='',telefonoCliente='';
@@ -2420,6 +2446,9 @@ function verDetalleOT(id){
   OTD_MO=(o.mano_obra_items||[]).map(i=>({desc:i.desc,valor:i.valor}));
   OTD_PROV=(o.costo_proveedor_items||[]).map(i=>({desc:i.desc,valor:i.valor,provId:i.provId||'',provNombre:i.provNombre||''}));
   document.getElementById('otd-titulo').textContent=`Editar orden #${o.id}`;
+  // mostrar botón crear CC si no está pagada
+  const btnCC=document.getElementById('btn-crear-cc');
+  if(btnCC)btnCC.style.display=(!o.pagado&&o.cliente_id)?'inline-flex':'none';
   const esAdmin=SESSION.rol==='admin';
   const svcsActuales=o.servicios||[];
   const provOpts='<option value="">Sin proveedor</option>'+C.prov.map(p=>`<option value="${p.id}">${p.nombre}</option>`).join('');
@@ -2500,7 +2529,7 @@ function verDetalleOT(id){
       </div>
     </div>`:''}
     <div class="fr"><label>Descripción / notas</label><textarea id="otd-desc">${o.descripcion||''}</textarea></div>
-    <div class="ma"><button class="btn" onclick="descargarPDFOT()"><i class="ti ti-file-type-pdf"></i> PDF cliente</button><button class="btn" onclick="closeM('m-ot-detalle')">Cancelar</button><button class="btn btn-p" onclick="guardarEdicionOT()">Guardar cambios</button></div>
+    <div class="ma"><button class="btn" onclick="descargarPDFOT()"><i class="ti ti-file-type-pdf"></i> PDF cliente</button><button class="btn btn-wa" id="btn-crear-cc" onclick="crearCCdesdeOT(parseInt(document.getElementById('otd-id').value))" style="display:none"><i class="ti ti-credit-card"></i> Crear CC</button><button class="btn" onclick="closeM('m-ot-detalle')">Cancelar</button><button class="btn btn-p" onclick="guardarEdicionOT()">Guardar cambios</button></div>
   `;
   openM('m-ot-detalle');
   if(esAdmin){

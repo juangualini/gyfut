@@ -2359,7 +2359,7 @@ async function guardarOT(){
   const mo=OT_MO.reduce((a,i)=>a+(i.valor||0),0);
   const pr=getMaskValue('ot-pr');
   setSyncStatus('syncing');
-  const totalCobrado=ins+mo;
+  const totalCobrado=ins+mo>0?ins+mo:(parseFloat(pr)||0);
   const totalProv=OT_PROV.reduce((a,i)=>a+(i.valor||0),0);
   const pagado=document.getElementById('ot-pagado').value==='true';
   const cajaPago=parseInt(document.getElementById('ot-pago-caja')?.value||'1');
@@ -2409,7 +2409,7 @@ async function guardarOT(){
       ...OT_MO.map(i=>({fecha:hoyD(),descripcion:`[OT] Mano de obra — ${i.desc}`,valor:i.valor}))
     ];
     if(itemsCC.length===0)itemsCC.push({fecha:hoyD(),descripcion:`Trabajo — ${(svcs.length?svcs:['General']).join(', ')}`,valor:totalCobrado});
-    console.log('Creando CC para cliente:', clienteId, nombreCliente, 'items:', itemsCC.length, 'CC existente:', cc?.id||'ninguna');
+    console.log('=== CC DEBUG ===', {clienteId, totalCobrado, OT_INS_len:OT_INS.length, OT_MO_len:OT_MO.length, itemsCC_len:itemsCC.length, cc_id:cc?.id||'nueva'});
     if(cc){
       const nuevosItems=[...(cc.items||[]),...itemsCC];
       const{error}=await db.from('cc_taller').update({items:nuevosItems,estado:'abierta'}).eq('id',cc.id);

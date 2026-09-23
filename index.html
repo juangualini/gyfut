@@ -2653,18 +2653,23 @@ async function guardarEdicionOT(){
       }
     }
   }
-  // Actualizar CC del cliente si existe
+  // Actualizar o crear CC del cliente
   const otActual=C.ots.find(x=>x.id===id);
-  if(otActual?.cliente_id){
+  const pagadoActual=document.getElementById('otd-pagado')?.value==='true';
+  if(otActual?.cliente_id&&!pagadoActual){
     await loadCCT();
     const nombreCliente2=document.getElementById('otd-cliente').value;
     const cc=C.cct.find(x=>(x.cliente_id===otActual.cliente_id||x.cliente_texto===nombreCliente2)&&x.estado==='abierta');
+    const totalCobrado=ins+mo;
+    const itemsNuevos=[];
+    OTD_INS.forEach(i=>itemsNuevos.push({fecha:hoyD(),descripcion:`[OT] Insumos — ${i.desc}`,valor:i.valor}));
+    OTD_MO.forEach(i=>itemsNuevos.push({fecha:hoyD(),descripcion:`[OT] Mano de obra — ${i.desc}`,valor:i.valor}));
+    if(itemsNuevos.length===0&&totalCobrado>0)itemsNuevos.push({fecha:hoyD(),descripcion:`[OT#${id}] ${(svcs.length?svcs:['General']).join(', ')}`,valor:totalCobrado});
     if(cc){
-      const itemsSinEstaOT=(cc.items||[]).filter(i=>!i.descripcion?.startsWith('[OT]'));
-      const nuevosItems=[...itemsSinEstaOT];
-      OTD_INS.forEach(i=>nuevosItems.push({fecha:hoyD(),descripcion:`[OT] Insumos — ${i.desc}`,valor:i.valor}));
-      OTD_MO.forEach(i=>nuevosItems.push({fecha:hoyD(),descripcion:`[OT] Mano de obra — ${i.desc}`,valor:i.valor}));
-      await db.from('cc_taller').update({items:nuevosItems}).eq('id',cc.id);
+      const itemsSinEstaOT=(cc.items||[]).filter(i=>!i.descripcion?.startsWith('[OT]')&&!i.descripcion?.includes(`[OT#${id}]`));
+      await db.from('cc_taller').update({items:[...itemsSinEstaOT,...itemsNuevos]}).eq('id',cc.id);
+    } else if(itemsNuevos.length>0){
+      await db.from('cc_taller').insert({cliente_id:otActual.cliente_id,cliente_texto:nombreCliente2,items:itemsNuevos,pagos:[],estado:'abierta'});
     }
   }
   setSyncStatus('ok');closeM('m-ot-detalle');

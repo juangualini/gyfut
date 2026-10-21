@@ -733,7 +733,7 @@ tr:hover td{background:var(--s2)}
     <div class="fg2"><div class="fr"><label>Vehículo</label><input id="ot-nuevo-veh" placeholder="VW Vento 2019"></div><div class="fr"><label>Patente</label><input id="ot-nuevo-pat" placeholder="AB123CD"></div></div>
   </div>
   <hr class="divider">
-  <div class="fg2"><div class="fr"><label>Asignado a</label><select id="ot-resp"><option>Martín</option><option>Theo</option><option>Lucho</option><option>Lucas</option><option>Elías</option><option>Georgi</option><option>Martín + Theo</option><option>Todos</option></select></div><div class="fr"><label>Estado</label><select id="ot-est"><option>Ingresado</option><option>En proceso</option><option>Listo</option><option>Entregado</option></select></div></div>
+  <div class="fg2"><div class="fr"><label>Asignado a</label><select id="ot-resp"><option>Martín</option><option>Nazareno</option><option>Gonzalo</option><option>Lucho</option><option>Lucas</option><option>Elías</option><option>Georgi</option><option>Todos</option></select></div><div class="fr"><label>Estado</label><select id="ot-est"><option>Ingresado</option><option>En proceso</option><option>Listo</option><option>Entregado</option></select></div></div>
   <div class="fg2"><div class="fr"><label>Fecha de ingreso</label><input id="ot-fing" type="date"></div><div class="fr"><label>Fecha de entrega</label><input id="ot-fent" type="date"></div></div>
   <div class="sub-label">Servicios</div>
   <div class="chk-group"><label class="chk-label"><input type="checkbox" id="os-mec"> Mecánica</label><label class="chk-label"><input type="checkbox" id="os-det"> Detailing</label><label class="chk-label"><input type="checkbox" id="os-ppf"> PPF</label><label class="chk-label"><input type="checkbox" id="os-lav"> Lavado</label><label class="chk-label"><input type="checkbox" id="os-otro"> Otro</label></div>
@@ -746,7 +746,7 @@ tr:hover td{background:var(--s2)}
   <div id="ot-ins-lista" style="margin-bottom:8px"></div>
   <div class="fg3" style="margin-bottom:6px">
     <div class="fr" style="margin-bottom:0"><input id="ot-ins-desc" placeholder="Ej: cubiertas"></div>
-    <div class="fr" style="margin-bottom:0"><input id="ot-ins-val" type="text" inputmode="numeric" placeholder="Valor $"></div>
+    <div class="fr" style="margin-bottom:0"><div style="display:flex;gap:4px"><input style="min-width:0;flex:1" id="ot-ins-val" type="text" inputmode="numeric" placeholder="Valor $"><select id="ot-ins-mon" style="width:64px;padding:0 4px"><option value="ARS">$</option><option value="USD">US$</option></select></div></div>
     <button class="btn" onclick="agregarItemOT('ins')" style="height:34px"><i class="ti ti-plus"></i> Agregar</button>
   </div>
   <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);margin-bottom:10px">
@@ -757,7 +757,7 @@ tr:hover td{background:var(--s2)}
   <div id="ot-mo-lista" style="margin-bottom:8px"></div>
   <div class="fg3" style="margin-bottom:6px">
     <div class="fr" style="margin-bottom:0"><input id="ot-mo-desc" placeholder="Ej: alineación"></div>
-    <div class="fr" style="margin-bottom:0"><input id="ot-mo-val" type="text" inputmode="numeric" placeholder="Valor $"></div>
+    <div class="fr" style="margin-bottom:0"><div style="display:flex;gap:4px"><input style="min-width:0;flex:1" id="ot-mo-val" type="text" inputmode="numeric" placeholder="Valor $"><select id="ot-mo-mon" style="width:64px;padding:0 4px"><option value="ARS">$</option><option value="USD">US$</option></select></div></div>
     <button class="btn" onclick="agregarItemOT('mo')" style="height:34px"><i class="ti ti-plus"></i> Agregar</button>
   </div>
   <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);margin-bottom:10px">
@@ -777,7 +777,7 @@ tr:hover td{background:var(--s2)}
   <div id="ot-prov-lista" style="margin-bottom:8px"></div>
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;margin-bottom:6px;align-items:end">
     <div class="fr" style="margin-bottom:0"><input id="ot-prov-desc" placeholder="Ej: cubiertas costo"></div>
-    <div class="fr" style="margin-bottom:0"><input id="ot-prov-val" type="text" inputmode="numeric" placeholder="Costo $"></div>
+    <div class="fr" style="margin-bottom:0"><div style="display:flex;gap:4px"><input style="min-width:0;flex:1" id="ot-prov-val" type="text" inputmode="numeric" placeholder="Costo $"><select id="ot-prov-mon" style="width:64px;padding:0 4px"><option value="ARS">$</option><option value="USD">US$</option></select></div></div>
     <div class="fr" style="margin-bottom:0"><select id="ot-prov-sel" style="width:100%;padding:8px 10px;border-radius:var(--r);border:1px solid var(--bd2);background:var(--s2);color:var(--tx);font-size:11px"><option value="">Sin proveedor</option></select></div>
     <button class="btn" onclick="agregarItemProvOT()" style="height:34px"><i class="ti ti-plus"></i></button>
   </div>
@@ -890,7 +890,7 @@ tr:hover td{background:var(--s2)}
   <div class="fr"><label>Asignado a</label>
     <select id="lav-asignado">
       <option value="">Sin asignar</option>
-      <option>Martín</option><option>Theo</option><option>Lucho</option>
+      <option>Martín</option><option>Nazareno</option><option>Gonzalo</option><option>Lucho</option>
       <option>Lucas</option><option>Elías</option><option>Georgi</option>
     </select>
   </div>
@@ -930,12 +930,12 @@ tr:hover td{background:var(--s2)}
       <select id="su-persona">
         <option value="">— elegir persona —</option>
         <option>Martín</option>
-        <option>Theo</option>
+        <option>Nazareno</option>
+        <option>Gonzalo</option>
         <option>Lucho</option>
         <option>Lucas</option>
         <option>Elías</option>
         <option>Georgi</option>
-        <option>Jorge</option>
         <option>Juan</option>
         <option>Otro</option>
       </select>
@@ -1195,6 +1195,9 @@ const MESES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','
 let SESSION=null;
 let C={leadsA:[],leadsT:[],clt:[],veh:[],ots:[],cajav:[],cajat:[],cf:[],cfPagos:[],ventas:[],recs:[],gestoria:[],cct:[],ccv:[],prov:[],saldosIniciales:[],lavados:[],lavFecha:new Date().toISOString().split('T')[0],activeId:null,activeType:null,recFiltro:'todos',diaActual:new Date().toISOString().split('T')[0],mesActual:{y:new Date().getFullYear(),m:new Date().getMonth()},diaVActual:new Date().toISOString().split('T')[0],mesVActual:{y:new Date().getFullYear(),m:new Date().getMonth()},cajaVistaActual:'dia',cajaVVistaActual:'dia'};
 
+const fmtM=(n,m)=>m==='USD'?'US'+fmt(n):fmt(n);
+const sumM=(arr,m)=>(arr||[]).filter(i=>(i.moneda||'ARS')===m).reduce((a,i)=>a+(Number(i.valor)||0),0);
+const totTxt=arr=>{const a=sumM(arr,'ARS'),u=sumM(arr,'USD');return u>0?(a>0?fmt(a)+' + US'+fmt(u):'US'+fmt(u)):fmt(a)};
 const fmt=n=>{const num=Math.round(Number(n||0));return'$'+num.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.')};
 const hoy=()=>new Date().toLocaleDateString('es-AR');
 
@@ -2118,11 +2121,10 @@ let OT_INS=[],OT_MO=[],OT_PROV=[];
 function renderItemsOT(tipo,containerId,totalId){
   const items=tipo==='ins'?OT_INS:OT_MO;
   const cont=document.getElementById(containerId);if(!cont)return;
-  const total=items.reduce((a,i)=>a+(i.valor||0),0);
-  const tel=document.getElementById(totalId);if(tel)tel.textContent=fmt(total);
+  const tel=document.getElementById(totalId);if(tel)tel.textContent=totTxt(items);
   if(!items.length){cont.innerHTML='';actualizarTotalesOT();return;}
   cont.innerHTML=`<div class="tw" style="margin-bottom:6px"><table><thead><tr><th>Descripción</th><th>Valor</th><th></th></tr></thead><tbody>${
-    items.map((it,idx)=>`<tr><td style="font-size:11px">${it.desc}</td><td class="ing" style="font-size:11px">${fmt(it.valor)}</td><td><button class="icon-btn" onclick="elimItemOT('${tipo}',${idx})"><i class="ti ti-trash"></i></button></td></tr>`).join('')
+    items.map((it,idx)=>`<tr><td style="font-size:11px">${it.desc}</td><td class="ing" style="font-size:11px">${fmtM(it.valor,it.moneda)}</td><td><button class="icon-btn" onclick="elimItemOT('${tipo}',${idx})"><i class="ti ti-trash"></i></button></td></tr>`).join('')
   }</tbody></table></div>`;
   actualizarTotalesOT();
 }
@@ -2133,7 +2135,8 @@ function agregarItemOT(tipo){
   const rawVal=document.getElementById(valId).value.replace(/\./g,'').replace(/[^\d]/g,'');
   const valor=parseFloat(rawVal)||0;
   if(!desc||!valor)return alert('Completá descripción y valor');
-  if(tipo==='ins')OT_INS.push({desc,valor});else OT_MO.push({desc,valor});
+  const moneda=document.getElementById(valId.replace('-val','-mon'))?.value||'ARS';
+  if(tipo==='ins')OT_INS.push({desc,valor,moneda});else OT_MO.push({desc,valor,moneda});
   document.getElementById(descId).value='';document.getElementById(valId).value='';
   renderItemsOT(tipo,tipo==='ins'?'ot-ins-lista':'ot-mo-lista',tipo==='ins'?'ot-ins-total':'ot-mo-total');
 }
@@ -2143,21 +2146,21 @@ function elimItemOT(tipo,idx){
   actualizarTotalesOT();
 }
 function actualizarTotalesOT(){
-  const totalIns=OT_INS.reduce((a,i)=>a+(i.valor||0),0);
-  const totalMo=OT_MO.reduce((a,i)=>a+(i.valor||0),0);
-  const totalProv=OT_PROV.reduce((a,i)=>a+(i.valor||0),0);
-  const totalCobrado=totalIns+totalMo;
-  const neto=totalCobrado-totalProv;
+  const cob=[...OT_INS,...OT_MO];
+  const netoA=sumM(cob,'ARS')-sumM(OT_PROV,'ARS'),netoU=sumM(cob,'USD')-sumM(OT_PROV,'USD');
+  const neto=netoA;
+  const netoTxt=netoU!==0?(netoA!==0?fmt(netoA)+' + ':'')+'US'+fmt(netoU):fmt(netoA);
+  const totalCobradoTxt=totTxt(cob),totalProvTxt=totTxt(OT_PROV);
   const set=(id,v,col)=>{const el=document.getElementById(id);if(el){el.textContent=v;if(col)el.style.color=col;}};
-  set('ot-total-cobrado',fmt(totalCobrado));
-  set('ot-prov-total',fmt(totalProv));
-  set('ot-neto',fmt(neto),neto>=0?'var(--ac)':'var(--er)');
+  set('ot-total-cobrado',totalCobradoTxt);
+  set('ot-prov-total',totalProvTxt);
+  set('ot-neto',netoTxt,(netoA>=0&&netoU>=0)?'var(--ac)':'var(--er)');
 }
 function renderItemsProvOT(){
   const cont=document.getElementById('ot-prov-lista');if(!cont)return;
   if(!OT_PROV.length){cont.innerHTML='';actualizarTotalesOT();return;}
   cont.innerHTML=`<div class="tw" style="margin-bottom:6px"><table><thead><tr><th>Descripción</th><th>Proveedor</th><th>Costo</th><th></th></tr></thead><tbody>${
-    OT_PROV.map((it,idx)=>`<tr><td style="font-size:11px">${it.desc}</td><td style="font-size:10px;color:var(--tx3)">${it.provNombre||'—'}</td><td class="eg" style="font-size:11px">${fmt(it.valor)}</td><td><button class="icon-btn" onclick="elimItemProvOT(${idx})"><i class="ti ti-trash"></i></button></td></tr>`).join('')
+    OT_PROV.map((it,idx)=>`<tr><td style="font-size:11px">${it.desc}</td><td style="font-size:10px;color:var(--tx3)">${it.provNombre||'—'}</td><td class="eg" style="font-size:11px">${fmtM(it.valor,it.moneda)}</td><td><button class="icon-btn" onclick="elimItemProvOT(${idx})"><i class="ti ti-trash"></i></button></td></tr>`).join('')
   }</tbody></table></div>`;
   actualizarTotalesOT();
 }
@@ -2169,7 +2172,7 @@ function agregarItemProvOT(){
   const provId=sel?.value||'';
   const provNombre=sel?.options[sel.selectedIndex]?.text||'';
   if(!desc||!valor)return alert('Completá descripción y costo');
-  OT_PROV.push({desc,valor,provId,provNombre});
+  OT_PROV.push({desc,valor,provId,provNombre,moneda:document.getElementById('ot-prov-mon')?.value||'ARS'});
   document.getElementById('ot-prov-desc').value='';document.getElementById('ot-prov-val').value='';
   renderItemsProvOT();
 }
@@ -2188,7 +2191,7 @@ function renderItemsProvOTEdit(){
   actualizarTotalesOTEdit();
   if(!OTD_PROV.length){cont.innerHTML='';return;}
   cont.innerHTML=`<div class="tw" style="margin-bottom:6px"><table><thead><tr><th>Descripción</th><th>Proveedor</th><th>Costo</th><th></th></tr></thead><tbody>${
-    OTD_PROV.map((it,idx)=>`<tr><td style="font-size:11px">${it.desc}</td><td style="font-size:10px;color:var(--tx3)">${it.provNombre||'—'}</td><td class="eg" style="font-size:11px">${fmt(it.valor)}</td><td><button class="icon-btn" onclick="elimItemProvOTEdit(${idx})"><i class="ti ti-trash"></i></button></td></tr>`).join('')
+    OTD_PROV.map((it,idx)=>`<tr><td style="font-size:11px">${it.desc}</td><td style="font-size:10px;color:var(--tx3)">${it.provNombre||'—'}</td><td class="eg" style="font-size:11px">${fmtM(it.valor,it.moneda)}</td><td><button class="icon-btn" onclick="elimItemProvOTEdit(${idx})"><i class="ti ti-trash"></i></button></td></tr>`).join('')
   }</tbody></table></div>`;
 }
 function agregarItemProvOTEdit(){
@@ -2199,20 +2202,20 @@ function agregarItemProvOTEdit(){
   const provId=sel?.value||'';
   const provNombre=sel?.options[sel.selectedIndex]?.text||'';
   if(!desc||!valor)return alert('Completá descripción y costo');
-  OTD_PROV.push({desc,valor,provId,provNombre});
+  OTD_PROV.push({desc,valor,provId,provNombre,moneda:document.getElementById('otd-prov-mon')?.value||'ARS'});
   document.getElementById('otd-prov-desc').value='';document.getElementById('otd-prov-val').value='';
   renderItemsProvOTEdit();
 }
 function elimItemProvOTEdit(idx){OTD_PROV.splice(idx,1);renderItemsProvOTEdit();}
 function actualizarTotalesOTEdit(){
-  const totalIns=OTD_INS.reduce((a,i)=>a+(i.valor||0),0);
-  const totalMo=OTD_MO.reduce((a,i)=>a+(i.valor||0),0);
-  const totalProv=OTD_PROV.reduce((a,i)=>a+(i.valor||0),0);
-  const totalCobrado=totalIns+totalMo;
-  const neto=totalCobrado-totalProv;
+  const cob=[...OTD_INS,...OTD_MO];
+  const netoA=sumM(cob,'ARS')-sumM(OTD_PROV,'ARS'),netoU=sumM(cob,'USD')-sumM(OTD_PROV,'USD');
+  const neto=netoA;
+  const netoTxt=netoU!==0?(netoA!==0?fmt(netoA)+' + ':'')+'US'+fmt(netoU):fmt(netoA);
+  const totalCobradoTxt=totTxt(cob),totalProvTxt=totTxt(OTD_PROV);
   const set=(id,v,col)=>{const el=document.getElementById(id);if(el){el.textContent=v;if(col)el.style.color=col;}};
-  set('otd-total-cobrado',fmt(totalCobrado));
-  set('otd-neto',fmt(neto),neto>=0?'var(--ac)':'var(--er)');
+  set('otd-total-cobrado',totalCobradoTxt);
+  set('otd-neto',netoTxt,(netoA>=0&&netoU>=0)?'var(--ac)':'var(--er)');
 }
 function toggleCajaPagoEdit(){
   const pago=document.getElementById('otd-pagado')?.value==='true';
@@ -2224,11 +2227,10 @@ function renderItemsOTD(tipo){
   const containerId=tipo==='ins'?'otd-ins-lista':'otd-mo-lista';
   const totalId=tipo==='ins'?'otd-ins-total':'otd-mo-total';
   const cont=document.getElementById(containerId);if(!cont)return;
-  const total=items.reduce((a,i)=>a+(i.valor||0),0);
-  const tel=document.getElementById(totalId);if(tel)tel.textContent=fmt(total);
+  const tel=document.getElementById(totalId);if(tel)tel.textContent=totTxt(items);
   if(!items.length){cont.innerHTML='';actualizarTotalesOTEdit();return;}
   cont.innerHTML=`<div class="tw" style="margin-bottom:6px"><table><thead><tr><th>Descripción</th><th>Valor</th><th></th></tr></thead><tbody>${
-    items.map((it,idx)=>`<tr><td style="font-size:11px">${it.desc}</td><td class="ing" style="font-size:11px">${fmt(it.valor)}</td><td><button class="icon-btn" onclick="elimItemOTEdit('${tipo}',${idx})"><i class="ti ti-trash"></i></button></td></tr>`).join('')
+    items.map((it,idx)=>`<tr><td style="font-size:11px">${it.desc}</td><td class="ing" style="font-size:11px">${fmtM(it.valor,it.moneda)}</td><td><button class="icon-btn" onclick="elimItemOTEdit('${tipo}',${idx})"><i class="ti ti-trash"></i></button></td></tr>`).join('')
   }</tbody></table></div>`;
   actualizarTotalesOTEdit();
 }
@@ -2239,7 +2241,8 @@ function agregarItemOTEdit(tipo){
   const rawVal=document.getElementById(valId).value.replace(/\./g,'').replace(/[^\d]/g,'');
   const valor=parseFloat(rawVal)||0;
   if(!desc||!valor)return alert('Completá descripción y valor');
-  if(tipo==='ins')OTD_INS.push({desc,valor});else OTD_MO.push({desc,valor});
+  const moneda=document.getElementById(valId.replace('-val','-mon'))?.value||'ARS';
+  if(tipo==='ins')OTD_INS.push({desc,valor,moneda});else OTD_MO.push({desc,valor,moneda});
   document.getElementById(descId).value='';document.getElementById(valId).value='';
   renderItemsOTD(tipo);
 }
@@ -2305,11 +2308,11 @@ async function crearCCdesdeOT(otId){
   const cc=C.cct.find(x=>x.cliente_id===o.cliente_id&&x.estado==='abierta');
   const ins=o.insumos_items||[];
   const mo=o.mano_obra_items||[];
-  const totalCobrado=o.precio_cobrado||(ins.reduce((a,i)=>a+(i.valor||0),0)+mo.reduce((a,i)=>a+(i.valor||0),0));
+  const totalCobrado=o.precio_cobrado||(sumM(ins,'ARS')+sumM(mo,'ARS')+sumM(ins,'USD')+sumM(mo,'USD'));
   if(!totalCobrado)return alert('La OT no tiene monto cobrado');
   const itemsCC=[
-    ...ins.map(i=>({fecha:hoyD(),descripcion:`[OT] Insumos — ${i.desc}`,valor:i.valor})),
-    ...mo.map(i=>({fecha:hoyD(),descripcion:`[OT] Mano de obra — ${i.desc}`,valor:i.valor}))
+    ...ins.map(i=>({fecha:hoyD(),descripcion:`[OT] Insumos — ${i.desc}`,valor:i.valor,moneda:i.moneda||'ARS'})),
+    ...mo.map(i=>({fecha:hoyD(),descripcion:`[OT] Mano de obra — ${i.desc}`,valor:i.valor,moneda:i.moneda||'ARS'}))
   ];
   if(itemsCC.length===0)itemsCC.push({fecha:hoyD(),descripcion:`[OT#${o.id}] ${(o.servicios||['General']).join(', ')}`,valor:totalCobrado});
   setSyncStatus('syncing');
@@ -2355,8 +2358,9 @@ async function guardarOT(){
     if(!leadExisteExt&&nombreCliente)await db.from('leads_taller').insert({nombre:nombreCliente,telefono:c?.telefono||'',origen:'Visita directa',estado:'Trabajo en proceso',servicio:svcsGet('os-')[0]||'Otro',vehiculo_cliente:vehiculoCliente,seguimiento:[{fecha:hoy(),txt:'Lead creado automáticamente desde orden de trabajo.'}]});
   }
   const svcs=svcsGet('os-');
-  const ins=OT_INS.reduce((a,i)=>a+(i.valor||0),0);
-  const mo=OT_MO.reduce((a,i)=>a+(i.valor||0),0);
+  const ins=sumM(OT_INS,'ARS');
+  const mo=sumM(OT_MO,'ARS');
+  const usdTot=sumM(OT_INS,'USD')+sumM(OT_MO,'USD');
   const pr=getMaskValue('ot-pr');
   setSyncStatus('syncing');
   const totalCobrado=ins+mo>0?ins+mo:(parseFloat(pr)||0);
@@ -2401,17 +2405,19 @@ async function guardarOT(){
     }
   }
   // Si NO pagó → crear o actualizar CC taller del cliente con la deuda
-  if(!pagado&&totalCobrado>0&&clienteId){
+  if(!pagado&&(totalCobrado>0||usdTot>0)&&clienteId){
     await loadCCT();
     let cc=C.cct.find(x=>x.cliente_id===clienteId&&x.estado==='abierta');
     const itemsCC=[
-      ...OT_INS.map(i=>({fecha:hoyD(),descripcion:`[OT] Insumos — ${i.desc}`,valor:i.valor})),
-      ...OT_MO.map(i=>({fecha:hoyD(),descripcion:`[OT] Mano de obra — ${i.desc}`,valor:i.valor}))
+      ...OT_INS.map(i=>({fecha:hoyD(),descripcion:`[OT] Insumos — ${i.desc}`,valor:i.valor,moneda:i.moneda||'ARS'})),
+      ...OT_MO.map(i=>({fecha:hoyD(),descripcion:`[OT] Mano de obra — ${i.desc}`,valor:i.valor,moneda:i.moneda||'ARS'}))
     ];
     if(itemsCC.length===0)itemsCC.push({fecha:hoyD(),descripcion:`Trabajo — ${(svcs.length?svcs:['General']).join(', ')}`,valor:totalCobrado});
     console.log('=== CC DEBUG ===', {clienteId, totalCobrado, OT_INS_len:OT_INS.length, OT_MO_len:OT_MO.length, itemsCC_len:itemsCC.length, cc_id:cc?.id||'nueva'});
     if(cc){
-      const nuevosItems=[...(cc.items||[]),...itemsCC];
+      // agregar ítems sin duplicar los de esta misma OT
+      const itemsExistentes=(cc.items||[]).filter(i=>!i.descripcion?.includes(`[OT#`)&&!i.descripcion?.startsWith('[OT]')||!itemsCC.some(n=>n.descripcion===i.descripcion));
+      const nuevosItems=[...itemsExistentes,...itemsCC];
       const{error}=await db.from('cc_taller').update({items:nuevosItems,estado:'abierta'}).eq('id',cc.id);
       if(error)console.error('Error actualizando CC taller:',error);
     } else {
@@ -2442,9 +2448,9 @@ async function guardarOT(){
 function verDetalleOT(id){
   const o=C.ots.find(x=>x.id===id);if(!o)return;
   const c=o.cliente_id?C.clt.find(x=>x.id===o.cliente_id):null;
-  OTD_INS=(o.insumos_items||[]).map(i=>({desc:i.desc,valor:i.valor}));
-  OTD_MO=(o.mano_obra_items||[]).map(i=>({desc:i.desc,valor:i.valor}));
-  OTD_PROV=(o.costo_proveedor_items||[]).map(i=>({desc:i.desc,valor:i.valor,provId:i.provId||'',provNombre:i.provNombre||''}));
+  OTD_INS=(o.insumos_items||[]).map(i=>({desc:i.desc,valor:i.valor,moneda:i.moneda||'ARS'}));
+  OTD_MO=(o.mano_obra_items||[]).map(i=>({desc:i.desc,valor:i.valor,moneda:i.moneda||'ARS'}));
+  OTD_PROV=(o.costo_proveedor_items||[]).map(i=>({desc:i.desc,valor:i.valor,provId:i.provId||'',provNombre:i.provNombre||'',moneda:i.moneda||'ARS'}));
   document.getElementById('otd-titulo').textContent=`Editar orden #${o.id}`;
 
   const esAdmin=SESSION.rol==='admin';
@@ -2455,7 +2461,7 @@ function verDetalleOT(id){
     <div class="fr"><label>Cliente</label><input id="otd-cliente" value="${(o.cliente||'').replace(/"/g,'&quot;')}"></div>
     ${esAdmin?`<div class="fg2"><div class="fr"><label>Teléfono</label><input id="otd-tel" value="${c?.telefono||''}"></div><div class="fr"><label>Patente</label><input id="otd-pat" value="${c?.patente||''}"></div></div>`:''}
     <div class="fg2">
-      <div class="fr"><label>Asignado a</label><select id="otd-resp"><option ${o.responsable==='Martín'?'selected':''}>Martín</option><option ${o.responsable==='Theo'?'selected':''}>Theo</option><option ${o.responsable==='Lucho'?'selected':''}>Lucho</option><option ${o.responsable==='Lucas'?'selected':''}>Lucas</option><option ${o.responsable==='Elías'?'selected':''}>Elías</option><option ${o.responsable==='Georgi'?'selected':''}>Georgi</option><option ${o.responsable==='Martín + Theo'?'selected':''}>Martín + Theo</option><option ${o.responsable==='Todos'?'selected':''}>Todos</option></select></div>
+      <div class="fr"><label>Asignado a</label><select id="otd-resp"><option ${o.responsable==='Martín'?'selected':''}>Martín</option><option ${o.responsable==='Nazareno'?'selected':''}>Nazareno</option><option ${o.responsable==='Gonzalo'?'selected':''}>Gonzalo</option><option ${o.responsable==='Lucho'?'selected':''}>Lucho</option><option ${o.responsable==='Lucas'?'selected':''}>Lucas</option><option ${o.responsable==='Elías'?'selected':''}>Elías</option><option ${o.responsable==='Georgi'?'selected':''}>Georgi</option><option ${o.responsable==='Todos'?'selected':''}>Todos</option></select></div>
       <div class="fr"><label>Estado</label><select id="otd-estado"><option ${o.estado==='Ingresado'?'selected':''}>Ingresado</option><option ${o.estado==='En proceso'?'selected':''}>En proceso</option><option ${o.estado==='Listo'?'selected':''}>Listo</option><option ${o.estado==='Entregado'?'selected':''}>Entregado</option></select></div>
     </div>
     <div class="fg2"><div class="fr"><label>Fecha ingreso</label><input id="otd-fing" type="date" value="${o.fecha_ingreso||''}"></div><div class="fr"><label>Fecha entrega</label><input id="otd-fent" type="date" value="${o.fecha_entrega||''}"></div></div>
@@ -2474,7 +2480,7 @@ function verDetalleOT(id){
     <div id="otd-ins-lista" style="margin-bottom:8px"></div>
     <div class="fg3" style="margin-bottom:6px">
       <div class="fr" style="margin-bottom:0"><input id="otd-ins-desc" placeholder="Ej: cubiertas"></div>
-      <div class="fr" style="margin-bottom:0"><input id="otd-ins-val" type="text" inputmode="numeric" placeholder="Valor $"></div>
+      <div class="fr" style="margin-bottom:0"><div style="display:flex;gap:4px"><input style="min-width:0;flex:1" id="otd-ins-val" type="text" inputmode="numeric" placeholder="Valor $"><select id="otd-ins-mon" style="width:64px;padding:0 4px"><option value="ARS">$</option><option value="USD">US$</option></select></div></div>
       <button class="btn" onclick="agregarItemOTEdit('ins')" style="height:34px"><i class="ti ti-plus"></i> Agregar</button>
     </div>
     <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);margin-bottom:10px">
@@ -2484,7 +2490,7 @@ function verDetalleOT(id){
     <div id="otd-mo-lista" style="margin-bottom:8px"></div>
     <div class="fg3" style="margin-bottom:6px">
       <div class="fr" style="margin-bottom:0"><input id="otd-mo-desc" placeholder="Ej: alineación"></div>
-      <div class="fr" style="margin-bottom:0"><input id="otd-mo-val" type="text" inputmode="numeric" placeholder="Valor $"></div>
+      <div class="fr" style="margin-bottom:0"><div style="display:flex;gap:4px"><input style="min-width:0;flex:1" id="otd-mo-val" type="text" inputmode="numeric" placeholder="Valor $"><select id="otd-mo-mon" style="width:64px;padding:0 4px"><option value="ARS">$</option><option value="USD">US$</option></select></div></div>
       <button class="btn" onclick="agregarItemOTEdit('mo')" style="height:34px"><i class="ti ti-plus"></i> Agregar</button>
     </div>
     <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);margin-bottom:10px">
@@ -2499,7 +2505,7 @@ function verDetalleOT(id){
     <div id="otd-prov-lista" style="margin-bottom:8px"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;margin-bottom:6px;align-items:end">
       <div class="fr" style="margin-bottom:0"><input id="otd-prov-desc" placeholder="Ej: cubiertas costo"></div>
-      <div class="fr" style="margin-bottom:0"><input id="otd-prov-val" type="text" inputmode="numeric" placeholder="Costo $"></div>
+      <div class="fr" style="margin-bottom:0"><div style="display:flex;gap:4px"><input style="min-width:0;flex:1" id="otd-prov-val" type="text" inputmode="numeric" placeholder="Costo $"><select id="otd-prov-mon" style="width:64px;padding:0 4px"><option value="ARS">$</option><option value="USD">US$</option></select></div></div>
       <div class="fr" style="margin-bottom:0"><select id="otd-prov-sel" style="width:100%;padding:8px 10px;border-radius:var(--r);border:1px solid var(--bd2);background:var(--s2);color:var(--tx);font-size:11px">${provOpts}</select></div>
       <button class="btn" onclick="agregarItemProvOTEdit()" style="height:34px"><i class="ti ti-plus"></i></button>
     </div>
@@ -2540,9 +2546,9 @@ function descargarPDFOT(){
   const o=C.ots.find(x=>x.id===id);if(!o)return;
   const ins=o.insumos_items||[];
   const mo=o.mano_obra_items||[];
-  const totalIns=ins.reduce((a,i)=>a+(i.valor||0),0);
-  const totalMO=mo.reduce((a,i)=>a+(i.valor||0),0);
-  const total=totalIns+totalMO;
+  const totalIns=totTxt(ins);
+  const totalMO=totTxt(mo);
+  const total=totTxt([...ins,...mo]);
   const fecha=new Date().toLocaleDateString('es-AR');
   const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
   <style>
@@ -2584,18 +2590,18 @@ function descargarPDFOT(){
   ${ins.length?`<div class="section">
     <div class="section-title">Insumos</div>
     <table><thead><tr><th>Descripción</th><th style="text-align:right">Valor</th></tr></thead><tbody>
-    ${ins.map(i=>`<tr><td>${i.desc}</td><td class="monto">${fmt(i.valor)}</td></tr>`).join('')}
-    ${ins.length>1?`<tr><td style="font-weight:600;padding-top:12px">Subtotal insumos</td><td class="monto" style="padding-top:12px">${fmt(totalIns)}</td></tr>`:''}
+    ${ins.map(i=>`<tr><td>${i.desc}</td><td class="monto">${fmtM(i.valor,i.moneda)}</td></tr>`).join('')}
+    ${ins.length>1?`<tr><td style="font-weight:600;padding-top:12px">Subtotal insumos</td><td class="monto" style="padding-top:12px">${totalIns}</td></tr>`:''}
     </tbody></table></div>`:''}
   ${mo.length?`<div class="section">
     <div class="section-title">Mano de obra</div>
     <table><thead><tr><th>Descripción</th><th style="text-align:right">Valor</th></tr></thead><tbody>
-    ${mo.map(i=>`<tr><td>${i.desc}</td><td class="monto">${fmt(i.valor)}</td></tr>`).join('')}
-    ${mo.length>1?`<tr><td style="font-weight:600;padding-top:12px">Subtotal mano de obra</td><td class="monto" style="padding-top:12px">${fmt(totalMO)}</td></tr>`:''}
+    ${mo.map(i=>`<tr><td>${i.desc}</td><td class="monto">${fmtM(i.valor,i.moneda)}</td></tr>`).join('')}
+    ${mo.length>1?`<tr><td style="font-weight:600;padding-top:12px">Subtotal mano de obra</td><td class="monto" style="padding-top:12px">${totalMO}</td></tr>`:''}
     </tbody></table></div>`:''}
   <div class="total-box">
     <div class="total-label">Total a pagar</div>
-    <div class="total-valor">${fmt(total)}</div>
+    <div class="total-valor">${total}</div>
   </div>
   <div class="footer">Gyfut • Puerto de Santa Fe, Argentina • @gyfut_</div>
   </body></html>`;
@@ -2613,8 +2619,9 @@ async function guardarEdicionOT(){
   if(document.getElementById('otd-svc-ppf').checked)svcs.push('PPF');
   if(document.getElementById('otd-svc-lav').checked)svcs.push('Lavado');
   if(document.getElementById('otd-svc-otro').checked)svcs.push('Otro');
-  const ins=OTD_INS.reduce((a,i)=>a+(i.valor||0),0);
-  const mo=OTD_MO.reduce((a,i)=>a+(i.valor||0),0);
+  const ins=sumM(OTD_INS,'ARS');
+  const mo=sumM(OTD_MO,'ARS');
+  const usdTot=sumM(OTD_INS,'USD')+sumM(OTD_MO,'USD');
   setSyncStatus('syncing');
   await db.from('ordenes_trabajo').update({
     cliente:document.getElementById('otd-cliente').value,
@@ -2629,7 +2636,7 @@ async function guardarEdicionOT(){
     mano_obra_items:OTD_MO,
     precio_cobrado:ins+mo,
     costo_proveedor_items:OTD_PROV,
-    costo_proveedor_total:OTD_PROV.reduce((a,i)=>a+(i.valor||0),0),
+    costo_proveedor_total:sumM(OTD_PROV,'ARS'),
     pagado:document.getElementById('otd-pagado')?.value==='true',
     pago_caja:parseInt(document.getElementById('otd-pago-caja')?.value||'1'),
     descripcion:document.getElementById('otd-desc').value
@@ -2654,22 +2661,25 @@ async function guardarEdicionOT(){
     }
   }
   // Actualizar o crear CC del cliente
+  await loadOT();
   const otActual=C.ots.find(x=>x.id===id);
   const pagadoActual=document.getElementById('otd-pagado')?.value==='true';
-  if(otActual?.cliente_id&&!pagadoActual){
+  if(otActual&&!pagadoActual&&(otActual.cliente_id||document.getElementById('otd-cliente').value)){
     await loadCCT();
     const nombreCliente2=document.getElementById('otd-cliente').value;
-    const cc=C.cct.find(x=>(x.cliente_id===otActual.cliente_id||x.cliente_texto===nombreCliente2)&&x.estado==='abierta');
+    const clienteIdActual=otActual.cliente_id||null;
+    const cc=C.cct.find(x=>(clienteIdActual&&x.cliente_id===clienteIdActual)||(x.cliente_texto===nombreCliente2&&x.estado==='abierta'));
     const totalCobrado=ins+mo;
     const itemsNuevos=[];
-    OTD_INS.forEach(i=>itemsNuevos.push({fecha:hoyD(),descripcion:`[OT] Insumos — ${i.desc}`,valor:i.valor}));
-    OTD_MO.forEach(i=>itemsNuevos.push({fecha:hoyD(),descripcion:`[OT] Mano de obra — ${i.desc}`,valor:i.valor}));
+    OTD_INS.forEach(i=>itemsNuevos.push({fecha:hoyD(),descripcion:`[OT] Insumos — ${i.desc}`,valor:i.valor,moneda:i.moneda||'ARS'}));
+    OTD_MO.forEach(i=>itemsNuevos.push({fecha:hoyD(),descripcion:`[OT] Mano de obra — ${i.desc}`,valor:i.valor,moneda:i.moneda||'ARS'}));
     if(itemsNuevos.length===0&&totalCobrado>0)itemsNuevos.push({fecha:hoyD(),descripcion:`[OT#${id}] ${(svcs.length?svcs:['General']).join(', ')}`,valor:totalCobrado});
     if(cc){
-      const itemsSinEstaOT=(cc.items||[]).filter(i=>!i.descripcion?.startsWith('[OT]')&&!i.descripcion?.includes(`[OT#${id}]`));
+      // solo reemplazar los ítems de ESTA OT específica, no tocar los demás
+      const itemsSinEstaOT=(cc.items||[]).filter(i=>!i.descripcion?.includes(`[OT#${id}]`)&&!(i.descripcion?.startsWith('[OT]')&&itemsNuevos.some(n=>n.descripcion===i.descripcion)));
       await db.from('cc_taller').update({items:[...itemsSinEstaOT,...itemsNuevos]}).eq('id',cc.id);
     } else if(itemsNuevos.length>0){
-      await db.from('cc_taller').insert({cliente_id:otActual.cliente_id,cliente_texto:nombreCliente2,items:itemsNuevos,pagos:[],estado:'abierta'});
+      await db.from('cc_taller').insert({cliente_id:clienteIdActual,cliente_texto:nombreCliente2,items:itemsNuevos,pagos:[],estado:'abierta'});
     }
   }
   setSyncStatus('ok');closeM('m-ot-detalle');

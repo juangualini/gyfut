@@ -2147,10 +2147,14 @@ async function guardarVeh(){
 }
 function renderInv(){const tb=document.getElementById('tb-inv');const bm={'disponible':['bg','Disponible'],'reservado':['ba','Reservado'],'preparacion':['bb','En preparación'],'vendido':['bgr','Vendido'],'uso_propio':['bb','Uso propio']};tb.innerHTML=C.veh.length?C.veh.map(v=>{const ct=costoTotal(v);const mg=(parseFloat(v.precio_venta)||0)-ct;const[bc,bt]=bm[v.estado]||['bgr',v.estado];return`<tr><td><strong>${v.marca} ${v.modelo}</strong>${v.color?` <span style="font-size:9px;color:var(--tx3)">${v.color}</span>`:''}</td><td>${v.anio||'—'}</td><td>${v.km?Number(v.km).toLocaleString('es-AR')+' km':'—'}</td><td>${fmt(ct)}</td><td>${fmt(v.precio_venta)}</td><td class="${mg>=0?'ing':'eg'}">${fmt(mg)}</td><td><span class="badge bgr" style="font-size:9px">${v.fuente||'—'}</span></td><td>${b(bc,bt)}</td><td style="white-space:nowrap"><button class="icon-btn" onclick="abrirEditVeh(${v.id})"><i class="ti ti-pencil"></i></button><button class="icon-btn" onclick="elimVeh(${v.id})"><i class="ti ti-trash"></i></button></td></tr>`}).join(''):'<tr><td colspan="9"><div class="empty"><i class="ti ti-car"></i>Sin vehículos.</div></td></tr>';}
 async function elimVeh(id){
-  const ventasV=C.ventas.filter(x=>x.vehiculo_id===id);
-  if(!confirm(ventasV.length?'Este vehículo tiene una venta registrada. Se eliminará también la venta. ¿Continuar?':'¿Eliminar vehículo?'))return;
   setSyncStatus('syncing');
-  if(ventasV.length){const r=await db.from('ventas').delete().eq('vehiculo_id',id);if(r.error){setSyncStatus('error');return alert('No se pudo eliminar la venta: '+r.error.message);}}
+  const q=await db.from('ventas').select('id').eq('vehiculo_id',id);
+  const nVentas=(q.data||[]).length;
+  setSyncStatus('ok');
+  if(!confirm(nVentas?'Este vehículo tiene una venta registrada. Se eliminará también la venta. ¿Continuar?':'¿Eliminar vehículo?'))return;
+  setSyncStatus('syncing');
+  if(nVentas){const r=await db.from('ventas').delete().eq('vehiculo_id',id);if(r.error){setSyncStatus('error');return alert('No se pudo eliminar la venta: '+r.error.message);}}
+  await db.from('leads_autos').update({vehiculo_id:null}).eq('vehiculo_id',id);
   const{error}=await db.from('vehiculos').delete().eq('id',id);
   if(error){setSyncStatus('error');return alert('No se pudo eliminar: '+error.message);}
   setSyncStatus('ok');await loadVentas();await loadVeh();renderInv();renderVentas();
